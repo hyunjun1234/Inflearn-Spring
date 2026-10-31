@@ -1,0 +1,201 @@
+# ===============================
+# 1️⃣ Tomcat Server 설정
+# ===============================
+server:
+  port: 80   # 애플리케이션이 실행될 HTTP 포트 (기본 8080 → 80으로 변경)
+
+# ===============================
+# 2️⃣ Logging 설정
+# ===============================
+logging:
+  level:
+    org.springframework.ai.retry: INFO #  OFF 면 LLM 호출 실페 시 console에 Log를 표시 안함
+    root: INFO   # 전체 패키지 기본 로그 레벨 (DEBUG, INFO, WARN, ERROR 가능)
+
+# ===============================
+# 3️⃣ Spring Boot 기본 설정
+# ===============================
+spring:
+
+  # --------------------------------
+  # 3-1️⃣ 외부 환경 변수 파일(.env) 로딩
+  # --------------------------------
+  config:
+    import: optional:file:.env[.properties]
+    # 프로젝트 루트의 .env 파일을 읽어 환경 변수로 사용
+    # optional → 파일이 없어도 에러 발생하지 않음
+
+  # --------------------------------
+  # 3-2️⃣ 애플리케이션 이름 설정
+  # --------------------------------
+  application:
+    name: edu   # Spring Application 이름 (Actuator, 로그 등에서 사용)
+
+  # --------------------------------
+  # 3-3️⃣ Thymeleaf 템플릿 설정
+  # --------------------------------
+  thymeleaf:
+    cache: false
+    # 템플릿 캐시 비활성화 (개발 시 HTML 수정 즉시 반영)
+    prefix: file:src/main/resources/templates/
+    # 템플릿 파일 위치
+    suffix: .html
+    # 템플릿 확장자
+
+  # --------------------------------
+  # 3-4️⃣ 정적 리소스 설정
+  # --------------------------------
+  web:
+    resources:
+      static-locations: file:src/main/resources/static/
+      # CSS, JS, 이미지 등의 정적 파일 경로
+
+  # --------------------------------
+  # 3-5️⃣ 파일 업로드 설정
+  # --------------------------------
+  servlet:
+    multipart:
+      max-request-size: 20MB
+      # 한 번의 요청에서 허용되는 최대 크기
+      enabled: true
+      # 파일 업로드 기능 활성화
+      max-file-size: 20MB
+      # 업로드 가능한 파일 하나의 최대 크기
+
+  # --------------------------------
+  # 3-6️⃣ DevTools 설정 (개발용)
+  # --------------------------------
+  devtools:
+    restart:
+      enabled: true
+      # 코드 변경 시 자동 재시작
+    livereload:
+      enabled: true
+      # 브라우저 자동 새로고침 기능
+
+  # --------------------------------
+  # 3-7️⃣ Redis 설정 Chapter3 ~ Chapter9
+  # --------------------------------
+
+
+  # --------------------------------
+  # 3-8️⃣ Spring AI 설정
+  # --------------------------------
+  ai:
+    # LLM 호출 실패 처리 정책 요약
+    # - retry.max-attempts: 1  → "최초 호출 1회만 수행" (추가 재시도 없음)
+    # - 즉, 실패 시 같은 요청을 2~3번 반복 호출하지 않음
+    # - 이 실패는 CircuitBreaker 통계(실패율/느린호출율)에 누적됨
+    # - 누적 결과가 임계치를 넘으면 CircuitBreaker가 OPEN 되고,
+    #   그 다음 호출부터는 실제 LLM 대신 fallback 경로로 빠르게 전환됨
+    retry:
+      enabled: true
+      max-attempts: 3  # 3으로 변경 시 3번 retry
+    # 🦙 Ollama 설정 (로컬 LLM)
+    ollama:
+      base-url: http://localhost:11434
+      # Ollama 서버 주소
+      chat:
+        options:
+          model: llama3.2
+          # 사용할 로컬 모델 이름
+
+    # 🤖 OpenAI 설정
+    openai:
+      api-key: ${OPEN_AI_KEY}
+      # 환경 변수에서 API Key 주입
+      chat:
+        options:
+          model: gpt-4.1-mini
+          # 사용할 OpenAI 모델
+          temperature: 0.3
+          # 창의성 조절 (0~2, 높을수록 랜덤성 증가)
+          max-tokens: 300
+          # 최대 응답 토큰 수
+
+    # 🌐 Google Gemini 설정
+    google:
+      genai:
+        api-key: ${GEMINI_API_KEY}
+        # Gemini API Key
+        chat:
+          options:
+            model: gemini-2.5-flash-lite
+            # 사용할 Gemini 모델
+            temperature: 0.3
+            maxOutputTokens: 300
+            # 응답 다양성 설정
+
+
+# ===============================
+# 4️⃣ Resilience4j CircuitBreaker 설정
+# ===============================
+resilience4j:
+#  timelimiter:
+#    instances:
+#      ollamaService:
+#        timeout-duration: 10s
+#        cancel-running-future: true
+  circuitbreaker:
+    instances:
+      # ── 서킷 브레이커 상태(CLOSED / OPEN / HALF_OPEN)
+      # CLOSED    정상 구간. 보호 대상(예: LLM 호출)을 실행하고, 성공·실패가 슬라이딩 윈도에 쌓임.
+      #           실패율 등이 임계치를 넘으면 OPEN으로 전환.
+      # OPEN      차단 구간. 보호 대상은 호출하지 않고 바로 거부 → @CircuitBreaker의 fallback이 실행됨.
+      #           장애가 계속 나는 업스트림으로의 요청을 막아 자원·타임아웃 낭비를 줄임.
+      # HALF_OPEN 복구 시험 구간. OPEN에서 wait-duration-in-open-state 만큼 기다린 뒤
+      #           (automatic-transition-from-open-to-half-open-enabled 가 true일 때) 소수의 실제 호출만 다시 허용.
+      #           시험 호출이 성공 위주면 CLOSED로, 또 실패하면 OPEN으로 돌아감.
+      # --------------------------------
+      # 4-1️⃣ Chapter 1-1 Multi LLM CircuitBreaker (간단 COUNT_BASED)
+      # --------------------------------
+      multiLLM:
+        sliding-window-type: COUNT_BASED
+        # 호출 횟수 기반으로 실패율 계산
+        sliding-window-size: 5
+        # 최근 5번 호출만 평가 대상
+        minimum-number-of-calls: 1
+        # 실패율 평가를 1회 호출부터 시작 (기본값은 커서, 그동안은 OPEN으로 안 갈 수 있음)
+        # spring.ai.retry max-attempts: 3 이더라도 CB는 chat() 1번 = 1건으로만 집계됨
+        # → 첫 요청이 재시도 끝까지 실패하면 실패율 100% → 다음 요청부터 OPEN
+        failure-rate-threshold: 50
+        # 실패율이 50% 초과하면 CLOSED → OPEN 전환
+        # 예: 5번 중 3번 실패 → 60% → OPEN
+        # OPEN 동안: 보호 대상 호출 없이 즉시 fallback
+        wait-duration-in-open-state: 30s
+        # OPEN 상태를 최소 이 시간만큼 유지(쿨다운). 지나면 HALF_OPEN으로 전환해 복구 시험 호출 허용
+        # 짧게(10~30s): 실습·빠른 복구 확인 / 길게(60s~): 업스트림·레이트리밋 회복 시간을 줄 때
+        automatic-transition-from-open-to-half-open-enabled: true
+        # true: 쿨다운 후 OPEN → HALF_OPEN(시험) → 성공 시 CLOSED / 실패 시 다시 OPEN
+        # false: 쿨다운이 지나도 OPEN 유지(자동 HALF_OPEN 없음, 수동 reset 등 별도 조치 전까지)
+        permitted-number-of-calls-in-half-open-state: 3
+        # HALF_OPEN에서 실제 보호 호출(LLM)을 통과시키는 시험 횟수 상한(미설정 시 라이브러리 기본 10)
+
+      # --------------------------------
+      # 4-2️⃣ Chapter 1 - 3 Ollama 전용 CircuitBreaker (간단 TIME_BASED)
+      # --------------------------------
+      ollamaService:
+        sliding-window-type: TIME_BASED
+        # 최근 N초 구간 안의 호출만으로 실패율 계산
+        sliding-window-size: 60
+        # 최근 60초 (운영에선 트래픽 스파이크·일시 장애를 부드럽게 보기 좋음)
+        minimum-number-of-calls: 1
+        # multiLLM과 동일: 첫 Llama 호출이 재시도 끝까지 실패하면 실패율 100% → 다음 요청부터 OPEN → GPT fallback
+        # 운영에서는 5~10 등으로 올려 일시 오류에 바로 OPEN 나는 것을 줄임
+        failure-rate-threshold: 50
+        # 구간 내 실패율이 50% 초과하면 CLOSED → OPEN
+        # OPEN 동안: Llama 호출 없이 즉시 GPT fallback
+        wait-duration-in-open-state: 30s
+        # OPEN 쿨다운. 이후 HALF_OPEN에서 Llama를 소수 번만 다시 시험(Ollama 재기동 대기 시간 조절, 필요 시 60s)
+        automatic-transition-from-open-to-half-open-enabled: true
+        # true면 쿨다운 후 HALF_OPEN으로 넘어가 Llama 복구 여부를 시험
+        permitted-number-of-calls-in-half-open-state: 3
+        # HALF_OPEN에서 Llama 실호출 시험 최대 횟수(multiLLM과 동일, 미설정 시 기본 10)
+
+
+
+
+
+
+
+

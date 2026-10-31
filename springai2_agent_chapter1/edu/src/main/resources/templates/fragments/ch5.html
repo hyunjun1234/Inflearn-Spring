@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<th:block>
+
+    <style>
+        .course-main { max-width: 52rem; margin: 0 auto; padding: 0 0.25rem 2.5rem; font-size: 1rem; line-height: 1.65; color: #1e293b; }
+        .course-hero { margin-bottom: 1.25rem; padding-bottom: 1rem; border-bottom: 1px solid #e2e8f0; }
+        .course-hero h1 { font-size: clamp(1.25rem, 2.2vw, 1.65rem); font-weight: 700; letter-spacing: -0.02em; margin: 0; color: #0f172a; line-height: 1.3; }
+        .course-toc { background: linear-gradient(165deg, #f8fafc 0%, #f1f5f9 100%); border: 1px solid #e2e8f0; border-radius: 10px; padding: 1rem 1.25rem 1.1rem; margin-bottom: 1.25rem; }
+        .course-toc-title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b; margin: 0 0 0.6rem; }
+        .course-toc ol { margin: 0; padding-left: 1.2rem; }
+        .course-toc li { margin-bottom: 0.35rem; line-height: 1.45; }
+        .course-toc a { color: #1d4ed8; text-decoration: none; font-size: 0.9rem; font-weight: 700; }
+        .course-toc a:hover { text-decoration: underline; color: #1e40af; }
+        .course-overview { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 1.25rem 1.4rem 1.35rem; margin-bottom: 1.25rem; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06); }
+        .course-content h3 { font-size: 1.12rem; margin: 1.35rem 0 0.85rem; padding-bottom: 0.55rem; border-bottom: 2px solid #93c5fd; color: #0f172a; font-weight: 700; line-height: 1.4; }
+        .course-content hr.course-divider + h3 { margin-top: 0; }
+        .course-content h4 { font-size: 1rem; margin: 1rem 0 0.5rem; color: #334155; font-weight: 600; }
+        .course-divider { border: none; height: 1px; background: linear-gradient(90deg, transparent, #cbd5e1, transparent); margin: 1.5rem 0; }
+        .course-footer-actions { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #e2e8f0; }
+        ul { margin-left: 1.25rem; margin-bottom: 0.75rem; }
+        code { background: #f1f5f9; padding: 0.12em 0.38em; border-radius: 4px; font-size: 0.9em; color: #0f172a; }
+        p { margin-bottom: 0.85rem; }
+        table { font-size: 0.95rem; }
+        .course-overview .meta { color: #475569; font-size: 0.95rem; margin-bottom: 0.75rem; }
+
+        /* Flow diagrams — Chapter 4와 동일 계열 */
+        .course-flow-pipeline {
+            margin: 1rem 0 1.25rem;
+            padding: 1.25rem 1.15rem 1.4rem;
+            border-radius: 14px;
+            background: linear-gradient(165deg, #f8fafc 0%, #eef2ff 40%, #f1f5f9 100%);
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
+        }
+        .course-flow-pipeline .course-flow-caption {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #64748b;
+            margin: 0 0 0.9rem;
+            text-align: center;
+        }
+        .course-flow-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 24rem;
+            margin: 0 auto;
+        }
+        .course-flow-step {
+            width: 100%;
+            border-radius: 11px;
+            padding: 0.65rem 0.9rem;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+        }
+        .course-flow-step .course-flow-kicker {
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #64748b;
+            margin-bottom: 0.2rem;
+        }
+        .course-flow-step .course-flow-title {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0;
+            line-height: 1.35;
+        }
+        .course-flow-step .course-flow-sub {
+            font-size: 0.74rem;
+            color: #64748b;
+            margin: 0.28rem 0 0;
+        }
+        .course-flow-step.course-flow-user {
+            background: linear-gradient(180deg, #f8fafc 0%, #fff 100%);
+            border-color: #cbd5e1;
+        }
+        .course-flow-step.course-flow-llm {
+            background: linear-gradient(135deg, #1e3a5f 0%, #1e293b 100%);
+            border-color: #334155;
+            color: #f8fafc;
+        }
+        .course-flow-step.course-flow-llm .course-flow-kicker { color: rgba(248, 250, 252, 0.75); }
+        .course-flow-step.course-flow-llm .course-flow-title { color: #f8fafc; }
+        .course-flow-step.course-flow-llm .course-flow-sub { color: rgba(248, 250, 252, 0.88); }
+        .course-flow-step.course-flow-tool {
+            border: 2px solid #38bdf8;
+            background: #fff;
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.1);
+        }
+        .course-flow-step.course-flow-tool .course-flow-kicker { color: #0369a1; }
+        .course-flow-step.course-flow-tool .course-flow-title { color: #0c4a6e; }
+        .course-flow-step.course-flow-act {
+            border-style: dashed;
+            border-color: #94a3b8;
+            background: #fffefb;
+        }
+        .course-flow-step.course-flow-act .course-flow-kicker { color: #a16207; }
+        .course-flow-step.course-flow-subagent {
+            border: 2px solid #8b5cf6;
+            background: linear-gradient(180deg, #faf5ff 0%, #fff 100%);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.08);
+        }
+        .course-flow-step.course-flow-subagent .course-flow-kicker { color: #6d28d9; }
+        .course-flow-step.course-flow-subagent .course-flow-title { color: #5b21b6; }
+        .course-flow-step.course-flow-subagent .course-flow-sub { color: #64748b; }
+        .course-flow-step.course-flow-merge {
+            background: linear-gradient(180deg, #fffbeb 0%, #fff 100%);
+            border-color: #fcd34d;
+        }
+        .course-flow-step.course-flow-merge .course-flow-kicker { color: #b45309; }
+        .course-flow-step.course-flow-out {
+            background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%);
+            border: 2px solid #34d399;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.12);
+        }
+        .course-flow-step.course-flow-out .course-flow-kicker { color: #047857; }
+        .course-flow-step.course-flow-out .course-flow-title { color: #065f46; }
+        .course-flow-arrow {
+            padding: 0.28rem 0 0.32rem;
+            color: #94a3b8;
+            font-size: 1rem;
+            line-height: 1;
+        }
+        .course-flow-h {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem 0.35rem;
+            margin: 0.75rem 0 1rem;
+            padding: 0.9rem 1rem;
+            border-radius: 12px;
+            background: linear-gradient(165deg, #f8fafc 0%, #f1f5f9 100%);
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.05);
+        }
+        .course-flow-h .course-flow-chip {
+            padding: 0.38rem 0.7rem;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            color: #0f172a;
+        }
+        .course-flow-h .course-flow-h-arrow { color: #94a3b8; font-size: 0.95rem; font-weight: 600; }
+
+        /* 비교표 — 관점 열 너비를 라벨 길이에 맞춤 */
+        .c5-agent-tool-diff {
+            table-layout: fixed;
+        }
+        .c5-agent-tool-diff col.c5-col-perspective { width: 12rem; }
+        .c5-agent-tool-diff th:first-child,
+        .c5-agent-tool-diff td:first-child {
+            vertical-align: top;
+            background: #f8fafc;
+            font-weight: 600;
+            color: #334155;
+            line-height: 1.4;
+        }
+        .c5-agent-tool-diff th:not(:first-child),
+        .c5-agent-tool-diff td:not(:first-child) {
+            vertical-align: top;
+            word-break: keep-all;
+            overflow-wrap: break-word;
+        }
+
+        /* Chapter 4 개요와 동일 계열: course-overview 안 요약 카드 */
+        .c2-field-section { margin-top: 0; margin-bottom: 0; }
+        .c2-field-section .c2-field-kicker {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #64748b;
+            margin: 1rem 0 0.4rem;
+        }
+        .c2-field-section .c2-field-kicker--top { margin-top: 0.35rem; }
+        .c2-field-section ul.c2-field-list { margin: 0.25rem 0 0.7rem; padding-left: 1.15rem; }
+        .c2-field-section ul.c2-field-list > li { margin-bottom: 0.42rem; line-height: 1.5; }
+        .c2-field-section .c2-field-focus {
+            margin-top: 0.5rem;
+            margin-bottom: 0.85rem;
+            padding: 0.85rem 1rem;
+            background: linear-gradient(165deg, #f8fafc 0%, #eff6ff 100%);
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            color: #334155;
+        }
+        .c2-field-section .c2-field-focus p { margin-bottom: 0.5rem; }
+        .c2-field-section .c2-field-focus p:last-child { margin-bottom: 0; }
+        .c2-field-section .c2-field-lead {
+            font-size: 1.02rem;
+            color: #0f172a;
+            font-weight: 600;
+            line-height: 1.5;
+            margin-bottom: 0.65rem;
+        }
+    </style>
+
+    <div class="course-main">
+    <header class="course-hero">
+    <h1>Chapter 5. Tool-Orchestrated Multi-Agent</h1>
+    <p style="margin:0.35rem 0 0; color:#475569; font-size:1.15rem; font-weight:700;">Tool을 이용한 실행 레이어 분리 아키텍처</p>
+    </header>
+
+    <div class="course-overview c2-field-section">
+
+    <p class="c2-field-lead">
+        Chapter 4에서는 <code>SubAgentRegistry</code>로 <strong>역할(SubAgent) 단위</strong>를 나눴습니다.
+        본 장은 <strong>같은 전략 분석 파이프라인</strong>을 <strong>Tool이라는 실행 단위</strong>로 한 번 더 나눕니다.
+    </p>
+
+    <div class="c2-field-focus">
+        <p>
+            <strong>Main</strong> (Main agent, Orchestrator agent)는 <strong>단계 정의·순서·재시도</strong> 같은 <strong>워크플로 제어</strong>를
+            <code>StrategicAnalysisAgentToolOrchestrator</code>에 두고, 각 단계에서 <strong>실제로 수행할 작업</strong>은 이름 붙은 <strong>Tool 구현체</strong>에 넘깁니다.
+        </p>
+    </div>
+
+    <p>
+        라우팅·경량 응답·기술/시장 병렬 분석·평가·개선 등 <strong>흐름을 짜는 일</strong>은 오케스트레이터가 맡고,
+        <strong>도메인·I/O</strong>(예: RAG, 벡터 스토어, DB·외부 API 조회 등)·<strong>LLM 호출 세부</strong>는 Tool이 맡습니다.
+        그래서 오케스트레이션 코드는 <strong>언제 무엇을 호출할지</strong>에, Tool은 <strong>그 호출이 실제로 무엇을 하는지</strong>에 집중하는 <strong>관심사 분리</strong>가 됩니다.
+    </p>
+
+    <p>
+        각 Tool은 Spring AI의 <code>@Tool</code>에 맞출 수 있는 <strong>단일 책임 실행 단위</strong>로 두고, <code>ToolRegistry</code>에 키로 등록합니다.
+        오케스트레이터는 <code>toolRegistry.require(…)</code>로 단계에 맞는 Tool만 고릅니다.
+        Tool <strong>안쪽</strong>에서는 Chapter 4처럼 <code>SubAgent</code>를 경유해 Llama·GPT·Gemini 등 <strong>역할별 <code>ChatClient</code></strong>를 고를 수 있어,
+        <strong>워크플로 경계 = Tool</strong>, <strong>모델·프롬프트 경계 = SubAgent</strong>로 겹쳐 씁니다.
+        Chapter 1~3의 <strong>Multi-LLM 전략</strong>을 유지하면서도 모듈을 <strong>테스트·교체</strong>하기 쉽습니다.
+    </p>
+
+    <p>
+        RAG·벡터 스토어·DB 조회처럼 <strong>외부 근거를 끌어오는 부작용(side effect)이 큰 작업</strong>도 Tool로 묶어 두면,
+        오케스트레이터는 필요할 때만 그 Tool을 불러 <strong>최신·사실 기반 컨텍스트</strong>를 얹을 수 있습니다.
+        이어지는 Chapter 6 이후 <strong>Task·외부 연동</strong> 실습으로 확장하는 <strong>발판</strong>이 됩니다.
+    </p>
+
+    <p>
+        <strong>한 줄 요약</strong> — Chapter 4의 SubAgent 위에 <strong>Tool 경계</strong>를 더해, 실행 레이어를 한 층 더 나눈 장입니다.
+    </p>
+
+    <p class="mb-0">
+        실습 화면: <a th:href="@{/go/ch5/1_strategic_analysis}">Strategic Analysis</a>
+    </p>
+    </div>
+
+    <nav class="course-toc" aria-label="목차">
+    <p class="course-toc-title">목차</p>
+    <ol>
+        <li><a href="#c5-s1">개념 정리 (Agent와 Tool)</a></li>
+        <li><a href="#c5-s2"><code>@Tool</code> vs <code>StrategicTool</code> + <code>ToolRegistry</code></a></li>
+        <li><a href="#c5-s3">Agent-only vs Agent + Tool 차이점 정리</a></li>
+        <li><a href="#c5-s4">언제 Agent만 쓰면 좋은가</a></li>
+        <li><a href="#c5-s5">언제 Tool이 필요한가</a></li>
+        <li><a href="#c5-s6">핵심 결론</a></li>
+    </ol>
+    </nav>
+
+    <div class="course-content">
+    <hr class="course-divider">
+
+    <h3 id="c5-s1">1. 개념 정리 (Agent와 Tool)</h3>
+
+    <h4>① Agent만 사용하는 구조 — Ch4 구조 복습</h4>
+    <p class="small text-muted mb-1">
+        자세한 설명은 <strong>Chapter 4</strong>에서 이미 다뤘기 때문에, 여기서는 <strong>Ch5(Agent + Tool)를 이해하기 위한 배경</strong>으로만 간단히 복습합니다.
+        Ch4의 핵심은 <strong>Main(Main agent, Orchestrator agent) 하나 + 여러 역할별 SubAgent</strong> 조합으로 멀티-LLM 전략 분석 파이프라인을 만든다는 점입니다.
+    </p>
+    <p><strong>전체 아키텍처 (Ch4 요약)</strong></p>
+    <div class="course-flow-pipeline" role="img" aria-label="Ch4: Main(Main agent, Orchestrator agent)와 SubAgent 구성 요약">
+        <p class="course-flow-caption">Ch4 — Multi-Agent (SubAgent 레지스트리)</p>
+        <div class="course-flow-col">
+            <div class="course-flow-step course-flow-user">
+                <div class="course-flow-kicker">입력</div>
+                <p class="course-flow-title">User 요청</p>
+            </div>
+            <div class="course-flow-arrow" aria-hidden="true">↓</div>
+            <div class="course-flow-step course-flow-stack">
+                <div class="course-flow-kicker">Main(Main agent, Orchestrator agent)</div>
+                <p class="course-flow-title">StrategicAnalysisAgentService</p>
+                <p class="course-flow-sub">라우팅·병렬 분석·평가/개선 순서를 제어하는 오케스트레이터</p>
+            </div>
+            <div class="course-flow-arrow" aria-hidden="true">↓</div>
+            <div class="course-flow-step course-flow-stack">
+                <div class="course-flow-kicker">조회</div>
+                <p class="course-flow-title">SubAgentRegistry</p>
+                <p class="course-flow-sub">name() → SubAgent 빈 매핑</p>
+            </div>
+            <div class="course-flow-arrow" aria-hidden="true">↓</div>
+            <div class="course-flow-step course-flow-llm">
+                <div class="course-flow-kicker">실행</div>
+                <p class="course-flow-title">여러 SubAgent</p>
+                <p class="course-flow-sub">routing · simple-query · technical-analysis · market-analysis · report-evaluator · report-optimizer 등</p>
+            </div>
+            <div class="course-flow-arrow" aria-hidden="true">↓</div>
+            <div class="course-flow-step course-flow-out">
+                <div class="course-flow-kicker">출력</div>
+                <p class="course-flow-title">최종 전략 보고서</p>
+            </div>
+        </div>
+    </div>
+    <p class="small text-muted">
+        요약하면, <strong>Ch4는 “Agent만 사용하는 구조”를 Multi-Agent(SubAgent) 관점에서 최대한 확장한 예</strong>이고,
+        이 장(Ch5)은 같은 전략 분석 문제를 <strong>Agent + Tool</strong> 관점에서 다시 설계해 보는 장입니다.
+        아래 ②부터가 이 장의 본격적인 주제입니다.
+    </p>
+
+    <h4>② Tool을 사용하는 구조 — Ch5 전용 Agent + Tool 패턴</h4>
+    <p class="small text-muted mb-2">본 실습은 LLM이 매 턴 Tool을 고르는 방식이 아니라, <strong>Java 오케스트레이터가 호출 순서를 고정</strong>합니다.</p>
+    <div class="course-flow-pipeline" role="img" aria-label="Java 오케스트레이터가 ToolRegistry로 고정 순서 호출">
+        <p class="course-flow-caption">Agent + Tool 흐름 (고정 워크플로)</p>
+        <div class="course-flow-col">
+            <div class="course-flow-step course-flow-user">
+                <div class="course-flow-kicker">입력</div>
+                <p class="course-flow-title">User 질문</p>
+            </div>
+            <div class="course-flow-arrow" aria-hidden="true">↓</div>
+            <div class="course-flow-step course-flow-llm">
+                <div class="course-flow-kicker">제어</div>
+                <p class="course-flow-title">Orchestrator (Java)</p>
+                <p class="course-flow-sub"><code>StrategicAnalysisAgentToolOrchestrator</code> — 단계·순서 고정</p>
+            </div>
+            <div class="course-flow-arrow" aria-hidden="true">↓</div>
+            <div class="course-flow-step course-flow-tool">
+                <div class="course-flow-kicker">조회</div>
+                <p class="course-flow-title"><code>ToolRegistry.require(키)</code></p>
+                <p class="course-flow-sub">단계에 맞는 <code>StrategicTool</code></p>
+            </div>
+            <div class="course-flow-arrow" aria-hidden="true">↓</div>
+            <div class="course-flow-step course-flow-act">
+                <div class="course-flow-kicker">실행</div>
+                <p class="course-flow-title">Tool 실행</p>
+                <p class="course-flow-sub"><code>StrategicTool#execute</code></p>
+            </div>
+            <div class="course-flow-arrow" aria-hidden="true">↓</div>
+            <div class="course-flow-step course-flow-subagent">
+                <div class="course-flow-kicker">위임</div>
+                <p class="course-flow-title">SubAgentRegistry → SubAgent</p>
+                <p class="course-flow-sub"><code>require("routing")</code> 등 동일 키로 LLM 호출</p>
+            </div>
+            <div class="course-flow-arrow" aria-hidden="true">↓</div>
+            <div class="course-flow-step course-flow-merge">
+                <div class="course-flow-kicker">반환</div>
+                <p class="course-flow-title">단계 결과 문자열</p>
+            </div>
+            <div class="course-flow-arrow" aria-hidden="true">↓</div>
+            <div class="course-flow-step course-flow-out">
+                <div class="course-flow-kicker">출력</div>
+                <p class="course-flow-title">최종 보고서 문자열</p>
+                <p class="course-flow-sub">오케스트레이터가 통합·HTTP 응답</p>
+            </div>
+        </div>
+    </div>
+    <p class="small text-muted mb-1">
+        이 구조는 <strong>Chapter 5 전체의 주제</strong>입니다. <code>StrategicAnalysisAgentToolOrchestrator</code>가
+        <code>ToolRegistry</code>에 등록된 <code>RoutingTool</code>, <code>SimpleQueryTool</code>, <code>TechnicalAnalysisTool</code>,
+        <code>MarketAnalysisTool</code>, <code>ReportEvaluatorTool</code>, <code>ReportOptimizerTool</code> 을 <strong>이름으로 꺼내 순서대로 호출</strong>하고,
+        각 Tool 내부에서는 <code>SubAgentRegistry</code>를 통해 Chapter 4에서 정의한 서브 에이전트를 재사용해 LLM을 실행합니다.
+        RAG나 데이터베이스 연동이 필요하다면, 해당 Tool 안에서 외부 API·DB·Vector Store를 호출한 뒤 그 결과를 SubAgent에 넘기는 식으로
+        <strong>“Agent + Tool + SubAgent + 외부 데이터”</strong>를 한 층으로 묶을 수 있습니다.
+    </p>
+
+    <hr class="course-divider">
+
+    <h3 id="c5-s2">2. <code>@Tool</code> vs <code>StrategicTool</code> + <code>ToolRegistry</code></h3>
+
+    <h4>Spring AI <code>@Tool</code>이 쓰이는 전형적인 경우</h4>
+    <p>
+        채팅 모델이 함수·도구 목록을 보고, 대화 맥락에 따라 <strong>언제 어떤 도구를 호출할지 스스로 결정</strong>할 때입니다.
+        Spring AI는 그 과정을 <strong>프롬프트·스키마·콜백</strong>으로 묶어 주는 패턴을 제공합니다.
+    </p>
+
+    <h4>이 코드베이스의 Chapter 5</h4>
+    <p>
+        <code>StrategicAnalysisAgentToolOrchestrator</code>가 <code>toolRegistry.require(&quot;routing&quot;)</code> → … 처럼 <strong>고정된 워크플로</strong>로 단계를 호출합니다.
+        즉 <strong>호출 주체는 LLM이 아니라 Java 코드</strong>이고, 도구는 “모델에게 노출되는 함수”가 아니라 <strong>이름으로 꺼내 쓰는 실행 단위</strong>에 가깝습니다.
+    </p>
+
+    <h4>정리</h4>
+    <div class="table-responsive">
+        <table class="table table-bordered table-sm">
+            <thead class="thead-light">
+            <tr>
+                <th scope="col">구분</th>
+                <th scope="col"><code>@Tool</code> (Spring AI)</th>
+                <th scope="col"><code>StrategicTool</code> + <code>ToolRegistry</code></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>누가 호출하나</td>
+                <td>보통 <strong>모델(에이전트)</strong>이 결정</td>
+                <td><strong>오케스트레이터(Java)</strong>가 결정</td>
+            </tr>
+            <tr>
+                <td>흐름</td>
+                <td>대화·도구 루프</td>
+                <td>미리 정한 순서·분기</td>
+            </tr>
+           
+            </tbody>
+        </table>
+    </div>
+
+    <hr class="course-divider">
+
+    <h3 id="c5-s3">3. Agent-only vs Agent + Tool 차이점 정리</h3>
+    <p class="small text-muted mb-1">
+        <strong>Agent-only vs Agent + Tool</strong>을 장단점 기준으로 한 번에 비교해 보면 아래와 같습니다.
+        특히 <strong>RAG(검색 증강 생성)</strong>나 <strong>데이터베이스 연동</strong>은 “모델이 기억에만 의존하지 않고, 실제 문서·DB에서 근거를 가져오게” 하려면
+        결국 <strong>Tool(또는 그에 준하는 실행 단위)</strong>로 분리해 두고 호출하는 경우가 많습니다.
+    </p>
+    <div class="table-responsive">
+        <table class="table table-bordered table-sm c5-agent-tool-diff">
+            <colgroup>
+                <col class="c5-col-perspective">
+                <col>
+                <col>
+            </colgroup>
+            <thead class="thead-light">
+            <tr>
+                <th scope="col">관점</th>
+                <th scope="col">Agent-only<br><small class="text-muted font-weight-normal">(LLM 위주)</small></th>
+                <th scope="col">Agent + Tool<br><small class="text-muted font-weight-normal">(앱 코드가 단계 조립)</small></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>근거</td>
+                <td>학습 때 본 내용 위주로 답한다 → 없는 정보를 지어낼 수 있다(환각)</td>
+                <td>검색(RAG)·DB·API로 <strong>가져온 결과</strong>를 넣고 답하게 할 수 있다</td>
+            </tr>
+            <tr>
+                <td>재현</td>
+                <td>매번 조금씩 달라질 수 있다</td>
+                <td>Tool 호출 방식을 고정하면 비슷하게 맞추기 쉽고, <strong>로그로 추적</strong>하기도 좋다</td>
+            </tr>
+
+            <tr>
+                <td>시스템 메시지<br><small class="text-muted font-weight-normal">(역할별 지시문)</small></td>
+                <td>한 프롬프트에 역할 지시가 섞이기 쉽고, 재사용은 복붙·중복으로 이어진다. 수정 시 어느 단계 문장인지 찾기도 어렵다</td>
+                <td><code>systemMessage()</code>로 역할별 지시를 한곳에 두면 오케스트레이터는 입력만 넘기면 되고, 문구만 바꿔도 해당 단계 전체에 반영되며 같은 Tool로 재사용하기 쉽다</td>
+            </tr>
+            <tr>
+                <td>난이도</td>
+                <td>처음 만들기는 가볍고, 시연·POC(개념 증명)에 잘 맞는다</td>
+                <td>처음엔 클래스·연결이 많아진다 → 대신 <strong>실서비스</strong>에서 필요한 모니터링·장애 대응에 유리하다</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <p class="small text-muted mt-2 mb-0">
+        이 장의 <strong>Agent + Tool</strong> 예제에서는 각 <code>StrategicTool</code>이 <code>systemMessage()</code>로 단계별 페르소나·출력 규칙을 담당합니다.
+        라우팅·기술 분석·평가처럼 서로 다른 지시가 필요할 때, <strong>파일(도구) 단위로 나눠 두면 수정 범위가 명확</strong>하고 동일 Tool을 레지스트리·오케스트레이터 여러 곳에서 호출해도 <strong>지시문이 한결같이 유지</strong>됩니다.
+    </p>
+
+    <hr class="course-divider">
+
+    <h3 id="c5-s4">4. 언제 Agent만 쓰면 좋은가</h3>
+    <p>이럴 때는 Tool이 필요 없습니다 👍</p>
+    <ul>
+        <li>문서 요약</li>
+        <li>블로그 글 생성</li>
+        <li>코드 설명</li>
+        <li>강의 자료 생성</li>
+        <li>이메일 자동 작성</li>
+        <li>아이디어 브레인스토밍</li>
+    </ul>
+
+    <hr class="course-divider">
+
+    <h3 id="c5-s5">5. 언제 Tool이 필요한가</h3>
+    <p>이 경우는 100% Tool 구조가 필요합니다.</p>
+    <ul>
+        <li>예약</li>
+        <li>결제</li>
+        <li>DB 조회</li>
+        <li>실시간 데이터</li>
+        <li>가격 비교</li>
+        <li>검색</li>
+        <li>API 연동</li>
+        <li>자동 업무 처리</li>
+    </ul>
+
+    <hr class="course-divider">
+
+    <h3 id="c5-s6">6. 핵심 결론</h3>
+    <p>정리하면 이렇습니다.</p>
+    <ul>
+        <li><strong>Agent만 사용</strong> = 빠르고 간단하지만 한계가 있음</li>
+        <li><strong>Tool 사용</strong> = 개발은 어렵지만 실제 서비스 가능</li>
+    </ul>
+
+    <div class="course-footer-actions">
+    <p>
+        <a th:href="@{/go/ch5/desc}" class="btn btn-warning font-weight-bold">Chapter5. 상세 가이드 (Screen Description)</a>
+    </p>
+    <p>
+        이전 장: <a th:href="@{/go/ch4}">Chapter 4 — Multi-Agent</a>
+    </p>
+    <p>
+        다음 장: <a th:href="@{/go/ch6}">Chapter 6 — Task-Orchestrated Multi-Agent</a>
+    </p>
+    </div>
+
+    </div>
+    </div>
+
+</th:block>
+</html>
+
+
+

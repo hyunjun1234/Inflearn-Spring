@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<th:block>
+    <style>
+        .ch3-desc-apr-wrap {
+            margin: 1rem 0 1.25rem;
+            max-width: 24rem;
+            padding: 1.1rem 1rem 1.2rem;
+            border-radius: 14px;
+            background: linear-gradient(165deg, #f8fafc 0%, #eef2ff 40%, #f1f5f9 100%);
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
+        }
+        .ch3-desc-apr-wrap .c4-flow-caption {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #64748b;
+            margin: 0 0 0.9rem;
+            text-align: center;
+        }
+        .ch3-desc-apr-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .ch3-desc-apr-step {
+            width: 100%;
+            border-radius: 11px;
+            padding: 0.65rem 0.9rem;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+        }
+        .ch3-desc-apr-step .c4-ps-kicker {
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #64748b;
+            margin-bottom: 0.2rem;
+        }
+        .ch3-desc-apr-step .c4-ps-title {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0;
+            line-height: 1.35;
+        }
+        .ch3-desc-apr-step .c4-ps-sub {
+            font-size: 0.74rem;
+            color: #64748b;
+            margin: 0.28rem 0 0;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        }
+        .ch3-desc-apr-step.c4-ps-user {
+            background: linear-gradient(180deg, #f8fafc 0%, #fff 100%);
+            border-color: #cbd5e1;
+        }
+        .ch3-desc-apr-step.c4-ps-main {
+            background: linear-gradient(135deg, #1e3a5f 0%, #1e293b 100%);
+            border-color: #334155;
+            color: #f8fafc;
+        }
+        .ch3-desc-apr-step.c4-ps-main .c4-ps-kicker { color: rgba(248, 250, 252, 0.75); }
+        .ch3-desc-apr-step.c4-ps-main .c4-ps-title { color: #f8fafc; }
+        .ch3-desc-apr-step.c4-ps-main .c4-ps-sub { color: rgba(248, 250, 252, 0.88); }
+        .ch3-desc-apr-step.c4-ps-registry {
+            border: 2px solid #38bdf8;
+            background: #fff;
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.1);
+        }
+        .ch3-desc-apr-step.c4-ps-registry .c4-ps-kicker { color: #0369a1; }
+        .ch3-desc-apr-step.c4-ps-registry .c4-ps-title { color: #0c4a6e; }
+        .ch3-desc-apr-step.c4-ps-out {
+            background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%);
+            border: 2px solid #34d399;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.12);
+        }
+        .ch3-desc-apr-step.c4-ps-out .c4-ps-kicker { color: #047857; }
+        .ch3-desc-apr-step.c4-ps-out .c4-ps-title { color: #065f46; }
+        .ch3-desc-apr-arrow {
+            padding: 0.28rem 0 0.32rem;
+            color: #94a3b8;
+            font-size: 1rem;
+            line-height: 1;
+        }
+        .ch3-desc-sa-branch {
+            display: flex;
+            gap: 0.75rem;
+            width: 100%;
+            max-width: 26rem;
+            margin: 0.2rem auto 0;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        .ch3-desc-sa-branch-col {
+            flex: 1 1 10rem;
+            min-width: 9rem;
+            border: 1px dashed #cbd5e1;
+            border-radius: 10px;
+            padding: 0.5rem 0.45rem 0.55rem;
+            background: rgba(255, 255, 255, 0.75);
+        }
+        .ch3-desc-sa-branch-label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #64748b;
+            text-align: center;
+            margin-bottom: 0.35rem;
+        }
+        .ch3-desc-sa-branch .ch3-desc-apr-step {
+            padding: 0.45rem 0.55rem;
+        }
+        .ch3-desc-sa-branch .ch3-desc-apr-step .c4-ps-title {
+            font-size: 0.8rem;
+        }
+        .ch3-desc-sa-branch .ch3-desc-apr-step .c4-ps-sub {
+            font-size: 0.68rem;
+        }
+        .ch3-desc-sa-branch .ch3-desc-apr-arrow {
+            padding: 0.15rem 0 0.2rem;
+            font-size: 0.85rem;
+        }
+        .ch3-desc-parallel-caption {
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: #64748b;
+            text-align: center;
+            margin: 0.15rem 0 0.25rem;
+            width: 100%;
+        }
+        .ch3-desc-parallel-row {
+            display: flex;
+            gap: 0.5rem;
+            width: 100%;
+            max-width: 28rem;
+            margin: 0.15rem auto 0;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: stretch;
+        }
+        .ch3-desc-parallel-cell {
+            flex: 1 1 7.5rem;
+            min-width: 7rem;
+            border: 1px dashed #cbd5e1;
+            border-radius: 10px;
+            padding: 0.4rem 0.35rem 0.45rem;
+            background: rgba(255, 255, 255, 0.75);
+        }
+        .ch3-desc-parallel-cell .ch3-desc-apr-step {
+            border: none;
+            box-shadow: none;
+            background: transparent;
+            padding: 0.3rem 0.2rem;
+        }
+        .ch3-desc-parallel-cell .ch3-desc-apr-step .c4-ps-title {
+            font-size: 0.78rem;
+        }
+        .ch3-desc-parallel-cell .ch3-desc-apr-step .c4-ps-sub {
+            font-size: 0.64rem;
+        }
+    </style>
+    <h4>Chapter 3. Orchestrated Multi-Agent Pattern (패턴 통합·실전 파이프라인)</h4>
+    <br>
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>Service Name</th>
+            <th>Description</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        <!-- 1. Strategic Analysis -->
+        <tr>
+            <td><b>1. Strategic Analysis</b></td>
+            <td>
+                <b>멀티 모델 기반 전략 분석 오케스트레이션 서비스</b><br><br>
+
+                <b>설명</b><br>
+                Chapter 2 관점에서는 <b>Routing</b>·<b>Parallelization</b>·<b>Evaluator-Optimizer</b>와 순차 단계(Chain에 대응)로 설명할 수 있고,
+                코드 구현은 <code>StrategicAnalysisService</code> 단일 진입 메서드가 SIMPLE/STRATEGIC 분기·병렬·평가 루프를 수행합니다.<br><br>
+
+                <b>실행 흐름</b> (<code>StrategicAnalysisService#executeWithMonitoring</code>)<br>
+                <code>STARTED</code> → <code>ROUTING</code> → (<b>SIMPLE</b>: LLaMA 단일 응답·<code>COMPLETED</code>) 또는 (<b>STRATEGIC</b>: <code>ANALYZING</code> → 병렬 분석 → Evaluator-Optimizer 최대 4회)<br><br>
+
+                <div class="ch3-desc-apr-wrap" role="img" aria-label="Strategic Analysis — STARTED부터 SIMPLE·STRATEGIC 분기까지 흐름">
+                    <p class="c4-flow-caption">Strategic Analysis (executeWithMonitoring)</p>
+                    <div class="ch3-desc-apr-col">
+                        <div class="ch3-desc-apr-step c4-ps-user">
+                            <div class="c4-ps-kicker">시작</div>
+                            <p class="c4-ps-title">STARTED</p>
+                            <p class="c4-ps-sub">Redis · publishStatus</p>
+                        </div>
+                        <div class="ch3-desc-apr-arrow" aria-hidden="true">↓</div>
+                        <div class="ch3-desc-apr-step c4-ps-main">
+                            <div class="c4-ps-kicker">라우팅</div>
+                            <p class="c4-ps-title">ROUTING · LLaMA</p>
+                            <p class="c4-ps-sub">SIMPLE | STRATEGIC</p>
+                        </div>
+                        <div class="ch3-desc-apr-arrow" aria-hidden="true">↓</div>
+                        <div class="ch3-desc-sa-branch">
+                            <div class="ch3-desc-sa-branch-col">
+                                <div class="ch3-desc-sa-branch-label">SIMPLE</div>
+                                <div class="ch3-desc-apr-step c4-ps-out">
+                                    <p class="c4-ps-title">LLaMA 단일 응답</p>
+                                    <p class="c4-ps-sub">병렬·평가 루프 생략</p>
+                                </div>
+                                <div class="ch3-desc-apr-arrow" aria-hidden="true">↓</div>
+                                <div class="ch3-desc-apr-step c4-ps-user">
+                                    <p class="c4-ps-title">COMPLETED</p>
+                                </div>
+                            </div>
+                            <div class="ch3-desc-sa-branch-col">
+                                <div class="ch3-desc-sa-branch-label">STRATEGIC</div>
+                                <div class="ch3-desc-apr-step c4-ps-registry">
+                                    <p class="c4-ps-title">ANALYZING</p>
+                                    <p class="c4-ps-sub">GPT 기술 ∥ Gemini 시장 · thenCombine</p>
+                                </div>
+                                <div class="ch3-desc-apr-arrow" aria-hidden="true">↓</div>
+                                <div class="ch3-desc-apr-step c4-ps-user">
+                                    <p class="c4-ps-title">Evaluator–Optimizer</p>
+                                    <p class="c4-ps-sub">EVALUATING (Gemini) ↔ OPTIMIZING (GPT) · ≤4회 · PASS 시 종료</p>
+                                </div>
+                                <div class="ch3-desc-apr-arrow" aria-hidden="true">↓</div>
+                                <div class="ch3-desc-apr-step c4-ps-out">
+                                    <p class="c4-ps-title">최종 보고서 반환</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p class="small text-muted mb-0" style="font-size:0.82rem;">Strategic Analysis 흐름</p>
+                <br>
+
+                <b>적용 패턴 (코드 대응)</b><br>
+                1) <b>Routing Workflow</b> → LLaMA가 <b>SIMPLE / STRATEGIC</b> 이진 분류; SIMPLE이면 여기서 종료<br>
+                2) <b>Parallelization Workflow</b> (STRATEGIC만) → GPT(<code>기술적 관점 분석</code>) + Gemini(<code>시장 트렌드 분석</code>)를 <code>CompletableFuture</code>·고정 풀(4)로 병렬, <code>thenCombine</code>으로 병합<br>
+                3) <b>Evaluator-Optimizer</b> (STRATEGIC만) → Gemini 검토(PASS/개선) 후 미통과 시 GPT 수정, 최대 4회<br>
+                4) 단계 전환·상태는 <code>publishStatus</code>(Redis)로 발행 — 별도 Orchestrator Bean 없이 본 서비스 메서드가 순서 제어<br><br>
+
+                <b>모델 사용 이유</b><br>
+                - <b>GPT</b>: STRATEGIC 시 기술 병렬 분석 및 Optimizer(피드백 반영 수정)<br>
+                - <b>Gemini</b>: STRATEGIC 시 시장 병렬 분석 및 Evaluator(검토·PASS)<br>
+                - <b>LLaMA</b>: SIMPLE/STRATEGIC 라우팅 및 SIMPLE 경로 단답<br><br>
+
+                <b>특징</b><br>
+                - STRATEGIC일 때만 CompletableFuture 병렬 및 평가 루프<br>
+                - Redis 기반 실시간 상태 모니터링<br>
+                - Worker 내부 예외 시 플레이스홀더 문자열 처리<br>
+                - 반복적 품질 개선 루프(최대 4회)<br><br>
+
+            </td>
+        </tr>
+
+        <!-- 2. Precision Execution -->
+        <tr>
+            <td><b>2. Precision Execution</b></td>
+            <td>
+                <b>아이디어 → 실행 산출물까지 완성하는 멀티 LLM 실행 워크플로우</b><br><br>
+
+                <b>설명</b><br>
+                Chapter 2 용어로는 Chain·Orchestrator-Workers·Parallelization으로 설명할 수 있으며,
+                코드 구현은 <code>PrecisionExecutionService#executeWithMonitoring</code> 한 메서드에서 이어집니다.<br><br>
+
+                <b>실행 흐름</b> (<code>PrecisionExecutionService#executeWithMonitoring</code>)<br>
+                <code>Refining</code> → <code>Orchestrator</code> → <code>Workers</code>(병렬) → <code>Aggregation</code> → <code>COMPLETED</code><br><br>
+
+                <div class="ch3-desc-apr-wrap" role="img" aria-label="Precision Execution — Refining부터 Aggregation까지 흐름">
+                    <p class="c4-flow-caption">Precision Execution (executeWithMonitoring)</p>
+                    <div class="ch3-desc-apr-col">
+                        <div class="ch3-desc-apr-step c4-ps-user">
+                            <div class="c4-ps-kicker">1단계</div>
+                            <p class="c4-ps-title">Refining · LLaMA</p>
+                            <p class="c4-ps-sub">rawIdea → refinedIdea · publishStatus</p>
+                        </div>
+                        <div class="ch3-desc-apr-arrow" aria-hidden="true">↓</div>
+                        <div class="ch3-desc-apr-step c4-ps-main">
+                            <div class="c4-ps-kicker">2단계</div>
+                            <p class="c4-ps-title">Orchestrator · GPT</p>
+                            <p class="c4-ps-sub">Worker 할당 텍스트 → tasks (두 Worker 공유)</p>
+                        </div>
+                        <div class="ch3-desc-apr-arrow" aria-hidden="true">↓</div>
+                        <p class="ch3-desc-parallel-caption">3단계 · Workers · CompletableFuture 병렬 · 풀 4</p>
+                        <div class="ch3-desc-parallel-row">
+                            <div class="ch3-desc-parallel-cell">
+                                <div class="ch3-desc-apr-step c4-ps-registry">
+                                    <p class="c4-ps-title">Code Worker · GPT</p>
+                                    <p class="c4-ps-sub">코드 작성 · 동일 tasks</p>
+                                </div>
+                            </div>
+                            <div class="ch3-desc-parallel-cell">
+                                <div class="ch3-desc-apr-step c4-ps-registry">
+                                    <p class="c4-ps-title">Doc Worker · Gemini</p>
+                                    <p class="c4-ps-sub">한글 가이드 · 동일 tasks</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ch3-desc-apr-arrow" aria-hidden="true">↓</div>
+                        <div class="ch3-desc-apr-step c4-ps-user">
+                            <div class="c4-ps-kicker">4단계</div>
+                            <p class="c4-ps-title">Aggregation</p>
+                            <p class="c4-ps-sub">join() · 개발 코드 + 사용 설명서 포맷</p>
+                        </div>
+                        <div class="ch3-desc-apr-arrow" aria-hidden="true">↓</div>
+                        <div class="ch3-desc-apr-step c4-ps-out">
+                            <p class="c4-ps-title">COMPLETED</p>
+                        </div>
+                    </div>
+                </div>
+                <p class="small text-muted mb-0" style="font-size:0.82rem;">Precision Execution 흐름</p>
+                <br>
+
+                <b>적용 패턴 (코드 대응)</b><br>
+                1) <b>Refining (LLaMA)</b> — <code>publishStatus(Refining)</code>; SRS 변환 시스템 프롬프트 + <code>rawIdea</code> → <code>refinedIdea</code><br>
+                2) <b>Orchestrator (GPT)</b> — Worker_A/B 할당량을 텍스트로 생성, 출력 <code>tasks</code>를 이후 두 Worker 입력으로 공유 (의존성 그래프·스케줄러 없음)<br>
+                3) <b>Workers</b> — GPT(<code>코드를 작성하세요.</code>)·Gemini(<code>가이드 문서를 한글로 작성하세요.</code>)가 동일 <code>tasks</code>로 <code>CompletableFuture</code> 병렬, 풀 크기 4<br>
+                4) <b>Aggregation</b> — <code>join()</code> 후 <code>--- 개발 코드 ---</code> / <code>--- 사용 설명서 ---</code> 포맷으로 결합 (별도 정합성·누락 검증 단계 없음)<br><br>
+
+                <b>모델 사용 이유</b><br>
+                - <b>GPT</b>: Orchestrator(작업 지시 문자열) + Code Worker<br>
+                - <b>LLaMA</b>: SRS Refiner<br>
+                - <b>Gemini</b>: 한글 가이드 Doc Worker<br><br>
+
+                <b>특징</b><br>
+                - Redis 상태: Refining, Orchestrator, Workers, Aggregation, COMPLETED (오류 시 Error)<br>
+                - 단계별 예외는 safeCall로 흡수해 오류 메시지 문자열을 산출에 반영<br>
+                - Workers 병렬은 CompletableFuture + 전용 고정 스레드 풀(크기 4)<br>
+                - Refining부터 Aggregation까지 단계 경계마다 로깅<br><br>
+
+            </td>
+        </tr>
+
+        <!-- 3. Voting Analysis -->
+        <tr>
+            <td><b>3. Voting Analysis</b></td>
+            <td>
+                <b>다수결 기반 멀티 모델 분석 서비스</b><br><br>
+
+                <b>설명</b><br>
+                Chapter 2 용어로는 Parallelization·Chain(수집 후 판정) 등으로 설명할 수 있으며,
+                코드 구현은 <code>VotingAnalysisService#executeWithMonitoring</code>으로 통합됩니다.<br><br>
+
+                <b>실행 흐름</b> (<code>VotingAnalysisService#executeWithMonitoring</code>)<br>
+                <code>VOTING_START</code> → 병렬 3호출 → <code>join</code> → <code>AGGREGATING</code> → GPT Judge → <code>COMPLETED</code><br>
+                동일 <code>input</code>에 대해 GPT·Gemini·LLaMA가 서로 다른 <b>시스템 프롬프트</b>(객관적 지표 / 데이터 통계 / 실행 가능성)로 답한 뒤,
+                GPT 판정관이 세 답을 비교해 하나를 고르고 사유를 씁니다.<br><br>
+
+                <div class="ch3-desc-apr-wrap" role="img" aria-label="Voting Analysis — 병렬 3응답부터 Judge까지 흐름">
+                    <p class="c4-flow-caption">Voting Analysis (executeWithMonitoring)</p>
+                    <div class="ch3-desc-apr-col">
+                        <div class="ch3-desc-apr-step c4-ps-user">
+                            <div class="c4-ps-kicker">시작</div>
+                            <p class="c4-ps-title">VOTING_START</p>
+                            <p class="c4-ps-sub">Redis · publishStatus</p>
+                        </div>
+                        <div class="ch3-desc-apr-arrow" aria-hidden="true">↓</div>
+                        <p class="ch3-desc-parallel-caption">동일 input · 서로 다른 시스템 프롬프트 · supplyAsync 병렬</p>
+                        <div class="ch3-desc-parallel-row">
+                            <div class="ch3-desc-parallel-cell">
+                                <div class="ch3-desc-apr-step c4-ps-registry">
+                                    <p class="c4-ps-title">GPT</p>
+                                    <p class="c4-ps-sub">객관적 지표</p>
+                                </div>
+                            </div>
+                            <div class="ch3-desc-parallel-cell">
+                                <div class="ch3-desc-apr-step c4-ps-registry">
+                                    <p class="c4-ps-title">Gemini</p>
+                                    <p class="c4-ps-sub">데이터·통계</p>
+                                </div>
+                            </div>
+                            <div class="ch3-desc-parallel-cell">
+                                <div class="ch3-desc-apr-step c4-ps-registry">
+                                    <p class="c4-ps-title">LLaMA</p>
+                                    <p class="c4-ps-sub">실행 가능성</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ch3-desc-apr-arrow" aria-hidden="true">↓</div>
+                        <div class="ch3-desc-apr-step c4-ps-user">
+                            <p class="c4-ps-title">join() 수집</p>
+                            <p class="c4-ps-sub">exceptionally → 오류 문자열 · 재시도 없음</p>
+                        </div>
+                        <div class="ch3-desc-apr-arrow" aria-hidden="true">↓</div>
+                        <div class="ch3-desc-apr-step c4-ps-main">
+                            <div class="c4-ps-kicker">집계</div>
+                            <p class="c4-ps-title">AGGREGATING</p>
+                            <p class="c4-ps-sub">3개 답을 Judge 입력으로</p>
+                        </div>
+                        <div class="ch3-desc-apr-arrow" aria-hidden="true">↓</div>
+                        <div class="ch3-desc-apr-step c4-ps-user">
+                            <p class="c4-ps-title">Judge · GPT</p>
+                            <p class="c4-ps-sub">선택 + 사유 · 실패 시 오류 문자열</p>
+                        </div>
+                        <div class="ch3-desc-apr-arrow" aria-hidden="true">↓</div>
+                        <div class="ch3-desc-apr-step c4-ps-out">
+                            <p class="c4-ps-title">COMPLETED</p>
+                            <p class="c4-ps-sub">원문 3개 + ===== 최종 판정 =====</p>
+                        </div>
+                    </div>
+                </div>
+                <p class="small text-muted mb-0" style="font-size:0.82rem;">Voting Analysis 흐름</p>
+                <br>
+
+                <b>적용 패턴 (코드 대응)</b><br>
+                1) <b>병렬 호출</b> — <code>CompletableFuture.supplyAsync(..., newFixedThreadPool(4))</code>, 각 Future는 <code>exceptionally</code>로 실패 시 오류 문자열 반환<br>
+                2) <b>수집</b> — <code>join()</code>으로 리스트화; 별도 유효성 검증·재시도 없음<br>
+                3) <b>Judge</b> — GPT에 3개 답을 라벨과 함께 전달, 시스템 문구로 선택·결과·사유 요청<br>
+                4) <b>반환</b> — 세 모델 원문 + <code>===== 최종 판정 =====</code> 블록을 한 문자열로 결합<br><br>
+
+                <b>모델 사용 이유</b><br>
+                - <b>GPT</b>: 1차 답변(객관적 지표) + 최종 판정관<br>
+                - <b>Gemini</b>: 데이터·통계 성향 답변<br>
+                - <b>LLaMA</b>: 실행 가능성 성향 답변<br><br>
+
+                <b>특징</b><br>
+                - Redis 상태: <code>VOTING_START</code>, <code>AGGREGATING</code>, <code>COMPLETED</code><br>
+                - CompletableFuture + 고정 스레드 풀<br>
+                - Judge 실패 시 오류 문자열을 최종 판정으로 사용<br>
+                - 가중치 투표·Judge 교체·Self-Eval 등은 본 코드에 없음<br><br>
+
+            </td>
+        </tr>
+
+        <!-- 4. Auto Pattern Routing -->
+        <tr>
+            <td><b>4. Auto Pattern Routing</b></td>
+            <td>
+                <b>질문 유형에 따라 Strategic / Precision / Voting 중 하나를 자동 선택하는 오케스트레이션 진입점</b><br><br>
+
+                <b>설명</b><br>
+                LLaMA가 사용자 입력을 <b>STRATEGIC</b>, <b>PRECISION</b>, <b>VOTING</b>으로 분류한 뒤,
+                기존 <code>StrategicAnalysisService</code>, <code>PrecisionExecutionService</code>, <code>VotingAnalysisService</code>의
+                <code>executeWithMonitoring</code>으로 위임합니다.<br><br>
+
+                <b>실행 흐름</b> (<code>AutoPatternRoutingService#executeWithMonitoring</code>)<br>
+                입력 수신 → LLaMA로 패턴 분류 → 선택된 서비스의 <code>executeWithMonitoring</code> 위임 → 해당 파이프라인의 단계·응답·상태 발행까지 동일 흐름으로 이어집니다.<br><br>
+
+                <div class="ch3-desc-apr-wrap" role="img" aria-label="Auto Pattern Routing — 입력부터 위임까지 흐름">
+                    <p class="c4-flow-caption">Auto Pattern Routing (Why a Router Layer)</p>
+                    <div class="ch3-desc-apr-col">
+                        <div class="ch3-desc-apr-step c4-ps-user">
+                            <div class="c4-ps-kicker">입력</div>
+                            <p class="c4-ps-title">POST + workflowId</p>
+                            <p class="c4-ps-sub">prompt · SSE 선연결</p>
+                        </div>
+                        <div class="ch3-desc-apr-arrow" aria-hidden="true">↓</div>
+                        <div class="ch3-desc-apr-step c4-ps-main">
+                            <div class="c4-ps-kicker">분류</div>
+                            <p class="c4-ps-title">Pattern Router</p>
+                            <p class="c4-ps-sub">LLaMA · STRATEGIC | PRECISION | VOTING</p>
+                        </div>
+                        <div class="ch3-desc-apr-arrow" aria-hidden="true">↓</div>
+                        <div class="ch3-desc-apr-step c4-ps-registry">
+                            <div class="c4-ps-kicker">위임</div>
+                            <p class="c4-ps-title">완성형 파이프라인 1개 선택</p>
+                            <p class="c4-ps-sub">Strategic · Precision · Voting Service</p>
+                        </div>
+                        <div class="ch3-desc-apr-arrow" aria-hidden="true">↓</div>
+                        <div class="ch3-desc-apr-step c4-ps-out">
+                            <div class="c4-ps-kicker">출력</div>
+                            <p class="c4-ps-title">NDJSON + Redis/SSE 관측</p>
+                            <p class="c4-ps-sub">기존 세 서비스와 동일 관측 모델</p>
+                        </div>
+                    </div>
+                </div>
+                <p class="small text-muted mb-0" style="font-size:0.82rem;">Auto Pattern Routing 흐름</p>
+                <br>
+
+                <b>적용 패턴 (코드 대응)</b><br>
+                1) <b>Routing Workflow</b> → 상위에서 완성형 패턴(STRATEGIC / PRECISION / VOTING) 선택<br>
+                2) 선택된 하위 서비스가 각각 Chain·Parallel·Evaluator 등 기존 Chapter 3 흐름 수행<br><br>
+
+                <b>모델 사용 이유</b><br>
+                - <b>LLaMA</b>: 패턴 라우팅(분류) 단계<br>
+                - 실행 단계의 GPT·Gemini·LLaMA 조합은 선택된 서비스(위 1~3행)와 동일<br><br>
+
+                <b>특징</b><br>
+                - Redis/SSE 상태 예시: STARTED → PATTERN_ROUTING → PATTERN_SELECTED → (선택된 서비스의 단계들) → COMPLETED<br>
+                - NDJSON·Redis/SSE 관측 모델은 세 완성형 서비스와 동일<br>
+                - <b>REST</b>: <code>POST /ch3/auto-pattern-routing</code> · <code>prompt</code>, <code>workflowId</code><br><br>
+
+            </td>
+        </tr>
+
+        </tbody>
+    </table>
+
+
+</th:block>
+
+</html>

@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<th:block>
+
+    <style>
+        .course-main { max-width: 52rem; margin: 0 auto; padding: 0 0.25rem 2.5rem; font-size: 1rem; line-height: 1.65; color: #1e293b; }
+        .course-hero { margin-bottom: 1.25rem; padding-bottom: 1rem; border-bottom: 1px solid #e2e8f0; }
+        .course-hero h1 { font-size: clamp(1.25rem, 2.2vw, 1.65rem); font-weight: 700; letter-spacing: -0.02em; margin: 0; color: #0f172a; line-height: 1.3; }
+        .course-toc { background: linear-gradient(165deg, #f8fafc 0%, #f1f5f9 100%); border: 1px solid #e2e8f0; border-radius: 10px; padding: 1rem 1.25rem 1.1rem; margin-bottom: 1.25rem; }
+        .course-toc-title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b; margin: 0 0 0.6rem; }
+        .course-toc ol { margin: 0; padding-left: 1.2rem; }
+        .course-toc li { margin-bottom: 0.35rem; line-height: 1.45; }
+        .course-toc a { color: #1d4ed8; text-decoration: none; font-size: 0.9rem; }
+        .course-toc a:hover { text-decoration: underline; color: #1e40af; }
+        .course-toc ul.course-toc-sub { margin: 0.35rem 0 0.15rem 0; padding-left: 1.15rem; list-style: disc; }
+        .course-toc ul.course-toc-sub li { margin-bottom: 0.22rem; font-size: 0.88rem; }
+        .d6-tao-outline {
+            margin: 0 0 1rem;
+            padding: 0.85rem 1rem 0.95rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            background: linear-gradient(165deg, #f8fafc 0%, #fff 100%);
+        }
+        .d6-tao-outline-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0 0 0.5rem;
+            letter-spacing: -0.02em;
+        }
+        .d6-tao-outline-list { margin: 0; padding-left: 1.2rem; }
+        .d6-tao-outline-list li { margin-bottom: 0.28rem; line-height: 1.45; }
+        .d6-tao-body h4 { margin-top: 0.85rem; }
+        .d6-tao-body h4:first-child { margin-top: 0; }
+        .course-overview { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 1.25rem 1.4rem 1.35rem; margin-bottom: 1.25rem; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06); }
+        .course-content h3 { font-size: 1.12rem; margin: 1.35rem 0 0.85rem; padding-bottom: 0.55rem; border-bottom: 2px solid #93c5fd; color: #0f172a; font-weight: 700; line-height: 1.4; }
+        .course-content > h3:first-of-type,
+        .course-content hr.course-divider + h3 { margin-top: 0; }
+        .course-content h4 { font-size: 1rem; margin: 1rem 0 0.5rem; color: #334155; font-weight: 600; }
+        .course-divider { border: none; height: 1px; background: linear-gradient(90deg, transparent, #cbd5e1, transparent); margin: 1.5rem 0; }
+        .course-footer-actions { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #e2e8f0; }
+        ul, ol { margin-left: 1.25rem; margin-bottom: 0.75rem; }
+        code { background: #f1f5f9; padding: 0.12em 0.38em; border-radius: 4px; font-size: 0.9em; color: #0f172a; }
+        p { margin-bottom: 0.85rem; }
+        .course-overview .meta { color: #475569; font-size: 0.95rem; margin-bottom: 0.75rem; }
+        .desc-overview-lead { margin-bottom: 0.9rem; }
+        .desc-overview-outro { margin-bottom: 0.5rem; }
+        .desc-callout { border-left: 4px solid #38bdf8; background: #f8fafc; padding: 0.75rem 1rem 0.85rem; border-radius: 0 8px 8px 0; margin: 0.75rem 0 1rem; font-size: 0.95rem; color: #334155; }
+
+        .c4-flow-wrap {
+            margin: 1rem 0 1.25rem;
+            padding: 1.35rem 1.25rem 1.5rem;
+            border-radius: 14px;
+            background: linear-gradient(160deg, #f0f9ff 0%, #f8fafc 45%, #f1f5f9 100%);
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 24px rgba(15, 23, 42, 0.06);
+        }
+        .c4-flow-wrap .c4-flow-caption {
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #64748b;
+            margin: 0 0 1rem;
+            text-align: center;
+        }
+        .c4-flow-col { display: flex; flex-direction: column; align-items: center; gap: 0; }
+        .c4-flow-arrow {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0.35rem 0 0.45rem;
+            color: #94a3b8;
+            font-size: 1.1rem;
+            line-height: 1;
+        }
+        .c4-flow-arrow span { font-size: 0.65rem; font-weight: 600; letter-spacing: 0.06em; color: #94a3b8; margin-top: 0.2rem; }
+        .c4-card {
+            width: 100%;
+            max-width: 22rem;
+            border-radius: 12px;
+            padding: 0.85rem 1rem;
+            text-align: center;
+            border: 1px solid transparent;
+        }
+        .c4-card-main {
+            background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%);
+            color: #f8fafc;
+            border-color: #1e293b;
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.25);
+        }
+        .c4-card-main .c4-card-kicker { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.85; margin-bottom: 0.35rem; }
+        .c4-card-main .c4-card-title { font-size: 1.02rem; font-weight: 700; margin: 0; line-height: 1.35; }
+        .c4-card-main .c4-card-sub { font-size: 0.78rem; opacity: 0.88; margin: 0.4rem 0 0; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+        .c4-card-registry {
+            background: #fff;
+            border: 2px solid #38bdf8;
+            box-shadow: 0 4px 14px rgba(14, 165, 233, 0.12);
+        }
+        .c4-card-registry .c4-card-kicker { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #0369a1; margin-bottom: 0.3rem; }
+        .c4-card-registry .c4-card-title { font-size: 0.98rem; font-weight: 700; color: #0c4a6e; margin: 0; }
+        .c4-card-registry .c4-card-sub { font-size: 0.78rem; color: #64748b; margin: 0.35rem 0 0; }
+        .c4-agents-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.5rem 0.45rem;
+            margin-top: 0.75rem;
+            padding-top: 0.35rem;
+        }
+        .c4-agent-pill {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 0.45rem 0.65rem 0.5rem;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            line-height: 1.35;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            min-width: 7.5rem;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+        }
+        .c4-agent-pill code { font-size: 0.78rem; font-weight: 600; background: transparent; padding: 0; color: #0f172a; }
+        .c4-agent-pill .c4-model { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.04em; margin-top: 0.25rem; padding: 0.12rem 0.38rem; border-radius: 4px; }
+        .c4-model-llama { background: #ecfdf5; color: #047857; }
+        .c4-model-gpt { background: #eff6ff; color: #1d4ed8; }
+        .c4-model-gemini { background: #f5f3ff; color: #6d28d9; }
+        .c4-agent-pill .c4-node-subagent {
+            display: block;
+            font-size: 0.72rem;
+            color: #475569;
+            margin-top: 0.35rem;
+            line-height: 1.4;
+        }
+        .c4-agent-pill .c4-node-subagent code { font-size: 0.85em; }
+        .c4-flow-footnote {
+            text-align: center;
+            font-size: 0.82rem;
+            color: #64748b;
+            margin: 1rem 0 0;
+            padding-top: 0.75rem;
+            border-top: 1px dashed #cbd5e1;
+        }
+        @media (min-width: 640px) {
+            .c4-agents-grid { max-width: 36rem; margin-left: auto; margin-right: auto; }
+        }
+
+        .c4-pipeline-wrap {
+            margin: 1rem 0 1.25rem;
+            padding: 1.25rem 1.15rem 1.4rem;
+            border-radius: 14px;
+            background: linear-gradient(165deg, #f8fafc 0%, #eef2ff 40%, #f1f5f9 100%);
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
+        }
+        .c4-pipeline-wrap .c4-flow-caption {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #64748b;
+            margin: 0 0 0.9rem;
+            text-align: center;
+        }
+        .c4-pipeline-col { display: flex; flex-direction: column; align-items: center; max-width: 24rem; margin: 0 auto; }
+        .c4-pipeline-step {
+            width: 100%;
+            border-radius: 11px;
+            padding: 0.65rem 0.9rem;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+        }
+        .c4-pipeline-step .c4-ps-kicker { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #64748b; margin-bottom: 0.2rem; }
+        .c4-pipeline-step .c4-ps-title { font-size: 0.92rem; font-weight: 700; color: #0f172a; margin: 0; line-height: 1.35; }
+        .c4-pipeline-step .c4-ps-sub { font-size: 0.74rem; color: #64748b; margin: 0.28rem 0 0; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+        .c4-pipeline-step.c4-ps-user { background: linear-gradient(180deg, #f8fafc 0%, #fff 100%); border-color: #cbd5e1; }
+        .c4-pipeline-step.c4-ps-main {
+            background: linear-gradient(135deg, #1e3a5f 0%, #1e293b 100%);
+            border-color: #334155;
+            color: #f8fafc;
+        }
+        .c4-pipeline-step.c4-ps-main .c4-ps-kicker { color: rgba(248, 250, 252, 0.75); }
+        .c4-pipeline-step.c4-ps-main .c4-ps-title { color: #f8fafc; }
+        .c4-pipeline-step.c4-ps-main .c4-ps-sub { color: rgba(248, 250, 252, 0.88); }
+        .c4-pipeline-step.c4-ps-registry { border: 2px solid #38bdf8; background: #fff; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.1); }
+        .c4-pipeline-step.c4-ps-registry .c4-ps-kicker { color: #0369a1; }
+        .c4-pipeline-step.c4-ps-registry .c4-ps-title { color: #0c4a6e; }
+        .c4-pipeline-step.c4-ps-subs { border-style: dashed; border-color: #94a3b8; background: #fffefb; }
+        .c4-pipeline-step.c4-ps-subs .c4-ps-kicker { color: #a16207; }
+        .c4-pipeline-step.c4-ps-merge { background: linear-gradient(180deg, #fffbeb 0%, #fff 100%); border: 1px solid #fcd34d; box-shadow: 0 2px 10px rgba(245, 158, 11, 0.12); }
+        .c4-pipeline-step.c4-ps-merge .c4-ps-kicker { color: #b45309; }
+        .c4-pipeline-step.c4-ps-merge .c4-ps-title { color: #78350f; }
+        .c4-pipeline-step.c4-ps-merge .c4-ps-sub { color: #92400e; }
+        .c4-pipeline-step.c4-ps-out {
+            background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%);
+            border: 2px solid #34d399;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.12);
+        }
+        .c4-pipeline-step.c4-ps-out .c4-ps-kicker { color: #047857; }
+        .c4-pipeline-step.c4-ps-out .c4-ps-title { color: #065f46; }
+        .c4-pipeline-arrow-sm { padding: 0.28rem 0 0.32rem; color: #94a3b8; font-size: 1rem; line-height: 1; }
+
+        .c4-lab-step {
+            margin: 0.85rem 0 1rem;
+            padding: 0.9rem 1rem;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+        }
+        .c4-lab-step .lab-n {
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 0.06em;
+            color: #0369a1;
+            margin-bottom: 0.35rem;
+        }
+        .c4-lab-step .lab-title { font-weight: 700; color: #0f172a; margin-bottom: 0.35rem; }
+        .c4-lab-step p:last-child { margin-bottom: 0; }
+        .c4-pipeline-wrap.c4-pipeline-stack-ch4 .c4-pipeline-col { max-width: 26rem; }
+    </style>
+
+    <div class="course-main">
+    <header class="course-hero">
+    <h1>Chapter 6 실습 가이드 — Task-Orchestrated Multi-Agent (agent-utils · TaskTool · Agent Runtime)</h1>
+    </header>
+
+    <div class="course-overview">
+    <p class="desc-overview-lead">
+        Chapter 5까지는 <strong>자바 오케스트레이터가 도구 레지스트리를 직접 구성</strong> 하였습니다.<br>
+        Chapter 6은 같은 Tool을 사용하는 것은 같지만 <strong>Agent Runtime</strong>에 맡깁니다. <br>
+        흐름 제어(라우팅·병렬·평가 루프)는 여전히 자바 쪽에서 고정하고,
+        실제 문장 생성은 <strong>Task 도구 + 리소스에 올린 Markdown 서브에이전트</strong>가 담당합니다.<br>
+
+        <strong>Chapter 7</strong>에서는 같은 비즈니스를 <strong>노드 그래프</strong>와 <strong>실행 컨텍스트</strong> 방식으로 다시 짜 봅니다.
+    </p>
+
+    <p>
+        <a th:href="@{/go/ch6/1_strategic_analysis}" class="btn btn-primary font-weight-bold">실습 화면 열기</a>
+        &nbsp;
+        <a th:href="@{/go/ch6}" class="btn btn-outline-secondary">Chapter 6 본문 보기</a>
+    </p>
+    </div>
+
+    <nav class="course-toc" aria-label="목차">
+    <p class="course-toc-title">목차</p>
+    <ol>
+        <li><a href="#d6-s1">진행 흐름</a></li>
+        <li><a href="#d6-s2">구조 — TaskTool · ChatClient · Markdown 서브에이전트</a></li>
+        <li>
+            <a href="#d6-s3">엔드투엔드 흐름</a>
+            <ul class="course-toc-sub">
+                <li><a href="#d6-s3-tao">생각 → 행동 → 관측</a></li>
+            </ul>
+        </li>
+        <li><a href="#d6-s4">SSE 단계와 TodoWrite</a></li>
+        <li><a href="#d6-s5">Markdown 파일</a></li>
+        <li><a href="#d6-s6">다른 Chapter와 이어지는 맥락</a></li>
+    </ol>
+    </nav>
+
+    <div class="course-content">
+    <hr class="course-divider">
+
+    <h3 id="d6-s1">1. 진행 흐름</h3>
+
+    <div class="c4-pipeline-wrap c4-pipeline-stack-ch4" role="img" aria-label="Ch6Controller부터 TaskTool 오케스트레이터와 ChatClient까지">
+        <p class="c4-flow-caption">서버 호출 스택 (실습 코드 기준)</p>
+        <div class="c4-pipeline-col">
+            <div class="c4-pipeline-step c4-ps-user">
+                <div class="c4-ps-kicker">실습 UI</div>
+                <p class="c4-ps-title">pages/ch6/1_strategic_analysis.html</p>
+                <p class="c4-ps-sub">폼 → POST /ch6/strategic-analysis</p>
+            </div>
+            <div class="c4-pipeline-arrow-sm" aria-hidden="true">↓</div>
+            <div class="c4-pipeline-step c4-ps-user">
+                <div class="c4-ps-kicker">REST</div>
+                <p class="c4-ps-title">Ch6Controller#strategicAnalysis</p>
+                <p class="c4-ps-sub">StrategicAnalysisAgentToolTaskService(ch6) 로 위임</p>
+            </div>
+            <div class="c4-pipeline-arrow-sm" aria-hidden="true">↓</div>
+            <div class="c4-pipeline-step c4-ps-main">
+                <div class="c4-ps-kicker">래핑</div>
+                <p class="c4-ps-title">StrategicAnalysisAgentToolTaskService</p>
+                <p class="c4-ps-sub">executeWithMonitoring — STARTED · AGENT · COMPLETED · StrategicWorkflowContext</p>
+            </div>
+            <div class="c4-pipeline-arrow-sm" aria-hidden="true">↓</div>
+            <div class="c4-pipeline-step c4-ps-main">
+                <div class="c4-ps-kicker">오케스트레이터</div>
+                <p class="c4-ps-title">StrategicAnalysisTaskToolOrchestrator</p>
+                <p class="c4-ps-sub">executeWithMonitoring — 라우팅 · 병렬 분석 · 평가·최적화 루프</p>
+            </div>
+            <div class="c4-pipeline-arrow-sm" aria-hidden="true">↓</div>
+            <div class="c4-pipeline-step c4-ps-registry">
+                <div class="c4-ps-kicker">Agent Runtime</div>
+                <p class="c4-ps-title">strategicAnalysisAgent ChatClient</p>
+                <p class="c4-ps-sub">TaskTool + TodoWrite — runSubAgent(routing 등)</p>
+            </div>
+            <div class="c4-pipeline-arrow-sm" aria-hidden="true">↓</div>
+            <div class="c4-pipeline-step c4-ps-subs">
+                <div class="c4-ps-kicker">실행</div>
+                <p class="c4-ps-title">Markdown 서브에이전트 (strategic-*.md)</p>
+                <p class="c4-ps-sub">routing · simple-query · technical-analysis · …</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="c4-lab-step">
+        <div class="lab-n">실습 STEP A</div>
+        <div class="lab-title">요청과 응답</div>
+        <p>
+            <code>POST /ch6/strategic-analysis</code>로 <code>prompt</code>, <code>workflowId</code>(UUID)를 보냅니다. HTTP 응답 본문은 최종 결과 문자열입니다.
+        </p>
+    </div>
+    <div class="c4-lab-step">
+        <div class="lab-n">실습 STEP B</div>
+        <div class="lab-title">SSE 연결</div>
+        <p>
+            <code>EventSource</code>로 <code>/api/workflow/stream/{workflowId}</code>를 구독합니다. 실습 스크립트는 일정 시간 후 연결 종료를 시도할 수 있습니다.
+            단계 이벤트는 <code>StrategicAnalysisAgentToolTaskService</code>(시작·에이전트 단계 등)와, 에이전트가 호출하는 <strong><code>TodoWriteTool</code></strong>(할 일 목록이 바뀔 때마다 <code>AGENT_TODO</code> 단계로 스냅샷 문자열을 넣는 쪽)이 <code>WorkflowStatusPublisher</code>로 Redis/SSE에 발행합니다.
+        </p>
+    </div>
+    <div class="c4-lab-step">
+        <div class="lab-n">실습 STEP C</div>
+        <div class="lab-title">오케스트레이터와 에이전트 구성</div>
+        <p>
+            <strong>순서·분기</strong>는 자바 <code>StrategicAnalysisTaskToolOrchestrator</code>가 잡습니다. 예를 들어 언제 라우팅할지, 기술·시장 분석을 동시에 돌릴지, 평가·개선을 몇 번 돌릴지 같은 <strong>워크플로 골격</strong>입니다.
+            그 안에서 쓸 <code>ChatClient</code>는 <code>StrategicTaskChatClientFactory</code>가 만듭니다. 서브에이전트 목록(<code>STRATEGIC_SUBAGENTS</code>), <code>TaskTool</code>, <strong><code>TodoWriteTool</code></strong>, 여러 LLM 빌더, <code>ToolCallAdvisor</code>를 한 번에 조립합니다.
+            <strong><code>TodoWriteTool</code></strong>은 agent-utils가 붙이는 Tool로, 모델이 호출해 할 일 목록을 바꿀 때마다 팩토리의 <code>todoEventHandler</code>가 항목을 한글 요약 줄로 펼쳐 <code>WorkflowStatusPublisher#publishStatus</code>에 넘깁니다.
+            <code>StrategicAnalysisAgentConfig</code>는 그 팩토리에 <strong>시스템 지시문(Java 상수 <code>STRATEGIC_TASK_SYSTEM_INSTRUCTION</code>)</strong>·<strong>현재 요청의 <code>workflowId</code>(<code>StrategicWorkflowContext</code>)</strong>·<strong>Redis에 쓸 Todo 태그(<code>AGENT_TODO</code>)</strong>만 넘겨 <strong><code>strategicAnalysisAgent</code></strong> 빈을 등록합니다.
+        </p>
+        <p>
+            정리하면, 오케스트레이터는 <strong>“지금은 어떤 단계인가”</strong>만 밀어 주고, <code>routing</code> 같은 이름으로 Markdown 서브에이전트를 실제로 호출하거나 할 일을 Redis로 보내는 일은 <strong>Agent Runtime</strong>이 붙은 <code>ChatClient</code> 쪽에서 이뤄집니다.
+            Runtime에 무엇을 태울지는 <code>StrategicTaskChatClientFactory#buildStrategicTaskChatClient</code> 한곳에 모아 두었고, <code>classpath:/agents/strategic/strategic-*.md</code> 파일들은 목록 <code>STRATEGIC_SUBAGENTS</code>로 <code>TaskTool</code>에 연결되어 <strong>이름으로</strong> 불립니다.<br><br>
+            <code>strategicAnalysisAgentMd</code>는 <code>StrategicAnalysisAgentMDConfig</code>가 같은 팩토리를 쓰되, system 지시를 <strong>Markdown 파일</strong>로 두고 Todo 단계 태그만 <code>AGENT_TODO_MD</code>로 바꾼 빈입니다.
+            <code>StrategicAnalysisTaskToolMDOrchestrator</code>는 Java로는 진입·SSE만 얇게 두고, <strong>라우팅·분석·평가 등 워크플로 문장을 자바 메서드 체인이 아니라 <code>prompts/strategic-analysis-agent-system.md</code>(system Markdown)과 <code>classpath:/agents/strategic/*.md</code> 서브 정의에 더 실어 둔 참고용 예시</strong>입니다 — 본문 <a th:href="|@{/go/ch6}#c6-s8|">§5 Java vs MD</a>와 같은 축입니다.
+            <strong>본 과정의 주 경로는 <code>StrategicAnalysisTaskToolOrchestrator</code></strong>(코드로 단계·순서를 잡는 쪽)이며, MD(system) 조합은 같은 Runtime에서 “흐름을 프롬프트·<code>.md</code>로 조정할 수 있다”는 대비를 보여 주는 <strong>참고용</strong>으로만 둡니다.
+            <br><br>Chapter 6은 <strong>팩토리 + 설정 클래스</strong>로 Task 기반 <code>ChatClient</code>를 만들어 오케스트레이터가 주입받아 쓰는 구조입니다.
+        </p>
+    </div>
+
+    <div class="desc-callout">
+        <strong>포인트:</strong> Chapter 4·5 쪽은 <code>ToolRegistry</code>나 <code>SubAgentRegistry</code>에서 <strong>자바 도구 빈을 키로 꺼내 바로 실행</strong>하는 그림에 가깝습니다.
+        Chapter 6에서는 <code>StrategicAnalysisTaskToolOrchestrator</code>가 그렇게 직접 부르기보다, <code>runSubAgent("routing", …)</code>처럼 <code>strategicAnalysisAgent</code> <code>ChatClient</code>에게 <strong>“task 도구로 <code>routing</code> 같은 이름의 서브를 불러라”</strong>는 사용자 메시지를 넘깁니다.
+        그러면 Runtime이 <strong>TaskTool</strong>을 통해 Markdown에 정의된 서브에이전트를 고르고, <strong>실제 문장·분석 생성</strong>은 그 <code>.md</code> 프롬프트를 탄 ChatClient 쪽에서 이뤄집니다. 예전 경로(<code>StrategicTool</code> 등)와 <strong>“레지스트리 직결” vs “ChatClient + TaskTool + Markdown”</strong>으로 나뉜다고 기억하면 됩니다.
+        <br><br><strong><code>StrategicWorkflowContext</code>를 두는 이유:</strong> Agent Runtime과 Tool 호출이 안쪽으로 여러 번 이어질 때, 매 단계마다 <code>workflowId</code>를 인자로 넘기면 시그니처가 지저분해지고 빠뜨리기 쉽습니다. 그래서 <strong>HTTP 요청을 처리하는 스레드마다</strong> “지금 이 요청의 워크플로 id”를 ThreadLocal에 한 번 심어 두고, <code>TodoWriteTool</code> 핸들러는 <code>workflowIdSupplier</code>(<code>StrategicWorkflowContext::getWorkflowId</code>)로 그 id를 꺼내 <code>publishStatus(workflowId, todoPublishStage, 메시지)</code> 형태로 보냅니다(기본 빈은 <code>todoPublishStage</code>가 <code>AGENT_TODO</code>). 클라이언트는 같은 <code>workflowId</code>의 SSE에서 <strong>할 일 스냅샷</strong>을 실시간으로 받습니다.
+        <br><br>이 ThreadLocal은 Chapter 4·5 HTTP 실습 경로에서는 쓰지 않고, Chapter 6에서만 위 목적으로 <code>com.ai.chapter6.service.StrategicAnalysisAgentToolTaskService</code> 진입에서 <code>set</code>하고 처리가 끝나면 <code>clear</code>합니다.
+    </div>
+
+    <hr class="course-divider">
+
+    <h3 id="d6-s2">2. 구조 — TaskTool · ChatClient · Markdown 서브에이전트</h3>
+
+    <div class="c4-flow-wrap" role="img" aria-label="Task 오케스트레이터와 strategicAnalysisAgent ChatClient 구조">
+        <p class="c4-flow-caption">실행 흐름 (개념)</p>
+        <div class="c4-flow-col">
+            <div class="c4-card c4-card-main">
+                <div class="c4-card-kicker">Orchestrator</div>
+                <p class="c4-card-title">흐름 제어</p>
+                <p class="c4-card-sub">StrategicAnalysisTaskToolOrchestrator</p>
+            </div>
+            <div class="c4-flow-arrow" aria-hidden="true">↓<span>단계별 위임</span></div>
+            <div class="c4-card c4-card-registry">
+                <div class="c4-card-kicker">Agent Runtime</div>
+                <p class="c4-card-title">strategicAnalysisAgent</p>
+                <p class="c4-card-sub">ChatClient + TaskTool + TodoWriteTool(모델 Tool → 할 일 스냅샷 → <code>AGENT_TODO</code> SSE)</p>
+            </div>
+            <div class="c4-flow-arrow" aria-hidden="true">↓<span>Markdown 서브에이전트</span></div>
+            <div class="c4-agents-grid">
+                <div class="c4-agent-pill">
+                    <code>strategic-router.md</code>
+                    <span class="c4-node-subagent"><code>routing</code></span>
+                    <span class="c4-model c4-model-llama">Llama</span>
+                </div>
+                <div class="c4-agent-pill">
+                    <code>strategic-simple.md</code>
+                    <span class="c4-node-subagent"><code>simple-query</code></span>
+                    <span class="c4-model c4-model-llama">Llama</span>
+                </div>
+                <div class="c4-agent-pill">
+                    <code>strategic-tech.md</code>
+                    <span class="c4-node-subagent"><code>technical-analysis</code></span>
+                    <span class="c4-model c4-model-gpt">GPT</span>
+                </div>
+                <div class="c4-agent-pill">
+                    <code>strategic-market.md</code>
+                    <span class="c4-node-subagent"><code>market-analysis</code></span>
+                    <span class="c4-model c4-model-gemini">Gemini</span>
+                </div>
+                <div class="c4-agent-pill">
+                    <code>strategic-evaluator.md</code>
+                    <span class="c4-node-subagent"><code>report-evaluator</code></span>
+                    <span class="c4-model c4-model-gemini">Gemini</span>
+                </div>
+                <div class="c4-agent-pill">
+                    <code>strategic-optimizer.md</code>
+                    <span class="c4-node-subagent"><code>report-optimizer</code></span>
+                    <span class="c4-model c4-model-gpt">GPT</span>
+                </div>
+            </div>
+        </div>
+        <p class="c4-flow-footnote">
+            <code>StrategicAnalysisTaskToolOrchestrator</code>가 <code>runSubAgent("…", payload)</code>로 TaskTool에 넘기는 이름과, 각 Markdown의 frontmatter <code>name</code>이 이 키와 맞춰져 있습니다.
+            <code>classpath:/agents/strategic/strategic-*.md</code>의 <code>name</code>·<code>model</code>·본문 지시가 Agent Runtime의 Task와 연결됩니다.
+        </p>
+    </div>
+
+    <hr class="course-divider">
+
+    <h3 id="d6-s3">3. 엔드투엔드 흐름</h3>
+
+    <nav id="d6-s3-tao" class="d6-tao-outline" aria-label="생각 행동 관측 목차">
+        <p class="d6-tao-outline-title">생각 → 행동 → 관측</p>
+        <ol class="d6-tao-outline-list">
+            <li><a href="#d6-s3-think">생각</a> — LLM이 “다음에 어떤 Tool을 쓸지” 정함</li>
+            <li><a href="#d6-s3-act">행동</a> — Runtime이 TaskTool·TodoWrite를 실제 호출</li>
+            <li><a href="#d6-s3-observe">관측</a> — Tool 결과가 모델로 돌아감 · SSE는 화면용</li>
+        </ol>
+    </nav>
+
+    <div class="d6-tao-body">
+        <h4 id="d6-s3-think">생각</h4>
+        <p>
+            <code>strategicAnalysisAgent</code>에 연결된 <strong>LLM</strong>이 “지금까지의 대화·Tool 결과를 보고 다음에 무엇을 할지” 고릅니다(보통 어떤 Tool을 호출할지).
+            <strong>전체 순서</strong>(언제 routing·병렬 분석을 할지)는 자바 <code>StrategicAnalysisTaskToolOrchestrator</code>가 정하고,
+            각 단계 안에서는 <code>runSubAgent(…)</code>로 넘기는 <strong>사용자 한 줄</strong>이 LLM의 입력이 됩니다.
+        </p>
+        <h4 id="d6-s3-act">행동</h4>
+        <p>
+            <strong>Agent Runtime</strong>이 모델이 고른 대로 Tool을 <strong>실제로 실행</strong>합니다.
+            <code>TaskTool</code>은 <code>classpath:/agents/strategic/*.md</code> 서브에이전트를 돌리고, <code>TodoWriteTool</code>은 할 일 목록을 바꿉니다.
+            할 일이 바뀌면 팩토리(<code>StrategicTaskChatClientFactory</code>)가 Redis/SSE로도 넘기도록 묶어 두었습니다. 이 모든 조립은 <code>strategicAnalysisAgent</code> 빈 하나에 들어 있습니다.
+        </p>
+        <h4 id="d6-s3-observe">관측</h4>
+        <p>
+            Tool이 돌려준 내용이 <strong>다시 모델에게</strong> 전달되어 다음 판단에 쓰입니다.
+            한편 진행률·체크리스트는 <code>WorkflowStatusPublisher</code> → SSE로 같은 <code>workflowId</code>에 올라갑니다(Orchestrator의 스냅샷 + <code>TodoWriteTool</code>).
+            이건 <strong>브라우저가 보는 진행 표시</strong>용이고, 모델이 다음 턴에 참고하는 “관측”과는 목적이 다릅니다.
+        </p>
+    </div>
+
+    <div class="c4-pipeline-wrap" role="img" aria-label="ch6 요청부터 응답까지: Orchestrator, Agent Runtime, 체크리스트 스냅샷 SSE">
+        <p class="c4-flow-caption">엔드투엔드 흐름</p>
+        <div class="c4-pipeline-col">
+            <div class="c4-pipeline-step c4-ps-user">
+                <div class="c4-ps-kicker">입력</div>
+                <p class="c4-ps-title">브라우저 폼 · prompt + workflowId</p>
+            </div>
+            <div class="c4-pipeline-arrow-sm" aria-hidden="true">↓</div>
+            <div class="c4-pipeline-step c4-ps-main">
+                <div class="c4-ps-kicker">Controller</div>
+                <p class="c4-ps-title">Ch6Controller</p>
+                <p class="c4-ps-sub">executeWithMonitoring</p>
+            </div>
+            <div class="c4-pipeline-arrow-sm" aria-hidden="true">↓</div>
+            <div class="c4-pipeline-step c4-ps-main">
+                <div class="c4-ps-kicker">Task Service</div>
+                <p class="c4-ps-title">StrategicAnalysisAgentToolTaskService</p>
+                <p class="c4-ps-sub">STARTED → AGENT → COMPLETED / ERROR · ThreadLocal workflowId</p>
+            </div>
+            <div class="c4-pipeline-arrow-sm" aria-hidden="true">↓</div>
+            <div class="c4-pipeline-step c4-ps-registry">
+                <div class="c4-ps-kicker">Orchestrator</div>
+                <p class="c4-ps-title">StrategicAnalysisTaskToolOrchestrator</p>
+                <p class="c4-ps-sub">단계 순서·분기 (Java) · runSubAgent → ChatClient</p>
+            </div>
+            <div class="c4-pipeline-arrow-sm" aria-hidden="true">↓</div>
+            <div class="c4-pipeline-step c4-ps-main">
+                <div class="c4-ps-kicker">Agent Runtime</div>
+                <p class="c4-ps-title">agent-utils (사고–행동–관측)</p>
+                <p class="c4-ps-sub"><code>strategicAnalysisAgent</code> 빈 — Runtime이 Task 진행과 TaskTool·TodoWrite 호출을 반복</p>
+            </div>
+            <div class="c4-pipeline-arrow-sm" aria-hidden="true">↓</div>
+            <div class="c4-pipeline-step c4-ps-subs">
+                <div class="c4-ps-kicker">Tools / 서브</div>
+                <p class="c4-ps-title">TaskTool · TodoWriteTool · Markdown 서브에이전트</p>
+            </div>
+            <div class="c4-pipeline-arrow-sm" aria-hidden="true">↓</div>
+            <div class="c4-pipeline-step c4-ps-merge">
+                <div class="c4-ps-kicker">체크리스트 스냅샷</div>
+                <p class="c4-ps-title"><code>AGENT_TODO</code> → Redis · SSE</p>
+                <p class="c4-ps-sub">Orchestrator <code>publishAgentTodoSnapshot</code> · Runtime <code>TodoWriteTool</code> → <code>WorkflowStatusPublisher</code> · 구독 URL <code>/api/workflow/stream/{workflowId}</code></p>
+            </div>
+            <div class="c4-pipeline-arrow-sm" aria-hidden="true">↓</div>
+            <div class="c4-pipeline-step c4-ps-out">
+                <div class="c4-ps-kicker">출력</div>
+                <p class="c4-ps-title">HTTP 응답 본문 + EventSource로 진행 이벤트 수신</p>
+                <p class="c4-ps-sub">본문은 동기 응답 · 스냅샷은 위 SSE와 병행(처리 중에도 계속 발행)</p>
+            </div>
+        </div>
+    </div>
+    <p class="small text-muted" style="max-width: 26rem; margin: 0.65rem auto 0; text-align: center; line-height: 1.45;">
+        체크리스트 스냅샷은 “맨 끝에 한 번”이 아니라, Orchestrator·Agent Runtime이 도는 동안 <strong>여러 번</strong> 같은 <code>workflowId</code> 채널로 올라갑니다.
+    </p>
+
+    <hr class="course-divider">
+
+    <h3 id="d6-s4">4. SSE 단계와 TodoWrite</h3>
+    <p>대표 Redis/SSE <code>step</code> 흐름:</p>
+    <ul>
+        <li><code>STARTED</code>, <code>AGENT</code>, <code>AGENT_TODO</code>(Todo 스냅샷), <code>COMPLETED</code> 또는 <code>ERROR</code></li>
+    </ul>
+    <p>
+        Chapter 5 경로와 비교하면 <code>AGENT_TODO</code>가 Chapter 6에서 두드러집니다. <code>TodoWriteTool</code>은 agent-utils가 <code>ChatClient</code>에 붙이는 <strong>일반 Tool</strong>이라, Runtime이 루프를 돌며 모델이 스스로 “할 일 쓰기/갱신”을 호출할 수 있습니다.
+        본 저장소 팩토리(<code>StrategicTaskChatClientFactory</code>)에서는 그때마다 <code>todoEventHandler</code>가 목록을 짧은 한글 문장으로 펼쳐, <code>StrategicWorkflowContext</code>에서 꺼낸 <code>workflowId</code>와 설정에서 넘긴 단계 태그(예: <code>AGENT_TODO</code>, MD 예제는 <code>AGENT_TODO_MD</code>)로 <code>WorkflowStatusPublisher</code>에 넣습니다. 브라우저는 <code>/api/workflow/stream/{workflowId}</code> 구독으로 그 메시지를 <strong>Todo 진행률·체크리스트 스냅샷</strong>처럼 받게 됩니다.
+    </p>
+
+    <hr class="course-divider">
+
+    <h3 id="d6-s5">5. Markdown 파일</h3>
+    <p>
+        같은 단계를 Chapter 5에서는 <code>ToolRegistry</code>에 등록한 <code>StrategicTool</code> 빈이 맡고, Chapter 6에서는 <code>classpath:/agents/strategic/*.md</code> 서브에이전트(frontmatter <code>name</code> = TaskTool 키)가 맡습니다.
+        아래는 파일·역할 요약과, Chapter 5에서 대응하는 Tool 클래스입니다.
+    </p>
+    <table class="table table-bordered table-sm">
+        <thead class="thead-light">
+        <tr>
+            <th>파일</th>
+            <th>역할</th>
+            <th>Chapter 5 Tool</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><code>strategic-router.md</code></td>
+            <td>라우팅 — SIMPLE / STRATEGIC 분류</td>
+            <td><code>RoutingTool</code></td>
+        </tr>
+        <tr>
+            <td><code>strategic-simple.md</code></td>
+            <td>단순 질의 한 번에 응답</td>
+            <td><code>SimpleQueryTool</code></td>
+        </tr>
+        <tr>
+            <td><code>strategic-tech.md</code></td>
+            <td>기술 분석</td>
+            <td><code>TechnicalAnalysisTool</code></td>
+        </tr>
+        <tr>
+            <td><code>strategic-market.md</code></td>
+            <td>시장 분석</td>
+            <td><code>MarketAnalysisTool</code></td>
+        </tr>
+        <tr>
+            <td><code>strategic-evaluator.md</code></td>
+            <td>보고서 평가</td>
+            <td><code>ReportEvaluatorTool</code></td>
+        </tr>
+        <tr>
+            <td><code>strategic-optimizer.md</code></td>
+            <td>보고서 개선(평가 피드백 반영)</td>
+            <td><code>ReportOptimizerTool</code></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <h4 class="mt-4">모델 지정 방식</h4>
+    <p>
+        각 <code>.md</code> 파일 상단 YAML(frontmatter)의 <code>model:</code>에 <strong>별칭</strong>을 적습니다. TaskTool이 해당 서브에이전트를 실행할 때
+        <code>ClaudeSubagentExecutor</code>가 <code>StrategicTaskChatClientFactory#strategicModelBuilders</code>로 별칭을 받아, 실제로는 아래처럼 Spring에 주입된 채팅 모델 빈에 연결된 <code>ChatClient.Builder</code>를 고릅니다.
+    </p>
+    <table class="table table-bordered table-sm table-striped">
+        <thead class="thead-light">
+        <tr>
+            <th>별칭 (<code>model:</code>)</th>
+            <th>연결되는 빈 (본 저장소 기준)</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><code>default</code></td>
+            <td><code>OpenAiChatModel</code> (GPT 계열)</td>
+        </tr>
+        <tr>
+            <td><code>cheap</code></td>
+            <td><code>OllamaChatModel</code> (가벼운 로컬/저비용)</td>
+        </tr>
+        <tr>
+            <td><code>heavy</code></td>
+            <td><code>GoogleGenAiChatModel</code> (Gemini)</td>
+        </tr>
+        <tr>
+            <td><code>gpt</code> · <code>llama</code> · <code>gemini</code></td>
+            <td>각각 OpenAI / Ollama / Gemini — 위와 동일 매핑으로 직접 지정할 때 사용</td>
+        </tr>
+        </tbody>
+    </table>
+    <p>
+        <strong>이번 장 예제 파일에서의 사용:</strong>
+        <code>strategic-router.md</code>는 <code>model: default</code>,
+        <code>strategic-simple.md</code>는 <code>model: cheap</code>,
+        나머지(<code>strategic-tech</code>, <code>strategic-market</code>, <code>strategic-evaluator</code>, <code>strategic-optimizer</code>)는 모두 <code>model: heavy</code>입니다.
+        즉 라우팅은 기본 GPT, 단순 응답은 Ollama, 분석·평가·개선처럼 부담이 큰 단계는 Gemini를 쓰도록 나뉘어 있습니다. 별칭만 바꾸면 같은 Markdown으로 다른 모델을 태울 수 있습니다.
+    </p>
+
+    <hr class="course-divider">
+
+    <h3 id="d6-s6">6. 다른 Chapter와 이어지는 맥락</h3>
+    <p>마지막으로, 지금 배운 내용이 앞뒤 장에서 어떻게 확장되는지만 짚고 마무리합니다.</p>
+    <ul>
+        <li><strong>Chapter 4</strong> — <code>Ch4Controller</code> → <code>StrategicAnalysisAgentService#executeWithMonitoring</code> → <code>StrategicAnalysisAgentOrchestrator</code> → <code>ToolRegistry</code> / <code>StrategicTool</code> → <code>SubAgentRegistry</code>.</li>
+        <li><strong>Chapter 5</strong> — <code>Ch5Controller</code> → <code>StrategicAnalysisAgentToolTaskService</code>(ch5) → <code>StrategicAnalysisAgentToolOrchestrator</code> → 동일 Tool·SubAgent 스택.</li>
+        <li><strong>Chapter 6 (지금 실습)</strong> — <code>Ch6Controller</code> → <code>StrategicAnalysisAgentToolTaskService</code>(ch6) → <code>StrategicAnalysisTaskToolOrchestrator</code> → ChatClient·TaskTool·Markdown.</li>
+        <li><strong>Chapter 7</strong> — <code>Ch7Controller</code> → <code>StrategicAnalysisDagWorkflowService</code> → <code>DagWorkflowEngine</code> → <code>WorkflowNode</code> 내부 <code>SubAgentRegistry</code>.</li>
+        <li><strong>Chapter 8</strong> — YAML 정의 + <code>YamlDagWorkflowEngine</code>(<code>ch8Engine</code>)로 동일 비즈니스를 선언적으로 실행.</li>
+        <li><strong>Chapter 9</strong> — <code>ValidatedYamlWorkflowDefinitionLoader</code>가 <strong>로딩 파이프라인의 검증층</strong>으로 통과분만 캐시하고, 동일 <code>YamlDagWorkflowEngine</code>(<code>ch9Engine</code>)으로 실행.</li>
+    </ul>
+
+    <div class="course-footer-actions">
+    <p>
+        <a th:href="@{/go/ch6/1_strategic_analysis}" class="btn btn-primary font-weight-bold">실습 다시 하기 — Strategic Analysis (Task tool)</a>
+        &nbsp;
+        <a th:href="@{/go/ch6}" class="btn btn-outline-primary">Chapter 6 본문으로 돌아가기</a>
+    </p>
+    </div>
+
+    </div>
+    </div>
+
+</th:block>
+</html>

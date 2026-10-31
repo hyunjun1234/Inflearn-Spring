@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<!-- fragment/center.html -->
+
+<!-- Main Center -->
+<th:block th:fragment="center(center)">
+    <div th:if="${center} != null" class="container">
+        <div th:replace="~{${center}}" ></div>
+    </div>
+</th:block>
+
+</html>

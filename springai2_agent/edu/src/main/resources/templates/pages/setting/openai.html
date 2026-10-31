@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<th:block>
+
+    <style>
+        .course-main { max-width: 52rem; margin: 0 auto; padding: 0 0.25rem 2.5rem; font-size: 1rem; line-height: 1.65; color: #1e293b; }
+        .course-hero { margin-bottom: 1.25rem; padding-bottom: 1rem; border-bottom: 1px solid #e2e8f0; }
+        .course-hero h1 { font-size: clamp(1.25rem, 2.2vw, 1.65rem); font-weight: 700; letter-spacing: -0.02em; margin: 0; color: #0f172a; line-height: 1.3; }
+        .course-toc { background: linear-gradient(165deg, #f8fafc 0%, #f1f5f9 100%); border: 1px solid #e2e8f0; border-radius: 10px; padding: 1rem 1.25rem 1.1rem; margin-bottom: 1.25rem; }
+        .course-toc-title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b; margin: 0 0 0.6rem; }
+        .course-toc ol { margin: 0; padding-left: 1.2rem; }
+        .course-toc li { margin-bottom: 0.35rem; line-height: 1.45; }
+        .course-toc a { color: #1d4ed8; text-decoration: none; font-size: 0.9rem; }
+        .course-toc a:hover { text-decoration: underline; color: #1e40af; }
+        .course-overview { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 1.25rem 1.4rem 1.35rem; margin-bottom: 1.25rem; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06); }
+        .course-content h3 { font-size: 1.12rem; margin: 1.35rem 0 0.85rem; padding-bottom: 0.55rem; border-bottom: 2px solid #93c5fd; color: #0f172a; font-weight: 700; line-height: 1.4; }
+        .course-content > h3:first-of-type,
+        .course-content hr.course-divider + h3 { margin-top: 0; }
+        .course-divider { border: none; height: 1px; background: linear-gradient(90deg, transparent, #cbd5e1, transparent); margin: 1.5rem 0; }
+        .course-footer-actions { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #e2e8f0; }
+        ul, ol { margin-left: 1.25rem; margin-bottom: 0.75rem; }
+        code { background: #f1f5f9; padding: 0.12em 0.38em; border-radius: 4px; font-size: 0.9em; color: #0f172a; }
+        p { margin-bottom: 0.85rem; }
+        .course-overview .meta { color: #475569; font-size: 0.95rem; margin-bottom: 0.75rem; }
+        .course-content figure { margin: 0.75rem 0 1rem; }
+        .course-content figure img { display: block; max-width: 100%; height: auto; border-radius: 10px; border: 1px solid #e2e8f0; box-shadow: 0 2px 12px rgba(15, 23, 42, 0.06); }
+        .course-content pre { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 0.85rem 1rem; overflow-x: auto; font-size: 0.88rem; line-height: 1.5; margin: 0.75rem 0 1rem; }
+    </style>
+
+    <div class="course-main">
+    <header class="course-hero">
+    <h1>OpenAI 환경 설정</h1>
+    </header>
+
+    <div class="course-overview">
+    <p class="meta">
+        API 키 발급 · 결제·크레딧 · 문서 · Spring Boot <code>.env</code> 연동
+    </p>
+    <p>
+        Spring AI에서 OpenAI 모델을 쓰려면 <strong>Platform API Key</strong>와 결제(크레딧) 설정이 필요합니다.
+        키는 저장소에 올리지 말고 <code>.env</code>로 관리하고, <code>application.yml</code>에서 선택적으로 불러옵니다.
+    </p>
+    </div>
+
+    <nav class="course-toc" aria-label="목차">
+    <p class="course-toc-title">목차</p>
+    <ol>
+        <li><a href="#oa-s1">API 키 발급</a></li>
+        <li><a href="#oa-s2">OpenAI 문서</a></li>
+        <li><a href="#oa-s3">Spring Boot 프로젝트에 키 입력</a></li>
+    </ol>
+    </nav>
+
+    <div class="course-content">
+    <hr class="course-divider">
+
+    <h3 id="oa-s1">1. API 키 발급</h3>
+    <p>
+        <a href="https://platform.openai.com/" target="_blank" rel="noopener noreferrer">OpenAI Platform</a>
+        에 로그인한 뒤 키를 발급합니다.
+    </p>
+    <ol>
+        <li>상단 톱니(설정) → <strong>API Keys</strong> → <em>Create new secret key</em> — 프로젝트는 default, 권한은 All 등 과정 안내에 맞게 선택</li>
+        <li><strong>Billing</strong> → <strong>Payment methods</strong>에서 카드 등록 후 크레딧 충전. <strong>Auto recharge</strong>는 반드시 꺼 두는 것을 권장합니다.</li>
+    </ol>
+    <figure>
+        <img th:src="@{/imgs/openai2.png}" alt="OpenAI API Keys 화면 예시">
+    </figure>
+    <figure>
+        <img th:src="@{/imgs/openai3.png}" alt="OpenAI Billing 화면 예시">
+    </figure>
+
+    <hr class="course-divider">
+
+    <h3 id="oa-s2">2. OpenAI 문서</h3>
+    <p>
+        <a href="https://platform.openai.com/docs/overview" target="_blank" rel="noopener noreferrer">OpenAI Documentation</a>
+    </p>
+
+    <hr class="course-divider">
+
+    <h3 id="oa-s3">3. Spring Boot 프로젝트에 키 정보 입력</h3>
+    <p>프로젝트 루트에 <code>.env</code> 파일을 만들고 키를 넣습니다. Git에 올릴 때는 <code>.gitignore</code>에 <code>.env</code>를 반드시 추가합니다.</p>
+    <figure>
+        <img th:src="@{/imgs/env.png}" alt=".env 파일 예시">
+    </figure>
+<pre>
+OPEN_AI_KEY=sk-proj-TcdDCv
+GEMINI_KEY=AIzaSyDkpW5sh1I</pre>
+    <p>Spring Boot가 <code>.env</code>를 읽도록 <code>application.yml</code>(또는 프로필별 yml)에 다음을 둡니다.</p>
+<pre>
+spring:
+  config:
+    import: optional:file:.env[.properties]</pre>
+
+    <div class="course-footer-actions">
+    <p style="font-size:0.88rem;color:#64748b;margin-bottom:0.5rem;">다른 환경 설정 가이드</p>
+    <p>
+        <a th:href="@{/go/setting/intellij}">IntelliJ</a> ·
+        <a th:href="@{/go/setting/springai}">Spring AI</a> ·
+        <a th:href="@{/go/setting/gemini}">Gemini</a> ·
+        <a th:href="@{/go/setting/ollama}">Ollama</a> ·
+        <a th:href="@{/go/setting/redis}">Redis</a> ·
+        <a th:href="@{/go/setting/postgresql}">PostgreSQL</a> ·
+        <a th:href="@{/go/setting/react}">React</a>
+    </p>
+    </div>
+
+    </div>
+    </div>
+
+</th:block>
+</html>

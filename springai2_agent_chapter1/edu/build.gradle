@@ -1,0 +1,136 @@
+// ✅ Java 프로젝트 플러그인
+// ✅ Spring Boot 플러그인 (애플리케이션 실행, 패키징 지원)
+// ✅ BOM 기반 의존성 버전 관리 플러그인
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.5.10'
+    id 'io.spring.dependency-management' version '1.1.7'
+}
+
+// ✅ 프로젝트 그룹 ID (패키지 네임스페이스 기준)
+group = 'com.ai'
+
+// ✅ 프로젝트 버전
+version = '0.0.1-SNAPSHOT'
+
+// ✅ 프로젝트 설명
+description = 'edu'
+
+// ✅ Java 17 사용 (Spring Boot 3.x 최소 요구 버전)
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+// ✅ compileOnly 설정이 annotationProcessor를 상속
+// Lombok 같은 컴파일 타임 전용 라이브러리 처리
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+// ✅ 기본 Maven 중앙 저장소
+// ✅ Spring AI Milestone 버전 사용을 위한 저장소
+repositories {
+    mavenCentral()
+    maven { url 'https://repo.spring.io/milestone' }
+}
+
+// ✅ Spring AI BOM 버전 정의 (한 번만 정의하고 전체에서 사용)
+ext {
+    set('springAiVersion', "1.1.2")
+}
+
+dependencies {
+
+    // ===============================
+    // 🌱 Spring Boot 기본 스타터
+    // ===============================
+
+    // ✅ 서버 사이드 템플릿 엔진 (HTML 렌더링)
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
+    // ✅ Spring MVC 기반 REST API 개발
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    // ✅ Lombok (컴파일 시점에만 사용)
+    compileOnly 'org.projectlombok:lombok'
+
+    // ✅ Lombok 어노테이션 처리기
+    annotationProcessor 'org.projectlombok:lombok'
+
+    // ✅ 개발 편의 기능 (자동 재시작 등)
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+
+    // ===============================
+    // 🔁 Resilience4j (Circuit Breaker) Chapter1
+    // ===============================
+    // @CircuitBreaker, @Retry 등 어노테이션 기반 장애 대응
+    implementation 'io.github.resilience4j:resilience4j-spring-boot3:2.1.0'
+
+    // ✅ AOP 의존성 (Resilience4j 어노테이션 처리 필수)
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+
+
+
+    // ===============================
+    // 🤖 Spring AI 모델 스타터 Chapter1 ~ Chapter9
+    // ===============================
+    // ✅ OpenAI (GPT 등) 연동 스타터
+    implementation 'org.springframework.ai:spring-ai-starter-model-openai'
+
+    // ✅ Google Gemini 연동 스타터
+    implementation 'org.springframework.ai:spring-ai-starter-model-google-genai'
+
+    // ✅ Ollama (로컬 LLM) 연동 스타터
+    implementation 'org.springframework.ai:spring-ai-starter-model-ollama'
+
+
+
+
+    // ===============================
+    // 🗄 Redis  Chapter3 ~ Chapter9
+    // ===============================
+
+
+    // ===============================
+    // 🗄 Spring AI Community — agent-utils  Chapter6
+    // https://springaicommunity.mintlify.app/projects/incubating/spring-ai-agent-utils
+    // 설명은 이 버전(0.4.2) 기준
+    // ===============================
+
+
+
+    // ===============================
+    // 📄 YAML 파싱 (SnakeYAML) Chapter8 ~ Chapter9
+    // ===============================
+
+
+    // ===============================
+    // 🧪 테스트
+    // ===============================
+
+    // ✅ JUnit, Mockito, Spring Test 포함
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    // ✅ JUnit 플랫폼 런처
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+
+}
+
+// ✅ Spring AI BOM 가져오기
+// 각 AI 스타터들의 버전을 springAiVersion 기준으로 통일
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.ai:spring-ai-bom:${springAiVersion}"
+    }
+}
+
+// ✅ JUnit5 플랫폼 사용
+tasks.named('test') {
+    useJUnitPlatform()
+}

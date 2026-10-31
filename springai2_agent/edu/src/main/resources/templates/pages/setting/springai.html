@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<th:block>
+
+    <style>
+        .course-main { max-width: 52rem; margin: 0 auto; padding: 0 0.25rem 2.5rem; font-size: 1rem; line-height: 1.65; color: #1e293b; }
+        .course-hero { margin-bottom: 1.25rem; padding-bottom: 1rem; border-bottom: 1px solid #e2e8f0; }
+        .course-hero h1 { font-size: clamp(1.25rem, 2.2vw, 1.65rem); font-weight: 700; letter-spacing: -0.02em; margin: 0; color: #0f172a; line-height: 1.3; }
+        .course-toc { background: linear-gradient(165deg, #f8fafc 0%, #f1f5f9 100%); border: 1px solid #e2e8f0; border-radius: 10px; padding: 1rem 1.25rem 1.1rem; margin-bottom: 1.25rem; }
+        .course-toc-title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b; margin: 0 0 0.6rem; }
+        .course-toc ol { margin: 0; padding-left: 1.2rem; }
+        .course-toc li { margin-bottom: 0.35rem; line-height: 1.45; }
+        .course-toc a { color: #1d4ed8; text-decoration: none; font-size: 0.9rem; }
+        .course-toc a:hover { text-decoration: underline; color: #1e40af; }
+        .course-overview { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 1.25rem 1.4rem 1.35rem; margin-bottom: 1.25rem; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06); }
+        .course-content h3 { font-size: 1.12rem; margin: 1.35rem 0 0.85rem; padding-bottom: 0.55rem; border-bottom: 2px solid #93c5fd; color: #0f172a; font-weight: 700; line-height: 1.4; }
+        .course-content > h3:first-of-type,
+        .course-content hr.course-divider + h3 { margin-top: 0; }
+        .course-divider { border: none; height: 1px; background: linear-gradient(90deg, transparent, #cbd5e1, transparent); margin: 1.5rem 0; }
+        .course-footer-actions { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #e2e8f0; }
+        ul { margin-left: 1.25rem; margin-bottom: 0.75rem; }
+        code { background: #f1f5f9; padding: 0.12em 0.38em; border-radius: 4px; font-size: 0.9em; color: #0f172a; }
+        p { margin-bottom: 0.85rem; }
+        .course-overview .meta { color: #475569; font-size: 0.95rem; margin-bottom: 0.75rem; }
+        .course-content figure { margin: 0.75rem 0 1rem; }
+        .course-content figure img { display: block; max-width: 100%; height: auto; border-radius: 10px; border: 1px solid #e2e8f0; box-shadow: 0 2px 12px rgba(15, 23, 42, 0.06); }
+        .course-content .cite { font-size: 0.88rem; color: #64748b; margin-top: -0.35rem; margin-bottom: 0.75rem; }
+        .course-content .cite a { color: #1d4ed8; }
+    </style>
+
+    <div class="course-main">
+    <header class="course-hero">
+    <h1>Spring AI</h1>
+    </header>
+
+    <div class="course-overview">
+    <p class="meta">
+        AI 통합 프레임워크 개요 · Provider 추상화 · RAG·Embedding·Advisor — 본 과정 실습과의 연결
+    </p>
+    <p>
+        Spring AI는 Spring Boot 애플리케이션에서 LLM·Embedding·멀티모달 모델을 <strong>일관된 프로그래밍 모델</strong>로 쓰기 위한 프레임워크입니다.
+        아래 섹션은 공식 문서와 과정 자료를 바탕으로 한 요약입니다.
+    </p>
+    <p>
+        Spring AI를 공부하고자 한다면 <a href="https://inf.run/QyDvb" target="_blank" rel="noopener noreferrer">https://inf.run/QyDvb</a> 링크로 가시면 됩니다.
+    </p>
+    </div>
+
+    <nav class="course-toc" aria-label="목차">
+    <p class="course-toc-title">목차</p>
+    <ol>
+        <li><a href="#sa-s1">Spring AI 개요</a></li>
+        <li><a href="#sa-s2">Spring AI가 해결하는 핵심 과제</a></li>
+        <li><a href="#sa-s3">Spring AI의 필요성</a></li>
+        <li><a href="#sa-s4">입력·출력 유형과 모델</a></li>
+        <li><a href="#sa-s5">핵심 구조 및 설계 요소</a></li>
+        <li><a href="#sa-s6">주요 AI Provider</a></li>
+        <li><a href="#sa-s7">기능 요약</a></li>
+    </ol>
+    </nav>
+
+    <div class="course-content">
+    <hr class="course-divider">
+
+    <h3 id="sa-s1">1. Spring AI 개요</h3>
+    <p>Spring AI의 핵심은 AI 통합의 근본적인 과제, 즉 <strong>기업 데이터와 API를 AI 모델에 연결하는 것</strong>입니다.</p>
+    <figure>
+        <img th:src="@{/imgs/springai.png}" alt="Spring AI 개요 다이어그램">
+    </figure>
+    <p class="cite"><a href="https://docs.spring.io/spring-ai/reference/index.html" target="_blank" rel="noopener noreferrer">출처: docs.spring.io</a></p>
+
+    <p>
+        Spring AI는 Spring 기반 애플리케이션에서 다양한 생성형 AI 모델과의 통합을 표준화하기 위해 설계된
+        <strong>AI 엔지니어링 프레임워크</strong>입니다. Spring Boot 애플리케이션 내에서 LLM(Large Language Model),
+        Embedding Model, 멀티모달 모델 등을 일관된 방식으로 활용할 수 있도록 추상화 레이어를 제공합니다.
+    </p>
+    <figure>
+        <img th:src="@{/imgs/support.png}" alt="Spring AI 지원 범위">
+    </figure>
+    <p class="cite"><a href="https://spring.io/projects/spring-ai#support" target="_blank" rel="noopener noreferrer">출처: spring.io/projects/spring-ai</a></p>
+
+    <p>
+        기존에는 OpenAI, AWS Bedrock, Azure OpenAI, HuggingFace 등 Provider마다 서로 다른 API 스펙을 직접 이해하고 구현해야 했지만,
+        Spring AI는 이를 <strong>일관된 프로그래밍 모델</strong>로 제공하여 서비스 개발의 복잡도를 크게 줄여줍니다.
+    </p>
+
+    <hr class="course-divider">
+
+    <h3 id="sa-s2">2. Spring AI가 해결하는 핵심 과제</h3>
+    <p>Spring AI는 엔터프라이즈 환경에서 빈번하게 발생하는 AI 통합 이슈를 다음과 같은 방식으로 해결합니다.</p>
+    <ul>
+        <li><strong>Provider API 다양성 문제</strong>: 모델 호출 방식(HTTP 스펙, 파라미터 구조, 인증 방식) 차이를 표준화.</li>
+        <li><strong>데이터와 AI 모델 간 연결 문제</strong>: Embedding API 및 Vector Store와의 통합을 통한 RAG 구현.</li>
+        <li><strong>프롬프트 관리 난이도</strong>: 템플릿 기반 Prompt 시스템을 통해 재사용성과 유지보수 향상.</li>
+        <li><strong>AI 출력 구조화 부족</strong>: Structured Output Converter로 JSON → Java POJO 변환 자동화.</li>
+        <li><strong>테스트/운영 어려움</strong>: Mock 모델 및 Advisor API를 통한 테스트 가능성 확대와 운영 안정성 확보.</li>
+        <li><strong>엔터프라이즈 수준 보안 요구</strong>: Spring Security 기반으로 요청 가로채기, 감사(Audit) 로그 관리.</li>
+    </ul>
+
+    <hr class="course-divider">
+
+    <h3 id="sa-s3">3. Spring AI의 필요성</h3>
+    <p>기업이 AI 기능을 기존 Spring 시스템에 안정적으로 통합하기 위해 Spring AI는 필수적인 역할을 수행합니다.</p>
+    <ul>
+        <li><strong>표준화된 AI 아키텍처</strong>: 서비스별로 서로 다른 AI SDK를 쓰지 않도록 통일성을 제공.</li>
+        <li><strong>AI 도입 속도 향상</strong>: Spring Boot 기반이므로 프로젝트 내 즉시 적용 가능.</li>
+        <li><strong>운영 및 모니터링과의 결합</strong>: Actuator, Micrometer, Logging 등 Spring 인프라와 연동.</li>
+        <li><strong>클라우드 전환/온프레미스 모두 지원</strong>: Provider 변경 시 코드 변경 최소화.</li>
+        <li><strong>AI-중심 도메인 로직 강화</strong>: Prompt, Retrieval, Output 처리 로직을 모듈화하여 재사용성 극대화.</li>
+    </ul>
+
+    <hr class="course-divider">
+
+    <h3 id="sa-s4">4. Spring AI의 입력 및 출력 유형에 따라 모델</h3>
+    <p>Spring AI는 현재 언어, 이미지, 오디오를 입력 및 출력으로 처리하는 모델을 지원합니다.</p>
+    <figure>
+        <img th:src="@{/imgs/springai2.png}" alt="Spring AI 입출력 유형">
+    </figure>
+    <p class="cite"><a href="https://docs.spring.io/spring-ai/reference/index.html" target="_blank" rel="noopener noreferrer">출처: docs.spring.io</a></p>
+
+    <ul>
+        <li>Chat / Completion (LLM)</li>
+        <li>Embeddings</li>
+        <li>Text-to-Image / Image Generation</li>
+        <li>Text-to-Speech / Speech-to-Text</li>
+    </ul>
+
+    <hr class="course-divider">
+
+    <h3 id="sa-s5">5. Spring AI의 핵심 구조 및 설계 요소</h3>
+    <p>Spring AI는 다음과 같은 세부적인 기술 컴포넌트로 구성됩니다.</p>
+    <ul>
+        <li>
+            <strong>1) Model Client Abstraction</strong><br>
+            ChatModel, EmbeddingModel, AudioModel 등 범용 인터페이스 제공.<br>
+            예: <code>ChatClient</code>는 OpenAI, Azure, Ollama 등 동일한 방식으로 호출 가능.
+        </li>
+        <li>
+            <strong>2) Prompt Template Engine</strong><br>
+            변수 삽입, System/Assistant/User 역할 기반 메시지 구성, 구조화된 Prompt 재사용.
+        </li>
+        <li>
+            <strong>3) Structured Output Converter</strong><br>
+            모델 응답을 JSON Schema에 맞춰 Java 객체로 자동 매핑.<br>
+            예: <code>WeatherResponse.class</code> 형태로 직접 변환.
+        </li>
+        <li>
+            <strong>4) Advisors API</strong><br>
+            요청(Request) 또는 응답(Response)을 가로채고 조작하는 필터링 기능 제공.<br>
+            예: 프롬프트 강화, 응답 검증, 커스텀 로깅, 금칙어 필터링 등.
+        </li>
+        <li>
+            <strong>5) Embedding API &amp; Vector Store</strong><br>
+            pgvector, Redis, Pinecone, Milvus 등과 통합하여 RAG 파이프라인 구축 가능.
+        </li>
+        <li>
+            <strong>6) Document Reader &amp; Chunking</strong><br>
+            PDF/TXT/HTML/URL을 분석하여 적절한 청크로 분리하고 Vector Store에 저장.
+        </li>
+        <li>
+            <strong>7) RAG End-to-End 지원</strong><br>
+            Retrieve → Augment → Generate 전체 파이프라인을 Spring 구조 안에서 구현 가능.
+        </li>
+    </ul>
+
+    <hr class="course-divider">
+
+    <h3 id="sa-s6">6. Spring AI가 지원하는 주요 AI Provider</h3>
+    <p>Spring AI는 다양한 AI 서비스와 네이티브 연동을 지원합니다.</p>
+    <ul>
+        <li>Amazon Bedrock – Claude, Llama, Mistral 등</li>
+        <li>Anthropic – Claude 모델</li>
+        <li>Azure OpenAI – Azure 기반 OpenAI 모델</li>
+        <li>Google AI – Gemini 모델 포함</li>
+        <li>Hugging Face – 30만+ 모델 API</li>
+        <li>MiniMax – 다국어 모델</li>
+        <li>Mistral AI – Mistral 7B 등</li>
+        <li>Ollama – 로컬 실행 가능 오픈소스 모델</li>
+    </ul>
+
+    <hr class="course-divider">
+
+    <h3 id="sa-s7">7. Spring AI 기능 요약</h3>
+    <p>Spring AI가 제공하는 주요 기능은 다음과 같습니다.</p>
+    <ul>
+        <li><strong>Chat Completion / 멀티턴 대화</strong> — ChatModel 기반 상호작용</li>
+        <li><strong>Function Calling / Tool Calling</strong> — LLM이 함수 호출을 통해 외부 시스템과 통신</li>
+        <li><strong>Embedding 생성</strong> — 문서·텍스트 데이터의 벡터화</li>
+        <li><strong>Vector Database 연동</strong> — Pinecone, Redis, pgvector 등</li>
+        <li><strong>RAG 구성</strong> — Retrieval, Context Augmentation, Prompt 결합</li>
+        <li><strong>문서 로더</strong> — PDF/HTML/Text 파일 자동 로딩 및 청킹</li>
+        <li><strong>Structured Output</strong> — LLM 결과를 정형 데이터로 변환</li>
+        <li><strong>멀티모달 지원</strong> — 이미지 생성, 음성 변환 등 Provider 기반 기능 지원</li>
+    </ul>
+
+    <div class="course-footer-actions">
+    <p style="font-size:0.88rem;color:#64748b;margin-bottom:0.5rem;">다른 환경 설정 가이드</p>
+    <p>
+        <a th:href="@{/go/setting/intellij}">IntelliJ</a> ·
+        <a th:href="@{/go/setting/openai}">OpenAI</a> ·
+        <a th:href="@{/go/setting/gemini}">Gemini</a> ·
+        <a th:href="@{/go/setting/ollama}">Ollama</a> ·
+        <a th:href="@{/go/setting/redis}">Redis</a> ·
+        <a th:href="@{/go/setting/postgresql}">PostgreSQL</a> ·
+        <a th:href="@{/go/setting/react}">React</a>
+    </p>
+    </div>
+
+    </div>
+    </div>
+
+</th:block>
+
+</html>

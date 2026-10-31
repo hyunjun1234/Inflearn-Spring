@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<th:block>
+
+    <style>
+        .course-main { max-width: 52rem; margin: 0 auto; padding: 0 0.25rem 2.5rem; font-size: 1rem; line-height: 1.65; color: #1e293b; }
+        .course-hero { margin-bottom: 1.25rem; padding-bottom: 1rem; border-bottom: 1px solid #e2e8f0; }
+        .course-hero h1 { font-size: clamp(1.25rem, 2.2vw, 1.65rem); font-weight: 700; letter-spacing: -0.02em; margin: 0; color: #0f172a; line-height: 1.3; }
+        .course-toc { background: linear-gradient(165deg, #f8fafc 0%, #f1f5f9 100%); border: 1px solid #e2e8f0; border-radius: 10px; padding: 1rem 1.25rem 1.1rem; margin-bottom: 1.25rem; }
+        .course-toc-title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b; margin: 0 0 0.6rem; }
+        .course-toc ol { margin: 0; padding-left: 1.2rem; }
+        .course-toc li { margin-bottom: 0.35rem; line-height: 1.45; }
+        .course-toc a { color: #1d4ed8; text-decoration: none; font-size: 0.9rem; }
+        .course-toc a:hover { text-decoration: underline; color: #1e40af; }
+        .course-overview { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 1.25rem 1.4rem 1.35rem; margin-bottom: 1.25rem; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06); }
+        .course-content h3 { font-size: 1.12rem; margin: 1.35rem 0 0.85rem; padding-bottom: 0.55rem; border-bottom: 2px solid #93c5fd; color: #0f172a; font-weight: 700; line-height: 1.4; }
+        .course-content > h3:first-of-type,
+        .course-content hr.course-divider + h3 { margin-top: 0; }
+        .course-content h4 { font-size: 1rem; margin: 1rem 0 0.5rem; color: #334155; font-weight: 600; }
+        .course-divider { border: none; height: 1px; background: linear-gradient(90deg, transparent, #cbd5e1, transparent); margin: 1.5rem 0; }
+        .course-footer-actions { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #e2e8f0; }
+        ul, ol { margin-left: 1.25rem; margin-bottom: 0.75rem; }
+        code { background: #f1f5f9; padding: 0.12em 0.38em; border-radius: 4px; font-size: 0.9em; color: #0f172a; }
+        p { margin-bottom: 0.85rem; }
+        .course-overview .meta { color: #475569; font-size: 0.95rem; margin-bottom: 0.75rem; }
+        .desc-overview-lead { margin-bottom: 0.9rem; }
+        .desc-overview-outro { margin-bottom: 0.5rem; }
+
+        .c8-flow-wrap {
+            margin: 1rem 0 1.25rem;
+            padding: 1.35rem 1.25rem 1.5rem;
+            border-radius: 14px;
+            background: linear-gradient(160deg, #f0f9ff 0%, #f8fafc 45%, #f1f5f9 100%);
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 24px rgba(15, 23, 42, 0.06);
+        }
+        .c8-flow-wrap .c8-flow-caption {
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #64748b;
+            margin: 0 0 1rem;
+            text-align: center;
+        }
+        .c8-flow-col { display: flex; flex-direction: column; align-items: center; gap: 0; }
+        .c8-flow-arrow {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0.35rem 0 0.45rem;
+            color: #94a3b8;
+            font-size: 1.1rem;
+            line-height: 1;
+        }
+        .c8-flow-arrow span { font-size: 0.65rem; font-weight: 600; letter-spacing: 0.06em; color: #94a3b8; margin-top: 0.2rem; }
+        .c8-card {
+            width: 100%;
+            max-width: 22rem;
+            border-radius: 12px;
+            padding: 0.85rem 1rem;
+            text-align: center;
+            border: 1px solid transparent;
+        }
+        .c8-card-main {
+            background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%);
+            color: #f8fafc;
+            border-color: #1e293b;
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.25);
+        }
+        .c8-card-main .c8-card-kicker { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.85; margin-bottom: 0.35rem; }
+        .c8-card-main .c8-card-title { font-size: 1.02rem; font-weight: 700; margin: 0; line-height: 1.35; }
+        .c8-card-main .c8-card-sub { font-size: 0.78rem; opacity: 0.88; margin: 0.4rem 0 0; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+        .c8-card-def {
+            background: #fff;
+            border: 2px solid #38bdf8;
+            box-shadow: 0 4px 14px rgba(14, 165, 233, 0.12);
+        }
+        .c8-card-def .c8-card-kicker { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #0369a1; margin-bottom: 0.3rem; }
+        .c8-card-def .c8-card-title { font-size: 0.98rem; font-weight: 700; color: #0c4a6e; margin: 0; }
+        .c8-card-def .c8-card-sub { font-size: 0.78rem; color: #64748b; margin: 0.35rem 0 0; }
+
+        .c8-pipeline-wrap {
+            margin: 1rem 0 1.25rem;
+            padding: 1.25rem 1.15rem 1.4rem;
+            border-radius: 14px;
+            background: linear-gradient(165deg, #f8fafc 0%, #eef2ff 40%, #f1f5f9 100%);
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
+        }
+        .c8-pipeline-wrap .c8-flow-caption {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #64748b;
+            margin: 0 0 0.9rem;
+            text-align: center;
+        }
+        .c8-pipeline-col { display: flex; flex-direction: column; align-items: center; max-width: 24rem; margin: 0 auto; }
+        .c8-pipeline-step {
+            width: 100%;
+            border-radius: 11px;
+            padding: 0.65rem 0.9rem;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+        }
+        .c8-pipeline-step .c8-ps-kicker { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #64748b; margin-bottom: 0.2rem; }
+        .c8-pipeline-step .c8-ps-title { font-size: 0.92rem; font-weight: 700; color: #0f172a; margin: 0; line-height: 1.35; }
+        .c8-pipeline-step .c8-ps-sub { font-size: 0.74rem; color: #64748b; margin: 0.28rem 0 0; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+        .c8-pipeline-step.c8-ps-user { background: linear-gradient(180deg, #f8fafc 0%, #fff 100%); border-color: #cbd5e1; }
+        .c8-pipeline-step.c8-ps-main {
+            background: linear-gradient(135deg, #1e3a5f 0%, #1e293b 100%);
+            border-color: #334155;
+            color: #f8fafc;
+        }
+        .c8-pipeline-step.c8-ps-main .c8-ps-kicker { color: rgba(248, 250, 252, 0.75); }
+        .c8-pipeline-step.c8-ps-main .c8-ps-title { color: #f8fafc; }
+        .c8-pipeline-step.c8-ps-main .c8-ps-sub { color: rgba(248, 250, 252, 0.88); }
+        .c8-pipeline-step.c8-ps-def { border: 2px solid #38bdf8; background: #fff; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.1); }
+        .c8-pipeline-step.c8-ps-def .c8-ps-kicker { color: #0369a1; }
+        .c8-pipeline-step.c8-ps-def .c8-ps-title { color: #0c4a6e; }
+        .c8-pipeline-step.c8-ps-nodes { border-style: dashed; border-color: #94a3b8; background: #fffefb; }
+        .c8-pipeline-step.c8-ps-out {
+            background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%);
+            border: 2px solid #34d399;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.12);
+        }
+        .c8-pipeline-step.c8-ps-out .c8-ps-kicker { color: #047857; }
+        .c8-pipeline-step.c8-ps-out .c8-ps-title { color: #065f46; }
+        .c8-pipeline-arrow-sm { padding: 0.28rem 0 0.32rem; color: #94a3b8; font-size: 1rem; line-height: 1; }
+
+        .c8-lab-step {
+            margin: 0.85rem 0 1rem;
+            padding: 0.9rem 1rem;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+        }
+        .c8-lab-step .lab-n {
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 0.06em;
+            color: #0369a1;
+            margin-bottom: 0.35rem;
+        }
+        .c8-lab-step .lab-title { font-weight: 700; color: #0f172a; margin-bottom: 0.35rem; }
+        .c8-lab-step p:last-child { margin-bottom: 0; }
+    </style>
+
+    <div class="course-main">
+    <header class="course-hero">
+    <h1>Chapter 9. Validated Agent Workflow DSL — 실습 가이드</h1>
+    </header>
+
+    <div class="course-overview">
+    <p class="desc-overview-lead">
+        Chapter 8에서는 <strong>YAML(DSL)</strong>로 워크플로를 선언하고 <code>YamlDagWorkflowEngine</code>이 읽어 실행했습니다.<br>
+        Chapter 9 실습에서는 <strong>엔진과 DSL 어휘는 그대로</strong> 두고, <code>chapter9/dagworkflow/*.yml</code>을 로드한 뒤 <code>WorkflowDefinitionValidator</code>를 통과한 정의만 캐시해 엔진에 넘깁니다.
+    </p>
+    <p>
+        이제는 <strong>엔진(<code>YamlDagWorkflowEngine</code> 예시)</strong>이 “어느 노드를 언제 실행할지”를
+        <strong>YAML에 기록된 노드/간선/조건/루프 설정</strong>을 기준으로 판단하고,
+        각 노드는 <strong>실행 컨텍스트</strong>에 사용자 입력·라우팅 결과·병렬 분석 결과·평가/최적화 결과를 누적합니다.
+        노드 내부에서는 필요할 때 <strong>SubAgent(역할별 LLM)</strong>나 보고서 최적화 단계를 호출합니다.
+    </p>
+    <p>
+        이 실습의 초점은 <strong>로딩 파이프라인의 검증층</strong>입니다.
+        워크플로 확장은 여전히 <strong>YAML만</strong> 추가·수정하면 되고, 오타·잘못된 <code>dependsOn</code>·사이클·필수 필드 누락 같은 <strong>선언 오류는 스케줄링 전에</strong> 걸러 냅니다(실행 엔진·노드 매핑은 Chapter 8과 동일).
+    </p>
+
+    <p>
+        <a th:href="@{/go/ch9/1_strategic_analysis}" class="btn btn-primary font-weight-bold">실습 화면 열기 (Validated DSL)</a>
+        &nbsp;
+        <a th:href="@{/go/ch9}" class="btn btn-outline-secondary">Chapter 9 본문 보기</a>
+    </p>
+    </div>
+
+    <nav class="course-toc" aria-label="목차">
+    <p class="course-toc-title">목차</p>
+    <ol>
+        <li><a href="#d9-s1">진행 흐름</a></li>
+        <li><a href="#d9-s2">YAML 정의 구조</a></li>
+        <li><a href="#d9-s3">실행 엔진과 노드 매핑</a></li>
+        <li><a href="#d9-s4">운영·버전 관리 관점</a></li>
+        <li><a href="#d9-s5">Chapter 4·5·6·7·8과의 연결</a></li>
+    </ol>
+    </nav>
+
+    <div class="course-content">
+    <hr class="course-divider">
+
+    <h3 id="d9-s1">1. 진행 흐름</h3>
+
+    <div class="c8-pipeline-wrap" role="img" aria-label="Chapter 9 Validated Agent Workflow DSL: Ch9Controller부터 YamlDagWorkflowEngine과 노드까지">
+        <p class="c8-flow-caption">서버 호출 스택 (실습 코드 기준)</p>
+        <div class="c8-pipeline-col">
+            <div class="c8-pipeline-step c8-ps-user">
+                <div class="c8-ps-kicker">실습 UI</div>
+                <p class="c8-ps-title">pages/ch9/1_strategic_analysis.html</p>
+                <p class="c8-ps-sub">폼 → POST /ch9/strategic-analysis</p>
+            </div>
+            <div class="c8-pipeline-arrow-sm" aria-hidden="true">↓</div>
+            <div class="c8-pipeline-step c8-ps-user">
+                <div class="c8-ps-kicker">REST</div>
+                <p class="c8-ps-title">Ch9Controller#strategicAnalysis</p>
+                <p class="c8-ps-sub">ValidatedYamlStrategicAnalysisWorkflowService 로 위임</p>
+            </div>
+            <div class="c8-pipeline-arrow-sm" aria-hidden="true">↓</div>
+            <div class="c8-pipeline-step c8-ps-main">
+                <div class="c8-ps-kicker">래핑</div>
+                <p class="c8-ps-title">ValidatedYamlStrategicAnalysisWorkflowService</p>
+                <p class="c8-ps-sub">executeWithMonitoring — STARTED · AGENT · COMPLETED · WorkflowContext + workflowId → engine.run</p>
+            </div>
+            <div class="c8-pipeline-arrow-sm" aria-hidden="true">↓</div>
+            <div class="c8-pipeline-step c8-ps-def">
+                <div class="c8-ps-kicker">정의</div>
+                <p class="c8-ps-title">ValidatedYamlWorkflowDefinitionLoader + Validator</p>
+                <p class="c8-ps-sub">chapter9/dagworkflow/strategic-analysis.yml → 검증 → WorkflowDefinition</p>
+            </div>
+            <div class="c8-pipeline-arrow-sm" aria-hidden="true">↓</div>
+            <div class="c8-pipeline-step c8-ps-main">
+                <div class="c8-ps-kicker">엔진</div>
+                <p class="c8-ps-title">YamlDagWorkflowEngine#run</p>
+                <p class="c8-ps-sub">정의 기반 의존성 조립 · 병렬 스케줄</p>
+            </div>
+            <div class="c8-pipeline-arrow-sm" aria-hidden="true">↓</div>
+            <div class="c8-pipeline-step c8-ps-nodes">
+                <div class="c8-ps-kicker">노드</div>
+                <p class="c8-ps-title">WorkflowNode 구현체</p>
+                <p class="c8-ps-sub">RouterNode, SimpleQueryNode, … → SubAgentRegistry 키</p>
+            </div>
+            <div class="c8-pipeline-arrow-sm" aria-hidden="true">↓</div>
+            <div class="c8-pipeline-step c8-ps-out">
+                <div class="c8-ps-kicker">출력</div>
+                <p class="c8-ps-title">HTTP String + Redis/SSE 이벤트</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="c8-lab-step">
+        <div class="lab-n">실습 STEP A</div>
+        <div class="lab-title">요청 · 응답 · 진행</div>
+        <p>
+            <code>POST /ch9/strategic-analysis</code>(<code>application/x-www-form-urlencoded</code>)에 <code>prompt</code>, <code>workflowId</code>(UUID).
+            응답 본문은 최종 문자열, 중간 단계는 <code>GET /api/workflow/stream/{workflowId}</code> SSE로 확인합니다.
+        </p>
+    </div>
+    <div class="c8-lab-step">
+        <div class="lab-n">실습 STEP B</div>
+        <div class="lab-title">SSE → POST 순서</div>
+        <p>
+            스크립트는 SSE를 <strong>먼저</strong> 연 뒤 POST를 보냅니다. 그래야 <code>STARTED</code>·<code>ROUTING</code> 같은 초반 이벤트가 로그에 남습니다.
+        </p>
+    </div>
+    <div class="c8-lab-step">
+        <div class="lab-n">실습 STEP C</div>
+        <div class="lab-title">이벤트 필드</div>
+        <p>
+            SSE JSON에 <code>step</code>·<code>message</code> 등이 붙습니다. 바깥 래핑은 <code>STARTED</code>·<code>AGENT</code>·<code>COMPLETED</code>·<code>ERROR</code>, 안쪽 본문은 대략 <code>ROUTING</code> → <code>SIMPLE</code> 또는 <code>STRATEGIC</code> 분기로 이어집니다(<a href="#d9-s2">§2</a>·<a href="#d9-s3">§3</a> YAML·엔진 매핑과 대조. 단계 이름 축은 <a th:href="|@{/go/ch4/desc}#d4-s3|">Ch4 실습 가이드 §3</a>과 같습니다).
+        </p>
+    </div>
+
+    <hr class="course-divider">
+
+    <h3 id="d9-s2">2. YAML 정의 구조</h3>
+    <p>
+        이 실습에서는 워크플로 정의를 아래와 같은 구조로 생각합니다.
+    </p>
+    <div class="c8-flow-wrap" role="img" aria-label="YAML 정의와 WorkflowDefinition 구조">
+        <p class="c8-flow-caption">YAML → WorkflowDefinition</p>
+        <div class="c8-flow-col">
+            <div class="c8-card c8-card-main">
+                <div class="c8-card-kicker">파일</div>
+                <p class="c8-card-title">strategic-analysis.yml</p>
+                <p class="c8-card-sub">id, nodes, edges, config…</p>
+            </div>
+            <div class="c8-flow-arrow" aria-hidden="true">↓<span>파싱</span></div>
+            <div class="c8-card c8-card-def">
+                <div class="c8-card-kicker">객체</div>
+                <p class="c8-card-title">WorkflowDefinition</p>
+                <p class="c8-card-sub">NodeDefinition · Edge/dependsOn · LoopConfig</p>
+            </div>
+        </div>
+    </div>
+    <p>
+        Spring에서는 <code>ObjectMapper(YAML)</code>나 <code>snakeyaml</code>를 활용하거나,
+        <code>@ConfigurationProperties</code>로 바인딩해 <code>WorkflowDefinition</code> 집합을 만들어 둘 수 있습니다.
+        이 정의를 기반으로 엔진은 <strong>동적으로 노드 그래프를 구성</strong>합니다.
+    </p>
+
+    <hr class="course-divider">
+
+    <h3 id="d9-s3">3. 실행 엔진과 노드 매핑</h3>
+    <p>
+        엔진은 정의를 바탕으로 다음과 같은 정보를 조합해야 합니다.
+    </p>
+    <ul>
+        <li><strong>어떤 순서로 실행할 수 있는지</strong> (의존성이 없는 노드 → 병렬 실행 가능)</li>
+        <li><strong>어떤 조건에서 실행할지</strong> (<code>when</code> 식 평가, 예: <code>route.category == 'STRATEGIC'</code>)</li>
+        <li><strong>어떤 Node 핸들러에 연결할지</strong> (<code>handler</code> 값을 Bean/Registry에 매핑)</li>
+    </ul>
+    <p>
+        실습에서는 실제 구현 대신, Ch7의 <code>DagWorkflowEngine</code> 구조를 떠올리면서
+        “<strong>이 로직을 YAML 정의에 기반한 일반화된 엔진으로 빼면 어떻게 될까?</strong>”를 중심으로 코드를 읽어보면 좋습니다.
+    </p>
+
+    <hr class="course-divider">
+
+    <h3 id="d9-s4">4. 운영·버전 관리 관점</h3>
+    <p>
+        YAML 기반 워크플로는 코드와 분리된 버전 관리가 가능합니다.
+        예를 들어, <code>strategic-analysis-v1.yml</code>, <code>strategic-analysis-v2.yml</code>를 나란히 두고
+        <code>workflowId</code>나 헤더 값에 따라 다른 정의를 선택할 수 있습니다.
+    </p>
+    <p>
+        또한, YAML에만 변경이 있을 경우에는 애플리케이션 코드 배포 없이도
+        워크플로를 교체할 수 있고, 문제가 생기면 <strong>이전 YAML로 되돌리는 롤백</strong>이 쉬워집니다.
+    </p>
+
+    <hr class="course-divider">
+
+    <h3 id="d9-s5">5. Chapter 4·5·6·7·8과의 연결</h3>
+    <p>마지막으로, 지금 장의 위치를 전체 흐름에서 정리하면 다음과 같습니다.</p>
+    <ul>
+        <li><strong>Chapter 4</strong> — <code>Agent + SubAgent</code>: Main(Main agent, Orchestrator agent) + <code>SubAgentRegistry</code>.</li>
+        <li><strong>Chapter 5</strong> — <code>Agent + Tool</code>: <code>ToolRegistry</code>와 외부 서비스 연동.</li>
+        <li><strong>Chapter 6</strong> — <code>Agent Runtime (Task)</code>: Task·Think–Act–Observe 루프, <code>TaskTool</code>.</li>
+        <li><strong>Chapter 7</strong> — <code>DAG-Orchestrated Multi-Agent</code>: 코드 기반 <code>DagWorkflowEngine</code> + <code>WorkflowNode</code>.</li>
+        <li><strong>Chapter 8</strong> — 선언적 YAML: <code>YamlWorkflowDefinitionLoader</code> + 동일 엔진.</li>
+        <li><strong>Chapter 9 (지금 실습)</strong> — Validated Agent Workflow DSL:
+            <strong>엔진·DSL 어휘는 Ch8과 동일</strong>, 확장은 YAML만. <code>chapter9/dagworkflow/*.yml</code> 로딩 직후 <strong>WorkflowDefinitionValidator</strong> 통과분만 캐시해 <strong>스케줄링 전</strong> 선언 오류 차단.</li>
+    </ul>
+    <p class="small text-muted">
+        실무에서는 Chapter 7 스타일의 코드 기반 DAG 위에 YAML 레이어를 얹고, Chapter 9처럼 <strong>로딩 파이프라인에 검증층</strong>(스키마·의존성·DAG)을 붙여 운영 안정성을 높이는 경우가 많습니다.
+    </p>
+
+    <div class="course-footer-actions">
+    <p>
+        <a th:href="@{/go/ch9/1_strategic_analysis}" class="btn btn-primary font-weight-bold">실습 다시 하기 — Strategic Analysis (Validated DSL)</a>
+        &nbsp;
+        <a th:href="@{/go/ch9}" class="btn btn-outline-primary">Chapter 9 본문으로 돌아가기</a>
+        &nbsp;
+        <a th:href="@{/go/ch8}" class="btn btn-outline-secondary">이전 — Chapter 8 (YAML 워크플로)</a>
+    </p>
+    </div>
+
+    </div>
+    </div>
+
+</th:block>
+</html>
+

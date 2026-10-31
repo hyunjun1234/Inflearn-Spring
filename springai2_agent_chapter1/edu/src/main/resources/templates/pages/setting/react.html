@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<th:block>
+
+    <style>
+        .course-main { max-width: 56rem; margin: 0 auto; padding: 0 0.25rem 2.5rem; font-size: 1rem; line-height: 1.65; color: #1e293b; }
+        .course-hero { margin-bottom: 1.25rem; padding-bottom: 1rem; border-bottom: 1px solid #e2e8f0; }
+        .course-hero h1 { font-size: clamp(1.25rem, 2.2vw, 1.65rem); font-weight: 700; letter-spacing: -0.02em; margin: 0; color: #0f172a; line-height: 1.3; }
+        .course-toc { background: linear-gradient(165deg, #f8fafc 0%, #f1f5f9 100%); border: 1px solid #e2e8f0; border-radius: 10px; padding: 1rem 1.25rem 1.1rem; margin-bottom: 1.25rem; }
+        .course-toc-title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b; margin: 0 0 0.6rem; }
+        .course-toc ol { margin: 0; padding-left: 1.2rem; }
+        .course-toc li { margin-bottom: 0.35rem; line-height: 1.45; }
+        .course-toc a { color: #1d4ed8; text-decoration: none; font-size: 0.9rem; }
+        .course-toc a:hover { text-decoration: underline; color: #1e40af; }
+        .course-overview { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 1.25rem 1.4rem 1.35rem; margin-bottom: 1.25rem; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06); }
+        .course-content h3 { font-size: 1.12rem; margin: 1.35rem 0 0.85rem; padding-bottom: 0.55rem; border-bottom: 2px solid #93c5fd; color: #0f172a; font-weight: 700; line-height: 1.4; }
+        .course-content > h3:first-of-type,
+        .course-content hr.course-divider + h3 { margin-top: 0; }
+        .course-divider { border: none; height: 1px; background: linear-gradient(90deg, transparent, #cbd5e1, transparent); margin: 1.5rem 0; }
+        .course-footer-actions { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #e2e8f0; }
+        .dir-table { width: 100%; border-collapse: collapse; font-size: 0.92rem; margin: 0.75rem 0 1.25rem; }
+        .dir-table th, .dir-table td { border: 1px solid #e2e8f0; padding: 0.5rem 0.65rem; vertical-align: top; }
+        .dir-table th { background: #f8fafc; text-align: left; font-weight: 700; color: #0f172a; }
+        .dir-table code { background: #f1f5f9; padding: 0.1em 0.35em; border-radius: 4px; font-size: 0.88em; }
+        ul, ol { margin-left: 1.25rem; margin-bottom: 0.75rem; }
+        code { background: #f1f5f9; padding: 0.12em 0.38em; border-radius: 4px; font-size: 0.9em; color: #0f172a; }
+        p { margin-bottom: 0.85rem; }
+        .course-overview .meta { color: #475569; font-size: 0.95rem; margin-bottom: 0.75rem; }
+        .course-content pre { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 0.85rem 1rem; overflow-x: auto; font-size: 0.88rem; line-height: 1.5; margin: 0.75rem 0 1rem; }
+        .muted { color: #64748b; font-size: 0.92rem; }
+    </style>
+
+    <div class="course-main">
+    <header class="course-hero">
+    <h1>React 프론트엔드 — <code>frontend_agent</code> 프로젝트</h1>
+    </header>
+
+    <div class="course-overview">
+    <p class="meta">
+        Vite · React 19 · TypeScript — <strong>순수 REST</strong> Spring Boot 프로젝트 <code>springai2_agent_rest</code>의 <code>/ch1</code>~<code>/ch9</code>,
+        <code>/api</code>, 정적 <code>/imgs</code>와 연동하는 SPA
+    </p>
+    <p>
+        백엔드는 <strong><code>springai2_agent_rest.zip</code></strong>을 내려받아 원하는 경로에 압축을 푼 뒤, 그 안의 <strong><code>edu</code></strong>
+        폴더를 Gradle 프로젝트 루트로 IDE에서 엽니다.
+    </p>
+    <p>
+        프론트는 <strong><code>frontend_agent.zip</code></strong>을 내려받아 압축을 풀고, 나오는 <strong><code>frontend_agent</code></strong>
+        폴더를 <strong>Visual Studio Code(VS Code)</strong>에서 프로젝트 루트로 열어 사용합니다(로컬 경로 예: <code>C:\edu\frontend_agent</code>). 본 페이지는 그
+        디렉터리 구조와 주요 파일 역할을 정리합니다. 백엔드를 띄운 뒤 VS Code 통합 터미널 등에서 해당 폴더 안으로 이동해 <code>npm install</code> →
+        <code>npm run dev</code>로 개발 서버(기본 <code>http://127.0.0.1:5173</code>)를 실행합니다.
+    </p>
+    <p>
+        <strong>Swagger UI 열기</strong>: 백엔드가 실행 중일 때, React 주소(<code>127.0.0.1:5173</code>)가 아니라 <strong>API 서버 주소</strong>로 브라우저에서
+        접속합니다. 예를 들어 백엔드가 <code>http://localhost:80</code>이면 주소창에 <code>http://localhost:80/swagger-ui.html</code>을 입력합니다.
+        OpenAPI JSON 스펙은 같은 호스트의 <code>http://localhost:80/v3/api-docs</code>입니다(<code>vite.config.ts</code>의 <code>VITE_API_URL</code>과 포트를 맞춥니다).
+        Vite에는 Swagger 경로 프록시가 없으므로, 위처럼 백엔드 origin으로 직접 열거나 필요 시 <code>vite.config.ts</code>에 <code>/swagger-ui</code>·<code>/v3</code> 프록시를 추가할 수 있습니다.
+    </p>
+    <p class="muted">
+        백엔드는 Thymeleaf 없이 JSON·<code>text/plain</code> 등 HTTP API만 제공합니다.
+    </p>
+    </div>
+
+    <nav class="course-toc" aria-label="목차">
+    <p class="course-toc-title">목차</p>
+    <ol>
+        <li><a href="#rx-root">루트·설정 파일</a></li>
+        <li><a href="#rx-src">src/ 전체 구조</a></li>
+        <li><a href="#rx-components">components/</a></li>
+        <li><a href="#rx-shared">shared/</a></li>
+        <li><a href="#rx-rest">백엔드 REST 계약</a></li>
+        <li><a href="#rx-run">실행·환경 변수</a></li>
+        <li><a href="#rx-troubleshoot">문제 해결(SSE 등)</a></li>
+    </ol>
+    </nav>
+
+    <div class="course-content">
+    <hr class="course-divider">
+
+    <h3 id="rx-root">1. 프로젝트 루트 파일</h3>
+    <p class="muted">프로젝트 최상위에 두는 설정·진입 파일입니다.</p>
+    <table class="dir-table">
+        <thead><tr><th>파일</th><th>설명</th></tr></thead>
+        <tbody>
+            <tr><td><code>package.json</code></td><td>npm 스크립트(<code>dev</code>, <code>build</code>, <code>preview</code>) 및 의존성(React, react-router-dom, axios, Vite 등).</td></tr>
+            <tr><td><code>package-lock.json</code></td><td>잠금 파일 — 설치 버전 고정.</td></tr>
+            <tr><td><code>vite.config.ts</code></td><td>Vite 설정. 개발 서버 프록시: <code>/api</code>, <code>/ch1</code>~<code>/ch9</code>, <code>/imgs</code> → <code>VITE_API_URL</code>(기본 <code>http://localhost:80</code>). <code>/swagger-ui.html</code>·<code>/v3/api-docs</code>는 기본 포함되지 않음(브라우저에서 API 서버로 직접 접속하거나 프록시 추가).</td></tr>
+            <tr><td><code>tsconfig.json</code>, <code>tsconfig.app.json</code>, <code>tsconfig.node.json</code></td><td>TypeScript 컴파일 옵션(앱·Node 분리).</td></tr>
+            <tr><td><code>index.html</code></td><td>SPA 진입 HTML — <code>#root</code>, Bootstrap CDN, <code>/src/main.tsx</code> 로드.</td></tr>
+            <tr><td><code>.env.development</code>, <code>.env.example</code></td><td>개발용 환경 변수 예시(<code>VITE_API_URL</code>, <code>VITE_SPRING_ORIGIN</code> 등).</td></tr>
+            <tr><td><code>eslint.config.js</code></td><td>ESLint 규칙.</td></tr>
+            <tr><td><code>dist/</code></td><td><code>npm run build</code> 결과물 — 정적 배포용.</td></tr>
+        </tbody>
+    </table>
+
+    <hr class="course-divider">
+
+    <h3 id="rx-src">2. <code>src/</code> 개요</h3>
+    <p class="muted">디렉터리 트리와 하위 폴더·파일별 역할입니다.</p>
+    <pre>src/                                      # SPA 소스 루트
+├── main.tsx                                  # 엔트리 — createRoot로 #root 마운트
+├── index.css                                 # 전역 기본 스타일
+├── App.tsx                                   # 라우트·BrowserRouter
+├── App.css                                   # 앱 단위 보조 스타일
+├── api/
+│   └── client.ts                             # HTTP 클라이언트(axios 등) 공통 설정
+├── assets/
+│   └── react.svg                             # 번들에 포함되는 정적 에셋(예: 로고)
+├── components/
+│   ├── Layout.tsx                            # 상단·사이드·Outlet 공통 레이아웃
+│   ├── Sidebar.tsx                           # 챕터/설정 좌측 네비
+│   └── ChatUI.tsx                            # 채팅형 UI 재사용 조각
+├── pages/
+│   ├── Home.tsx                              # 랜딩(메인 커리큘럼 본문)
+│   ├── mainCourse.css                        # Home 본문 스타일
+│   ├── mainCourseBody.html                   # Home에 삽입할 정적 HTML
+│   ├── chapter1/                             # ch1 — 멀티 LLM·스트림·데모
+│   ├── chapter2/                             # ch2 — 워크플로(Chain 등) 실습
+│   ├── chapter3/                             # ch3 — 전략·정밀·투표·자동 패턴 라우팅
+│   ├── chapter4/                             # ch4 — 전략 분석(SSE/POST)
+│   ├── chapter5/                             # ch5 — 전략 분석(SSE/POST)
+│   ├── chapter6/                             # ch6 — 전략 분석(SSE/POST)
+│   ├── chapter7/                             # ch7 — 전략 분석(SSE/POST)
+│   ├── chapter8/                             # ch8 — 전략 분석(SSE/POST)
+│   ├── chapter9/                             # ch9 — 전략 분석(SSE/POST)
+│   └── setting/                              # 도구·환경 안내(React 설정 페이지)
+└── shared/
+    ├── config/                               # Spring origin 등 URL·설정 헬퍼
+    ├── chat/                                 # 이미지 URL·말풍선 UI 블록
+    ├── api/                                  # Fetch 스트림 누적 등 API 유틸
+    ├── workflow/                             # 전략 분석·SSE·NDJSON 공통 실습
+    ├── chapters/                             # ch4~9 공용 페이지 래퍼
+    └── ch2/                                  # ch2 NDJSON·병렬 워크플로 실습 조각</pre>
+
+    <h4 style="font-size:1rem;margin:1.25rem 0 0.5rem;color:#334155;font-weight:600;">2-1. src 루트 파일</h4>
+    <table class="dir-table">
+        <thead><tr><th>파일</th><th>설명</th></tr></thead>
+        <tbody>
+            <tr><td><code>main.tsx</code></td><td>엔트리 — <code>createRoot</code>로 <code>#root</code>에 앱 마운트. <code>BrowserRouter</code>는 <code>App.tsx</code>에서 사용.</td></tr>
+            <tr><td><code>index.css</code></td><td>전역 기본 스타일.</td></tr>
+            <tr><td><code>App.tsx</code></td><td><code>react-router-dom</code> 라우트 정의 — Home, chapter1~9, setting. 챕터 설명·fragment HTML은 과거 Thymeleaf와 <strong>문구·구조 동기</strong>를 맞춘 <strong>정적 HTML</strong>로 유지하는 경우가 많음(서버 템플릿 아님).</td></tr>
+            <tr><td><code>App.css</code></td><td>앱 레벨 보조 스타일.</td></tr>
+        </tbody>
+    </table>
+
+    <h4 style="font-size:1rem;margin:1.25rem 0 0.5rem;color:#334155;font-weight:600;">2-2. api/</h4>
+    <table class="dir-table">
+        <thead><tr><th>파일</th><th>설명</th></tr></thead>
+        <tbody>
+            <tr><td><code>client.ts</code></td><td>axios 등 HTTP 클라이언트 래퍼(공통 헤더·베이스 URL 등, 필요 시 확장).</td></tr>
+        </tbody>
+    </table>
+
+    <h4 style="font-size:1rem;margin:1.25rem 0 0.5rem;color:#334155;font-weight:600;">2-3. assets/</h4>
+    <table class="dir-table">
+        <thead><tr><th>파일</th><th>설명</th></tr></thead>
+        <tbody>
+            <tr><td><code>react.svg</code></td><td>Vite 기본 로고 에셋(참조용).</td></tr>
+        </tbody>
+    </table>
+
+    <h4 style="font-size:1rem;margin:1.25rem 0 0.5rem;color:#334155;font-weight:600;">2-4. components/</h4>
+    <table class="dir-table">
+        <thead><tr><th>파일</th><th>설명</th></tr></thead>
+        <tbody>
+            <tr><td><code>Layout.tsx</code></td><td>상단 Jumbotron·설정 링크·chapter 네비·좌측 Sidebar·<code>Outlet</code>으로 자식 라우트 렌더.</td></tr>
+            <tr><td><code>Sidebar.tsx</code></td><td>chapter1~9·setting 하위 메뉴 — 현재 경로에 맞는 버튼 세트 표시.</td></tr>
+            <tr><td><code>ChatUI.tsx</code></td><td>채팅형 UI 보조 컴포넌트(재사용 가능한 레이아웃).</td></tr>
+        </tbody>
+    </table>
+
+    <h4 id="rx-pages-detail" style="font-size:1rem;margin:1.25rem 0 0.5rem;color:#334155;font-weight:600;">2-5. pages/</h4>
+    <p class="muted">URL은 <code>App.tsx</code> 라우트와 동일합니다. 아래는 폴더·파일별 역할 요약입니다.</p>
+    <table class="dir-table">
+        <thead><tr><th>경로</th><th>설명</th></tr></thead>
+        <tbody>
+            <tr><td><code>Home.tsx</code></td><td>랜딩 — 메인 커리큘럼 본문을 <code>mainCourseBody.html</code>로 두고 <code>dangerouslySetInnerHTML</code>로 렌더. 과거 Spring <code>fragments/main.html</code>과 본문을 맞춘 정적 HTML.</td></tr>
+            <tr><td><code>mainCourse.css</code></td><td>Home 본문용 스타일(레거시 메인 fragment와 시각적 동기).</td></tr>
+            <tr><td><code>mainCourseBody.html</code></td><td>Home에 삽입하는 정적 HTML(메인 커리큘럼 본문).</td></tr>
+        </tbody>
+    </table>
+
+    <p style="font-size:0.95rem;font-weight:600;margin:1rem 0 0.35rem;color:#334155;"><code>chapter1/</code> — Spring <code>/ch1</code> 연동, 멀티 LLM·스트림·보조 데모</p>
+    <table class="dir-table">
+        <thead><tr><th>파일</th><th>설명</th></tr></thead>
+        <tbody>
+            <tr><td><code>index.tsx</code></td><td>Chapter 1 진입·목차.</td></tr>
+            <tr><td><code>Desc.tsx</code></td><td>챕터 화면 설명.</td></tr>
+            <tr><td><code>MultiLLM.tsx</code></td><td>멀티 LLM 호출 실습 UI. 성공 시 백엔드는 <code>ResponseEntity</code> + <code>text/plain;charset=UTF-8</code> 본문을 반환할 수 있음.</td></tr>
+            <tr><td><code>MultiLLMStream.tsx</code></td><td>스트리밍 응답 표시.</td></tr>
+            <tr><td><code>Fallback.tsx</code></td><td>폴백 동작 데모.</td></tr>
+            <tr><td><code>Router.tsx</code></td><td><code>POST /ch1/router</code>. 상단 <code>Ch1ExamplePanel</code>에 RouterService(CREATIVE / TECHNICAL / GENERAL) 예시 문장.</td></tr>
+            <tr><td><code>Security.tsx</code></td><td><code>POST /ch1/security</code> 스트림. 상단 예시는 SecurityScanner·SecurityService(민감 → Llama, 일반 → GPT)와 맞춤.</td></tr>
+            <tr><td><code>ch1Assets.ts</code></td><td>이미지·에셋 URL 등 상수.</td></tr>
+            <tr><td><code>ch1Overview.css</code></td><td>챕터1 전용 스타일.</td></tr>
+        </tbody>
+    </table>
+
+    <p style="font-size:0.95rem;font-weight:600;margin:1rem 0 0.35rem;color:#334155;"><code>chapter2/</code> — 워크플로 패턴(Chain·Parallel·Routing 등) 실습</p>
+    <table class="dir-table">
+        <thead><tr><th>파일</th><th>설명</th></tr></thead>
+        <tbody>
+            <tr><td><code>index.tsx</code></td><td>Chapter 2 진입·목차.</td></tr>
+            <tr><td><code>Desc.tsx</code></td><td>챕터 화면 설명.</td></tr>
+            <tr><td><code>ChainWorkflow.tsx</code></td><td>Chain 워크플로·NDJSON 스트림 실습.</td></tr>
+            <tr><td><code>ParallelizationWorkflow.tsx</code></td><td>병렬 워크플로 실습. <code>POST /ch2/parallel-workflow</code>는 <code>200</code> + <code>application/json</code> 본문(<code>AnalysisResult</code>, <code>ResponseEntity</code>).</td></tr>
+            <tr><td><code>RoutingWorkflow.tsx</code></td><td>라우팅 워크플로 실습.</td></tr>
+            <tr><td><code>OrchestratorWorkers.tsx</code></td><td>오케스트레이터·워커 패턴.</td></tr>
+            <tr><td><code>EvaluatorOptimizer.tsx</code></td><td>평가·최적화 루프.</td></tr>
+        </tbody>
+    </table>
+
+    <p style="font-size:0.95rem;font-weight:600;margin:1rem 0 0.35rem;color:#334155;"><code>chapter3/</code> — 분석·실행·투표·Auto Pattern Routing 화면</p>
+    <table class="dir-table">
+        <thead><tr><th>파일</th><th>설명</th></tr></thead>
+        <tbody>
+            <tr><td><code>index.tsx</code></td><td>Chapter 3 본문 — <code>ch3Fragment.html</code>을 삽입 렌더(과거 <code>fragments/ch3.html</code> 본문 동기).</td></tr>
+            <tr><td><code>Desc.tsx</code></td><td>챕터 화면 설명.</td></tr>
+            <tr><td><code>StrategicAnalysis.tsx</code></td><td>전략 분석 화면.</td></tr>
+            <tr><td><code>PrecisionExecution.tsx</code></td><td>정밀 실행 화면.</td></tr>
+            <tr><td><code>VotingAnalysis.tsx</code></td><td>투표·합의 분석 화면.</td></tr>
+            <tr><td><code>AutoPatternRouting.tsx</code></td><td><code>POST /ch3/auto-pattern-routing</code> — 세 패턴 자동 선택 후 위임.</td></tr>
+            <tr><td><code>ch3Fragment.html</code></td><td>과거 <code>fragments/ch3.html</code>과 동일 본문 — <code>/chapter3</code> React 화면과 동기. 서버 <code>/go/ch3</code>는 REST 전용 구성에서는 없음.</td></tr>
+        </tbody>
+    </table>
+
+    <p style="font-size:0.95rem;font-weight:600;margin:1rem 0 0.35rem;color:#334155;"><code>chapter4/</code> — 백엔드 Chapter 4 API 연동</p>
+    <table class="dir-table">
+        <thead><tr><th>파일</th><th>설명</th></tr></thead>
+        <tbody>
+            <tr><td><code>index.tsx</code></td><td>Chapter 4 진입·목차.</td></tr>
+            <tr><td><code>Desc.tsx</code></td><td>챕터 화면 설명.</td></tr>
+            <tr><td><code>StrategicAnalysis.tsx</code></td><td><code>StrategicAnalysisLab</code> 경유: 클라이언트 <code>workflowId</code>(<code>crypto.randomUUID()</code>) 생성 → <strong>SSE 먼저</strong> <code>/api/workflow/stream/{workflowId}</code> → <code>POST</code> <code>/ch4/strategic-analysis</code>(<code>application/x-www-form-urlencoded</code>, <code>Accept: application/x-ndjson</code>). 성공 응답은 <code>text/plain;charset=UTF-8</code> 스트림·일반 본문. HTTP 오류 시 JSON <code>{"error":"..."}</code>.</td></tr>
+        </tbody>
+    </table>
+
+    <p style="font-size:0.95rem;font-weight:600;margin:1rem 0 0.35rem;color:#334155;"><code>chapter5/</code> — 백엔드 Chapter 5 API 연동</p>
+    <table class="dir-table">
+        <thead><tr><th>파일</th><th>설명</th></tr></thead>
+        <tbody>
+            <tr><td><code>index.tsx</code></td><td>Chapter 5 진입·목차.</td></tr>
+            <tr><td><code>Desc.tsx</code></td><td>챕터 화면 설명.</td></tr>
+            <tr><td><code>StrategicAnalysis.tsx</code></td><td><code>StrategicAnalysisLab</code> 경유: 클라이언트 <code>workflowId</code>(<code>crypto.randomUUID()</code>) 생성 → <strong>SSE 먼저</strong> <code>/api/workflow/stream/{workflowId}</code> → <code>POST</code> <code>/ch5/strategic-analysis</code>(<code>application/x-www-form-urlencoded</code>, <code>Accept: application/x-ndjson</code>). 성공 응답은 <code>text/plain;charset=UTF-8</code> 스트림·일반 본문. HTTP 오류 시 JSON <code>{"error":"..."}</code>.</td></tr>
+        </tbody>
+    </table>
+
+    <p style="font-size:0.95rem;font-weight:600;margin:1rem 0 0.35rem;color:#334155;"><code>chapter6/</code> — 백엔드 Chapter 6 API 연동</p>
+    <table class="dir-table">
+        <thead><tr><th>파일</th><th>설명</th></tr></thead>
+        <tbody>
+            <tr><td><code>index.tsx</code></td><td>Chapter 6 진입·목차.</td></tr>
+            <tr><td><code>Desc.tsx</code></td><td>챕터 화면 설명.</td></tr>
+            <tr><td><code>StrategicAnalysis.tsx</code></td><td><code>StrategicAnalysisLab</code> 경유: 클라이언트 <code>workflowId</code>(<code>crypto.randomUUID()</code>) 생성 → <strong>SSE 먼저</strong> <code>/api/workflow/stream/{workflowId}</code> → <code>POST</code> <code>/ch6/strategic-analysis</code>(<code>application/x-www-form-urlencoded</code>, <code>Accept: application/x-ndjson</code>). 성공 응답은 <code>text/plain;charset=UTF-8</code> 스트림·일반 본문. HTTP 오류 시 JSON <code>{"error":"..."}</code>.</td></tr>
+        </tbody>
+    </table>
+
+    <p style="font-size:0.95rem;font-weight:600;margin:1rem 0 0.35rem;color:#334155;"><code>chapter7/</code> — 백엔드 Chapter 7 API 연동</p>
+    <table class="dir-table">
+        <thead><tr><th>파일</th><th>설명</th></tr></thead>
+        <tbody>
+            <tr><td><code>index.tsx</code></td><td>Chapter 7 진입·목차.</td></tr>
+            <tr><td><code>Desc.tsx</code></td><td>챕터 화면 설명.</td></tr>
+            <tr><td><code>StrategicAnalysis.tsx</code></td><td><code>StrategicAnalysisLab</code> 경유: 클라이언트 <code>workflowId</code>(<code>crypto.randomUUID()</code>) 생성 → <strong>SSE 먼저</strong> <code>/api/workflow/stream/{workflowId}</code> → <code>POST</code> <code>/ch7/strategic-analysis</code>(<code>application/x-www-form-urlencoded</code>, <code>Accept: application/x-ndjson</code>). 성공 응답은 <code>text/plain;charset=UTF-8</code> 스트림·일반 본문. HTTP 오류 시 JSON <code>{"error":"..."}</code>.</td></tr>
+        </tbody>
+    </table>
+
+    <p style="font-size:0.95rem;font-weight:600;margin:1rem 0 0.35rem;color:#334155;"><code>chapter8/</code> — 백엔드 Chapter 8 API 연동</p>
+    <table class="dir-table">
+        <thead><tr><th>파일</th><th>설명</th></tr></thead>
+        <tbody>
+            <tr><td><code>index.tsx</code></td><td>Chapter 8 진입·목차.</td></tr>
+            <tr><td><code>Desc.tsx</code></td><td>챕터 화면 설명.</td></tr>
+            <tr><td><code>StrategicAnalysis.tsx</code></td><td><code>StrategicAnalysisLab</code> 경유: 클라이언트 <code>workflowId</code>(<code>crypto.randomUUID()</code>) 생성 → <strong>SSE 먼저</strong> <code>/api/workflow/stream/{workflowId}</code> → <code>POST</code> <code>/ch8/strategic-analysis</code>(<code>application/x-www-form-urlencoded</code>, <code>Accept: application/x-ndjson</code>). 성공 응답은 <code>text/plain;charset=UTF-8</code> 스트림·일반 본문. HTTP 오류 시 JSON <code>{"error":"..."}</code>.</td></tr>
+        </tbody>
+    </table>
+
+    <p style="font-size:0.95rem;font-weight:600;margin:1rem 0 0.35rem;color:#334155;"><code>chapter9/</code> — 백엔드 Chapter 9 API 연동</p>
+    <table class="dir-table">
+        <thead><tr><th>파일</th><th>설명</th></tr></thead>
+        <tbody>
+            <tr><td><code>index.tsx</code></td><td>Chapter 9 진입·목차.</td></tr>
+            <tr><td><code>Desc.tsx</code></td><td>챕터 화면 설명.</td></tr>
+            <tr><td><code>StrategicAnalysis.tsx</code></td><td><code>StrategicAnalysisLab</code> 경유: 클라이언트 <code>workflowId</code>(<code>crypto.randomUUID()</code>) 생성 → <strong>SSE 먼저</strong> <code>/api/workflow/stream/{workflowId}</code> → <code>POST</code> <code>/ch9/strategic-analysis</code>(<code>application/x-www-form-urlencoded</code>, <code>Accept: application/x-ndjson</code>). 성공 응답은 <code>text/plain;charset=UTF-8</code> 스트림·일반 본문. HTTP 오류 시 JSON <code>{"error":"..."}</code>.</td></tr>
+        </tbody>
+    </table>
+
+    <p style="font-size:0.95rem;font-weight:600;margin:1rem 0 0.35rem;color:#334155;"><code>setting/</code> — 도구·환경 안내(React 페이지 및 스타일)</p>
+    <table class="dir-table">
+        <thead><tr><th>파일</th><th>설명</th></tr></thead>
+        <tbody>
+            <tr><td><code>setting.css</code></td><td>설정 계열 페이지 공통 스타일.</td></tr>
+            <tr><td><code>SettingFooter.tsx</code></td><td>다른 설정 페이지로 이동하는 하단 링크.</td></tr>
+            <tr><td><code>ReactProjectDoc.tsx</code></td><td>본 문서(React 프로젝트 구조). <code>ReactPage.tsx</code>에서 re-export.</td></tr>
+            <tr><td><code>ReactPage.tsx</code></td><td><code>ReactProjectDoc</code> 진입 래퍼.</td></tr>
+            <tr><td><code>IntellijPage.tsx</code></td><td>IntelliJ 관련 안내.</td></tr>
+            <tr><td><code>OpenAiPage.tsx</code></td><td>OpenAI 관련 안내.</td></tr>
+            <tr><td><code>GeminiPage.tsx</code></td><td>Gemini 관련 안내.</td></tr>
+            <tr><td><code>OllamaPage.tsx</code></td><td>Ollama 관련 안내.</td></tr>
+            <tr><td><code>RedisPage.tsx</code></td><td>Redis 환경 설정 — <code>redisFragment.html</code> 삽입 렌더(과거 Thymeleaf <code>pages/setting/redis.html</code> 본문 동기).</td></tr>
+            <tr><td><code>redisFragment.html</code></td><td>과거 Thymeleaf <code>pages/setting/redis.html</code> 본문을 보관한 정적 HTML.</td></tr>
+            <tr><td><code>PostgreSQLPage.tsx</code></td><td>PostgreSQL 환경 설정 — <code>postgresqlFragment.html</code> 삽입 렌더(과거 Thymeleaf <code>pages/setting/postgresql.html</code> 본문 동기).</td></tr>
+            <tr><td><code>postgresqlFragment.html</code></td><td>과거 Thymeleaf <code>pages/setting/postgresql.html</code> 본문을 보관한 정적 HTML.</td></tr>
+        </tbody>
+    </table>
+
+    <h4 style="font-size:1rem;margin:1.25rem 0 0.5rem;color:#334155;font-weight:600;">2-6. shared/</h4>
+    <table class="dir-table">
+        <thead><tr><th>경로</th><th>설명</th></tr></thead>
+        <tbody>
+            <tr><td><code>ch1/Ch1ExamplePanel.tsx</code></td><td>Chapter 1 Router·Security 상단 예시 안내 — <code>ch2/Ch2ExamplePanel</code> 재노출.</td></tr>
+            <tr><td><code>ch1/ch1ExamplePrompts.ts</code></td><td>Thymeleaf <code>pages/ch1/4_router.html</code>·<code>5_security.html</code> 및 백엔드 서비스 설명과 맞춘 예시 프롬프트 상수.</td></tr>
+            <tr><td><code>config/springUrl.ts</code></td><td><code>VITE_SPRING_ORIGIN</code> 기준 절대 URL(<code>springAbsoluteUrl</code>).</td></tr>
+            <tr><td><code>chat/springImg.ts</code></td><td>백엔드 정적 이미지 경로 <code>/imgs/...</code>를 절대 URL로 변환.</td></tr>
+            <tr><td><code>chat/ChatBlocks.tsx</code></td><td>사용자/봇 말풍선 UI 블록.</td></tr>
+            <tr><td><code>api/readStreamBody.ts</code></td><td>Fetch ReadableStream을 텍스트로 누적(NDJSON 스트림 처리).</td></tr>
+            <tr><td><code>workflow/StrategicAnalysisLab.tsx</code></td><td>전략 분석 공통 UI. SSE 이벤트 <code>data</code>는 JSON(<code>step</code>, <code>message</code>). <strong>routing 배지</strong>는 <code>showRoutingBadge</code>(기본 true); Chapter 3 정밀·투표·자동 패턴 라우팅은 false(위임 후 <code>ROUTING</code>·<code>ROUTING_RESULT</code> 미반영). <strong>TodoWrite</strong>(<code>AGENT_TODO</code> 250ms 버퍼), 단계 로그는 과거 Thymeleaf <code>pages/ch6/1_strategic_analysis.html</code>과 동일 패턴. <code>!response.ok</code> 시 JSON <code>error</code> 필드 파싱. 백엔드는 <code>ResponseEntity</code>로 <code>Content-Type</code> 명시; 프론트는 <code>fetch</code> + <code>readStreamBody.ts</code>.</td></tr>
+            <tr><td><code>workflow/strategicDefaults.ts</code></td><td>전략 분석 기본 프롬프트 상수.</td></tr>
+            <tr><td><code>chapters/StrategicOnlyChapter.tsx</code></td><td>ch4~ch9 공통 전략 분석 래퍼.</td></tr>
+            <tr><td><code>ch2/NdjsonPromptLab.tsx</code></td><td>NDJSON 스트림 실습(Chain·Routing 등). 선택 prop <code>exampleBanner</code>로 Chapter 3 Auto Pattern과 같은 톤의 예시 안내 블록을 제목 아래에 둘 수 있음.</td></tr>
+            <tr><td><code>ch2/ParallelWorkflowLab.tsx</code></td><td><code>POST /ch2/parallel-workflow</code> — <code>200</code> + <code>application/json</code> 본문(<code>AnalysisResult</code>). 백엔드는 <code>ResponseEntity</code>로 감쌀 수 있음.</td></tr>
+            <tr><td><code>ch2/chainHints.tsx</code></td><td>Chain 실습용 샘플 프롬프트 힌트.</td></tr>
+            <tr><td><code>ch2/Ch2ExamplePanel.tsx</code></td><td>Chapter 2 실습 화면 상단 예시 안내(<code>alert-light</code> 패널).</td></tr>
+            <tr><td><code>ch2/ch2ExamplePrompts.ts</code></td><td>Thymeleaf <code>pages/ch2/*.html</code> 기본 문장과 맞춘 예시 프롬프트 상수.</td></tr>
+        </tbody>
+    </table>
+
+    <hr class="course-divider">
+
+    <h3 id="rx-components">3. <code>src/components/</code></h3>
+    <p class="muted">상세는 위 §2-4와 동일. 레이아웃·내비·채팅 UI.</p>
+    <table class="dir-table">
+        <thead><tr><th>파일</th><th>설명</th></tr></thead>
+        <tbody>
+            <tr><td><code>Layout.tsx</code></td><td>공통 레이아웃 — 상단 Jumbotron·네비·좌측 <code>Sidebar</code>·<code>Outlet</code>으로 자식 라우트 렌더.</td></tr>
+            <tr><td><code>Sidebar.tsx</code></td><td>chapter1~9 및 setting 링크 — 현재 경로에 따라 좌측 메뉴 분기.</td></tr>
+            <tr><td><code>ChatUI.tsx</code></td><td>채팅형 UI 보조 컴포넌트(재사용).</td></tr>
+        </tbody>
+    </table>
+
+    <hr class="course-divider">
+
+    <h3 id="rx-shared">4. <code>src/shared/</code></h3>
+    <p class="muted">상세는 위 §2-6. API URL·채팅 블록·스트림·워크플로 실습 공통 모듈.</p>
+    <table class="dir-table">
+        <thead><tr><th>경로</th><th>설명</th></tr></thead>
+        <tbody>
+            <tr><td><code>config/springUrl.ts</code></td><td><code>VITE_SPRING_ORIGIN</code> 기준 절대 URL 생성.</td></tr>
+            <tr><td><code>chat/springImg.ts</code>, <code>chat/ChatBlocks.tsx</code></td><td>백엔드 <code>/imgs</code> URL·사용자/봇 말풍선 블록.</td></tr>
+            <tr><td><code>api/readStreamBody.ts</code></td><td>Fetch 응답 바디를 텍스트로 스트리밍 누적(NDJSON 등).</td></tr>
+            <tr><td><code>workflow/StrategicAnalysisLab.tsx</code>, <code>workflow/strategicDefaults.ts</code></td><td>SSE + POST 전략 분석 실습 공통 컴포넌트·기본 질문. (<code>StrategicAnalysisLab</code>은 routing·TodoWrite·단계 로그 UI를 Thymeleaf ch6 실습 HTML과 동일 패턴으로 제공; Chapter 3 정밀·투표·자동 패턴 실습은 routing 배지 비표시·Strategic <code>ROUTING</code> 계열 SSE 생략.)</td></tr>
+            <tr><td><code>chapters/StrategicOnlyChapter.tsx</code></td><td>ch4~ch9 전략 분석 페이지 래퍼.</td></tr>
+            <tr><td><code>ch1/Ch1ExamplePanel.tsx</code>, <code>ch1/ch1ExamplePrompts.ts</code></td><td>ch1 Router·Security 예시 안내.</td></tr>
+            <tr><td><code>ch2/NdjsonPromptLab.tsx</code>, <code>ParallelWorkflowLab.tsx</code>, <code>chainHints.tsx</code>, <code>Ch2ExamplePanel.tsx</code>, <code>ch2ExamplePrompts.ts</code></td><td>ch2 NDJSON·병렬 워크플로 실습 및 예시 안내.</td></tr>
+        </tbody>
+    </table>
+
+    <hr class="course-divider">
+
+    <h3 id="rx-rest">5. 백엔드 REST 계약 요약</h3>
+    <p class="muted">아래 API는 <code>springai2_agent_rest</code>의 <code>edu</code> 모듈을 기동했을 때 제공됩니다.</p>
+    <ul class="muted" style="line-height:1.65;">
+        <li><strong>프록시</strong>: 개발 시 Vite가 <code>/ch*</code>, <code>/api</code>, <code>/imgs</code>를 <code>VITE_API_URL</code>로 넘깁니다. React는 상대 경로만 호출해도 동일 출처처럼 동작합니다.</li>
+        <li><strong>CORS</strong>: 백엔드가 <code>http://localhost:*</code> / <code>127.0.0.1:*</code> 패턴을 허용하면, 프록시 없이 절대 URL로 API를 호출할 때도 브라우저에서 막히지 않습니다.</li>
+        <li><strong>전략 분석·SSE</strong>: Redis Pub/Sub → SSE. 실습 전 Redis 기동이 필요합니다. <code>workflowId</code>는 POST와 SSE 경로가 반드시 일치해야 합니다.</li>
+        <li><strong>응답 형식</strong>: 문자열 API는 <code>text/plain;charset=UTF-8</code>, 일부는 JSON. 전역 예외는 <code>502</code>(연결 실패)·<code>500</code>과 JSON <code>error</code> 메시지를 사용할 수 있습니다.</li>
+    </ul>
+
+    <hr class="course-divider">
+
+    <h3 id="rx-run">6. 실행 및 환경 변수</h3>
+    <p><strong>백엔드 <code>springai2_agent_rest</code></strong>: <code>springai2_agent_rest.zip</code>을 다운로드한 뒤 압축을 풀고, 포함된 <code>edu</code> 디렉터리에서 Spring Boot 애플리케이션을 실행합니다. 전략 분석·SSE 실습에는 Redis 등이 필요할 수 있으니 강의 자료의 환경 절차를 함께 맞춥니다.</p>
+    <p><strong>프론트 <code>frontend_agent</code></strong>: <code>frontend_agent.zip</code>을 다운로드한 뒤 압축을 풀고, 생성된 <code>frontend_agent</code> 폴더를 <strong>VS Code</strong>에서 연 뒤, 백엔드가 떠 있는 상태에서 그 폴더(통합 터미널 기준)에서:</p>
+<pre>
+npm install
+npm run dev
+</pre>
+    <ul>
+        <li><code>VITE_API_URL</code> — Vite 프록시 대상(백엔드 origin). 기본값은 vite.config.ts에서 <code>http://localhost:80</code>.</li>
+        <li><code>VITE_SPRING_ORIGIN</code> — <code>springImg</code> 등 절대 URL용 백엔드 주소.</li>
+    </ul>
+    <p>프로덕션 빌드: <code>npm run build</code> 후 <code>dist/</code>를 정적 호스팅하거나, 동일 출처로 서빙 시 API 프록시는 웹 서버(nginx 등)에서 구성합니다.</p>
+
+    <hr class="course-divider">
+
+    <h3 id="rx-troubleshoot">7. 문제 해결(SSE·전략 분석)</h3>
+    <ul class="muted" style="line-height:1.65;">
+        <li><strong>SSE 로그가 비어 있음</strong>: Redis 실행 여부, 백엔드 로그의 Pub/Sub 발행, 브라우저 개발자 도구 Network에서 <code>/api/workflow/stream/…</code> 이벤트 스트림 수신 여부를 확인합니다. <code>event.data</code>가 JSON이 아니면 서버 SSE·Redis 직렬화 설정을 점검합니다.</li>
+        <li><strong>초기 STARTED·ROUTING 이벤트 누락</strong>: 클라이언트가 POST보다 <strong>SSE를 먼저</strong> 열고, 서버가 이력 replay를 제공하는지 확인합니다(<code>StrategicAnalysisLab</code>이 그 순서를 따름).</li>
+        <li><strong>POST만 4xx/5xx</strong>: 응답 본문이 JSON이면 <code>error</code> 필드를 읽습니다. 프록시 대상 <code>VITE_API_URL</code> 포트가 백엔드와 일치하는지 확인합니다.</li>
+    </ul>
+
+    <div class="course-footer-actions">
+    <p style="font-size:0.88rem;color:#64748b;margin-bottom:0.5rem;">다른 환경 설정 가이드</p>
+    <p>
+        <a th:href="@{/go/setting/intellij}">IntelliJ</a> ·
+        <a th:href="@{/go/setting/springai}">Spring AI</a> ·
+        <a th:href="@{/go/setting/openai}">OpenAI</a> ·
+        <a th:href="@{/go/setting/gemini}">Gemini</a> ·
+        <a th:href="@{/go/setting/ollama}">Ollama</a> ·
+        <a th:href="@{/go/setting/redis}">Redis</a> ·
+        <a th:href="@{/go/setting/postgresql}">PostgreSQL</a>
+    </p>
+    </div>
+
+    </div>
+    </div>
+
+</th:block>
+
+</html>

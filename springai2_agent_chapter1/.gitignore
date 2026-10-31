@@ -1,0 +1,7 @@
+/.idea
+#/dev
+/logs
+#/mcp-server-time-webflux
+#/mcp-server-weather-forecast-stdio
+#/mcp-server-weather-webmvc
+/springai.iml

@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<!-- fragment/left.html -->
+
+<th:block th:fragment="left(page)">
+
+    <!-- Main Left Menu -->
+    <ul th:if="${page == 'main' || page == 'setting' }" class="nav nav-pills flex-column" style="font-weight: bold; font-size: small">
+
+        <li class="nav-item">
+            <a th:href="@{/go/ch1}" class="btn btn-secondary btn-block mb-2" role="button" style="font-weight: bold;text-align: left; font-size: small">
+                1. Multi-LLM Architecture
+            </a>
+        </li>
+        <li class="nav-item">
+            <a th:href="@{/go/ch2}" class="btn btn-secondary btn-block mb-2" role="button" style="font-weight: bold;text-align: left; font-size: small">
+                2. Agentic Workflow Patterns
+            </a>
+        </li>
+        <li class="nav-item">
+            <a th:href="@{/go/ch3}" class="btn btn-secondary btn-block mb-2" role="button" style="font-weight: bold;text-align: left; font-size: small">
+                3. Orchestrated Multi-Agent Patterns
+            </a>
+        </li>
+        <li class="nav-item">
+            <a th:href="@{/go/ch4}" class="btn btn-secondary btn-block mb-2" role="button" style="font-weight: bold;text-align: left; font-size: small">
+                4. Multi-Agent
+            </a>
+        </li>
+        <li class="nav-item">
+            <a th:href="@{/go/ch5}" class="btn btn-secondary btn-block mb-2" role="button" style="font-weight: bold;text-align: left; font-size: small">
+                5. Tool-Orchestrated Multi-Agent
+            </a>
+        </li>
+        <li class="nav-item">
+            <a th:href="@{/go/ch6}" class="btn btn-secondary btn-block mb-2" role="button" style="font-weight: bold;text-align: left; font-size: small">
+                6. Task-Orchestrated Multi-Agent
+            </a>
+        </li>
+        <li class="nav-item">
+            <a th:href="@{/go/ch7}" class="btn btn-secondary btn-block mb-2" role="button" style="font-weight: bold;text-align: left; font-size: small">
+                7. DAG-Orchestrated Multi-Agent
+            </a>
+        </li>
+        <li class="nav-item">
+            <a th:href="@{/go/ch8}" class="btn btn-secondary btn-block mb-2" role="button" style="font-weight: bold;text-align: left; font-size: small">
+                8. Declarative Agent Workflow with YAML
+            </a>
+        </li>
+        <li class="nav-item">
+            <a th:href="@{/go/ch9}" class="btn btn-secondary btn-block mb-2" role="button" style="font-weight: bold;text-align: left; font-size: small">
+                9. Validated Agent Workflow DSL
+            </a>
+        </li>
+
+    </ul>
+    <!-- Chapter1 Left Menu -->
+    <ul th:if="${page == 'ch1'}" class="nav nav-pills flex-column" style="font-weight: bold">
+        <li class="nav-item">
+            <a th:href="@{/go/ch1/desc}" class="btn btn-warning btn-block mb-2" role="button" style="font-weight: bold;text-align: left; font-size: small">
+                Chapter1. Screen Description
+            </a>
+        </li>
+        <li class="nav-item">
+            <a th:href="@{/go/ch1/1_multi_llm}" class="btn btn-primary btn-block mb-2" role="button" style="font-weight: bold;text-align: left; font-size: small">
+                1. Multi LLM
+            </a>
+        </li>
+        <li class="nav-item">
+            <a th:href="@{/go/ch1/2_multi_llm_stream}" class="btn btn-primary btn-block mb-2" role="button" style="font-weight: bold;text-align: left; font-size: small">
+                2. Multi LLM Stream
+            </a>
+        </li>
+        <li class="nav-item">
+            <a th:href="@{/go/ch1/3_fallback}" class="btn btn-primary btn-block mb-2" role="button" style="font-weight: bold;text-align: left; font-size: small">
+                3. Fallback
+            </a>
+        </li>
+        <li class="nav-item">
+            <a th:href="@{/go/ch1/4_router}" class="btn btn-primary btn-block mb-2" role="button" style="font-weight: bold;text-align: left; font-size: small">
+                4. Router
+            </a>
+        </li>
+        <li class="nav-item">
+            <a th:href="@{/go/ch1/5_security}" class="btn btn-primary btn-block mb-2" role="button" style="font-weight: bold;text-align: left; font-size: small">
+                5. Security
+            </a>
+        </li>
+
+
+
+    </ul>
+
+    <!-- Chapter3 Left Menu -->
+    <ul th:if="${page == 'ch2'}" class="nav nav-pills flex-column" style="font-weight: bold">
+        <li class="nav-item">
+            <a th:href="@{/go/ch2/desc}" class="btn btn-warning btn-block mb-2" role="button" style="font-weight: bold;text-align: left; font-size: small">
+                Chapter2. Screen Description
+            </a>
+        </li>
+        <li class="nav-item">
+            <a th:href="@{/go/ch2/1_chain_workflow}" class="btn btn-primary btn-block mb-2" role="button" style="font-weight: bold;text-align: left; font-size: small">
+                1. Chain Workflow
+            </a>
+        </li>
+        <li class="nav-item">
+            <a th:href="@{/go/ch2/2_parallelization_workflow}" class="btn btn-primary btn-block mb-2" role="button" style="font-weight: bold;text-align: left; font-size: small">
+                2. Parallelization Workflow
+            </a>
+        </li>
+        <li class="nav-item">
+            <a th:href="@{/go/ch2/3_routing_workflow}" class="btn btn-primary btn-block mb-2" role="button" style="font-weight: bold;text-align: left; font-size: small">
+                3. Routing Workflow
+            </a>
+        </li>
+        <li class="nav-item">
+            <a th:href="@{/go/ch2/4_orchestrator_workers}" class="btn btn-primary btn-block mb-2" role="button" style="font-weight: bold;text-align: left; font-size: small">
+                4. Orchestrator-Workers
+            </a>
+        </li>
+        <li class="nav-item">
+            <a th:href="@{/go/ch2/5_evaluator_optimizer}" class="btn btn-primary btn-block mb-2" role="button" style="font-weight: bold;text-align: left; font-size: small">
+                5. Evaluator-Optimizer
+            </a>
+        </li>
+    </ul>
+    <!-- Chapter3 Left Menu -->
+    <ul th:if="${page == 'ch3'}" class="nav nav-pills flex-column" style="font-weight: bold">
+        <li class="nav-item">
+            <a th:href="@{/go/ch3/desc}" class="btn btn-warning btn-block mb-2" role="button" style="font-weight: bold;text-align: left; font-size: small">
+                Chapter3. Screen Description
+            </a>
+        </li>
+        <li class="nav-item">
+            <a th:href="@{/go/ch3/1_strategic_analysis}" class="btn btn-primary btn-block mb-2" role="button" style="font-weight: bold;text-align: left; font-size: small">
+                1. Strategic Analysis
+            </a>
+        </li>
+        <li class="nav-item">
+            <a th:href="@{/go/ch3/2_precision_execution}" class="btn btn-primary btn-block mb-2" role="button" style="font-weight: bold;text-align: left; font-size: small">
+                2. Precision Execution
+            </a>
+        </li>
+        <li class="nav-item">
+            <a th:href="@{/go/ch3/3_voting_analysis}" class="btn btn-primary btn-block mb-2" role="button" style="font-weight: bold;text-align: left; font-size: small">
+                3. Voting Analysis
+            </a>
+        </li>
+        <li class="nav-item">
+            <a th:href="@{/go/ch3/4_auto_pattern_routing}" class="btn btn-primary btn-block mb-2" role="button" style="font-weight: bold;text-align: left; font-size: small">
+                4. Auto Pattern Routing
+            </a>
+        </li>
+    </ul>
+    <!-- Chapter4 Left Menu -->
+    <ul th:if="${page == 'ch4'}" class="nav nav-pills flex-column" style="font-weight: bold">
+        <li class="nav-item">
+            <a th:href="@{/go/ch4/desc}" class="btn btn-warning btn-block mb-2" role="button" style="font-weight: bold;text-align: left; font-size: small">
+                Chapter4. Screen Description
+            </a>
+        </li>
+        <li class="nav-item">
+            <a th:href="@{/go/ch4/1_strategic_analysis}" class="btn btn-primary btn-block mb-2" role="button" style="font-weight: bold;text-align: left; font-size: small">
+                1. Strategic Analysis (Multi-Agent)
+            </a>
+        </li>
+    </ul>
+    <!-- Chapter5 Left Menu -->
+    <ul th:if="${page == 'ch5'}" class="nav nav-pills flex-column" style="font-weight: bold">
+        <li class="nav-item">
+            <a th:href="@{/go/ch5/desc}" class="btn btn-warning btn-block mb-2" role="button" style="font-weight: bold;text-align: left; font-size: small">
+                Chapter5. Screen Description
+            </a>
+        </li>
+        <li class="nav-item">
+            <a th:href="@{/go/ch5/1_strategic_analysis}" class="btn btn-primary btn-block mb-2" role="button" style="font-weight: bold;text-align: left; font-size: small">
+                1. Strategic Analysis (Tool-Orchestrated)
+            </a>
+        </li>
+    </ul>
+    <!-- Chapter6 Left Menu -->
+    <ul th:if="${page == 'ch6'}" class="nav nav-pills flex-column" style="font-weight: bold">
+        <li class="nav-item">
+            <a th:href="@{/go/ch6/desc}" class="btn btn-warning btn-block mb-2" role="button" style="font-weight: bold;text-align: left; font-size: small">
+                Chapter6. Screen Description
+            </a>
+        </li>
+        <li class="nav-item">
+            <a th:href="@{/go/ch6/1_strategic_analysis}" class="btn btn-primary btn-block mb-2" role="button" style="font-weight: bold;text-align: left; font-size: small">
+                1. Strategic Analysis (Task-Orchestrated)
+            </a>
+        </li>
+    </ul>
+    <!-- Chapter7 Left Menu -->
+    <ul th:if="${page == 'ch7'}" class="nav nav-pills flex-column" style="font-weight: bold">
+        <li class="nav-item">
+            <a th:href="@{/go/ch7/desc}" class="btn btn-warning btn-block mb-2" role="button" style="font-weight: bold;text-align: left; font-size: small">
+                Chapter7. Screen Description
+            </a>
+        </li>
+        <li class="nav-item">
+            <a th:href="@{/go/ch7/1_strategic_analysis}" class="btn btn-primary btn-block mb-2" role="button" style="font-weight: bold;text-align: left; font-size: small">
+                1. Strategic Analysis (DAG)
+            </a>
+        </li>
+    </ul>
+
+    <!-- Chapter8 Left Menu -->
+    <ul th:if="${page == 'ch8'}" class="nav nav-pills flex-column" style="font-weight: bold">
+        <li class="nav-item">
+            <a th:href="@{/go/ch8/desc}" class="btn btn-warning btn-block mb-2" role="button" style="font-weight: bold;text-align: left; font-size: small">
+                Chapter8. Screen Description
+            </a>
+        </li>
+        <li class="nav-item">
+            <a th:href="@{/go/ch8/1_strategic_analysis}" class="btn btn-primary btn-block mb-2" role="button" style="font-weight: bold;text-align: left; font-size: small">
+                1. Strategic Analysis (YAML)
+            </a>
+        </li>
+    </ul>
+
+    <!-- Chapter9 Left Menu -->
+    <ul th:if="${page == 'ch9'}" class="nav nav-pills flex-column" style="font-weight: bold">
+        <li class="nav-item">
+            <a th:href="@{/go/ch9/desc}" class="btn btn-warning btn-block mb-2" role="button" style="font-weight: bold;text-align: left; font-size: small">
+                Chapter9. Screen Description
+            </a>
+        </li>
+        <li class="nav-item">
+            <a th:href="@{/go/ch9/1_strategic_analysis}" class="btn btn-primary btn-block mb-2" role="button" style="font-weight: bold;text-align: left; font-size: small">
+                1. Strategic Analysis (Validated DSL)
+            </a>
+        </li>
+    </ul>
+
+</th:block>
+
+</html>
+

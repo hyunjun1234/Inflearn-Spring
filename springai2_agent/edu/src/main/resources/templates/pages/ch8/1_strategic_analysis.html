@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<th:block>
+    <script>
+        /*
+         * ch8_strategic_analysis 객체
+         * - YAML로 정의된 DAG 워크플로우를 서버에서 로드·실행하고
+         * - SSE(Server-Sent Events)로 단계별 진행 상태를 실시간 수신하며
+         * - NDJSON 스트리밍 응답을 화면에 출력하는 모듈
+         *
+         * ✔ 학습 포인트
+         * 1. workflowDefinition으로 실행할 YAML 워크플로 식별자 전달
+         * 2. fetch + ReadableStream으로 본문 스트리밍 처리
+         * 3. ANALYZING / TECH / MARKET 등 단계로 STRATEGIC 라우팅 배지 반영
+         * 4. EventSource.onopen 이후 본 요청으로 SSE 초기 이벤트 유실 완화
+         */
+        ch8_strategic_analysis = {
+
+            // ch8 YAML 기반 전략 분석 API
+            url:'/ch8/strategic-analysis',
+
+            // 서버가 Workflow 진행 상태를 SSE로 push 해주는 엔드포인트 (뒤에 workflowId 연결)
+            sseUrl: '/api/workflow/stream/',
+
+            /*
+             * 초기화 함수
+             * - 페이지 로드 시 실행
+             * - 버튼 클릭 이벤트 등록
+             * - 로딩 스피너 초기 숨김 처리
+             */
+            init:function(){
+                document.querySelector("#send_btn").addEventListener("click", ()=>{
+                    this.send();
+                })
+                document.querySelector("#spinner").style.cssText = "visibility:hidden;";
+            },
+
+            /*
+             * 사용자 질문을 화면에 출력하는 UI 생성 함수
+             * - 채팅 UI 구조를 동적으로 생성
+             * - 현재 시간 표시
+             */
+            makeQuestionHtml:function(question){
+
+            },
+
+            /*
+             * 챗봇 응답이 출력될 HTML 영역 생성
+             * - 고유 ID 생성
+             * - 이후 스트리밍 데이터가 이 영역에 append 됨
+             */
+            makeResponseHtml: async function(){
+
+            },
+
+            /*
+             * 질문 전송 메인 로직
+             *
+             * 실행 순서:
+             * 1. 로딩 표시
+             * 2. 질문 및 workflowDefinition(hidden) 수집
+             * 3. workflowId 생성
+             * 4. SSE 연결 (상태 패널 + onopen 대기)
+             * 5. fetch로 분석 요청 (prompt, workflowId, workflowDefinition)
+             * 6. 응답 영역 생성 후 스트리밍 출력
+             */
+            send:async function(){
+                // 1️⃣ 로딩 표시
+                // 2️⃣ 질문·#workflowDefinition 값 읽기 (기본값 strategic-analysis)
+                // 3️⃣ 사용자 질문 UI 출력
+                // 4️⃣ 워크플로우 고유 ID 생성
+                // 5️⃣ SSE 먼저 연결
+                // 6️⃣ YAML DAG 전략 분석 POST 요청 (form: application/x-www-form-urlencoded, Accept: application/x-ndjson)
+                // 7️⃣ 응답 출력 영역 생성
+                // 8️⃣ 스트리밍 본문 출력
+            },
+
+            /*
+             * Workflow 진행 상태 UI 생성
+             * - 상단 메시지 + routing 배지 + 단계 로그
+             * - ch7과 유사하나 YAML 엔진용 안내 문구 사용
+             */
+            makeStatusArea: function(workflowId) {
+
+            },
+
+            /*
+             * SSE(Server-Sent Events) 연결
+             *
+             * ✔ 특징
+             * - ROUTING 시 배지 "결정 중"
+             * - YAML 엔진: ANALYZING 또는 TECH / MARKET 수신 시 STRATEGIC 확정 (ch7과 신호명 차이 가능)
+             * - COMPLETED 시 미확정이면 sawStrategicSignal 없으면 SIMPLE 로 표시
+             *
+             * ✔ onopen + 1초 타임아웃: send()에서 fetch 전에 호출되어 채널 준비를 기다림
+             */
+            connectSSE: async function(workflowId) {
+                // ch7 코드 엔진과 달리 YAML 파이프라인은 ANALYZING 등으로 STRATEGIC 신호를 줄 수 있음
+                // STRATEGIC 신호를 한 번도 못 봤으면 COMPLETED 시 SIMPLE 로 간주
+            },
+
+            /*
+             * NDJSON 스트리밍 응답 처리
+             *
+             * ✔ fetch()의 ReadableStream 사용
+             * ✔ reader.read() 반복 호출
+             * ✔ 서버에서 오는 데이터를 chunk 단위로 출력
+             */
+            responseDisplay:async function(targetId, response) {
+
+            }
+        }
+
+        // 페이지 로드 시 초기화
+        window.onload = function(){
+            ch8_strategic_analysis.init();
+        }
+    </script>
+
+    <div class="col-sm-10">
+        <h2 class="text-center">1. Strategic Analysis (YAML-based DAG Workflow)</h2>
+        <div class="container py-5">
+            <div class="row d-flex justify-content-center">
+                <div class="col-sm-10">
+                    <button class="btn btn-primary" disabled id="spinner">
+                        <span class="spinner-border spinner-border-sm" ></span>
+                        Loading..
+                    </button>
+                    <div class="card">
+                        <div class="card-header text-muted d-flex justify-content-start align-items-center p-3">
+                            <div class="input-group mb-0">
+                                <input id="question" type="text" class="form-control" placeholder="Type message" value="도심형 항공 모빌리티(UAM) 서비스의 국내 도입을 위한 기술적 과제와 예상 수익 모델을 분석해줘."
+                                       aria-label="Recipient's username" aria-describedby="button-addon2" />
+                                <input id="workflowDefinition" type="hidden" value="strategic-analysis" />
+                                <button type="button" class="btn btn-primary" id="send_btn">Send</button>
+                            </div>
+                        </div>
+                        <div id="result" class="card-body" data-mdb-perfect-scrollbar-init ></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</th:block>
+
+</html>

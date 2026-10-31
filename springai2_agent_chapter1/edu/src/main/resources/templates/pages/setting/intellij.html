@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<th:block>
+
+    <style>
+        .course-main { max-width: 52rem; margin: 0 auto; padding: 0 0.25rem 2.5rem; font-size: 1rem; line-height: 1.65; color: #1e293b; }
+        .course-hero { margin-bottom: 1.25rem; padding-bottom: 1rem; border-bottom: 1px solid #e2e8f0; }
+        .course-hero h1 { font-size: clamp(1.25rem, 2.2vw, 1.65rem); font-weight: 700; letter-spacing: -0.02em; margin: 0; color: #0f172a; line-height: 1.3; }
+        .course-toc { background: linear-gradient(165deg, #f8fafc 0%, #f1f5f9 100%); border: 1px solid #e2e8f0; border-radius: 10px; padding: 1rem 1.25rem 1.1rem; margin-bottom: 1.25rem; }
+        .course-toc-title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b; margin: 0 0 0.6rem; }
+        .course-toc ol { margin: 0; padding-left: 1.2rem; }
+        .course-toc li { margin-bottom: 0.35rem; line-height: 1.45; }
+        .course-toc a { color: #1d4ed8; text-decoration: none; font-size: 0.9rem; }
+        .course-toc a:hover { text-decoration: underline; color: #1e40af; }
+        .course-overview { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 1.25rem 1.4rem 1.35rem; margin-bottom: 1.25rem; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06); }
+        .course-content h3 { font-size: 1.12rem; margin: 1.35rem 0 0.85rem; padding-bottom: 0.55rem; border-bottom: 2px solid #93c5fd; color: #0f172a; font-weight: 700; line-height: 1.4; }
+        .course-content > h3:first-of-type,
+        .course-content hr.course-divider + h3 { margin-top: 0; }
+        .course-content h6 { font-size: 0.95rem; margin: 0.85rem 0 0.4rem; color: #334155; font-weight: 600; }
+        .course-divider { border: none; height: 1px; background: linear-gradient(90deg, transparent, #cbd5e1, transparent); margin: 1.5rem 0; }
+        .course-footer-actions { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #e2e8f0; }
+        ul, ol { margin-left: 1.25rem; margin-bottom: 0.75rem; }
+        code { background: #f1f5f9; padding: 0.12em 0.38em; border-radius: 4px; font-size: 0.9em; color: #0f172a; }
+        p { margin-bottom: 0.85rem; }
+        .course-overview .meta { color: #475569; font-size: 0.95rem; margin-bottom: 0.75rem; }
+        .course-content figure { margin: 0.75rem 0 1rem; }
+        .course-content figure img { display: block; max-width: 100%; height: auto; border-radius: 10px; border: 1px solid #e2e8f0; box-shadow: 0 2px 12px rgba(15, 23, 42, 0.06); }
+        .course-content pre { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 0.85rem 1rem; overflow-x: auto; font-size: 0.88rem; line-height: 1.5; margin: 0.75rem 0 1rem; }
+    </style>
+
+    <div class="course-main">
+    <header class="course-hero">
+    <h1>IntelliJ 환경 설정</h1>
+    </header>
+
+    <div class="course-overview">
+    <p class="meta">
+        JDK 설치 · IntelliJ IDEA 설치 · 자동 빌드·인코딩·Hot Swap — 본 과정 Spring Boot 실습을 위한 IDE 준비
+    </p>
+    <p>
+        이 문서는 로컬 개발에 필요한 <strong>JDK</strong>와 <strong>IntelliJ IDEA</strong> 설치 링크, 그리고 저장 시 재실행·UTF-8 인코딩 등
+        본 저장소 예제를 따라가기 위한 최소 설정을 정리합니다. 이후 Chapter 실습은 이 환경을 전제로 합니다.
+    </p>
+    </div>
+
+    <nav class="course-toc" aria-label="목차">
+    <p class="course-toc-title">목차</p>
+    <ol>
+        <li><a href="#ij-s1">JDK</a></li>
+        <li><a href="#ij-s2">IntelliJ IDEA 다운로드</a></li>
+        <li><a href="#ij-s3">IDE 기본 설정 (탐색기·자동 빌드·인코딩·Update)</a></li>
+    </ol>
+    </nav>
+
+    <div class="course-content">
+    <hr class="course-divider">
+
+    <h3 id="ij-s1">1. JDK</h3>
+    <p>
+        <a href="https://www.oracle.com/kr/java/technologies/downloads/" target="_blank" rel="noopener noreferrer">JDK Download (Oracle)</a>
+        — 프로젝트는 Java 17(Java 21 버전 사용 가능)  을 사용합니다.<br>설치 후 명령 프롬프트에서 <code>java -version</code>으로 버전을 확인하세요.
+    </p>
+
+    <hr class="course-divider">
+
+    <h3 id="ij-s2">2. IntelliJ IDEA 다운로드</h3>
+    <p>
+        <a href="https://www.jetbrains.com/ko-kr/idea/download/" target="_blank" rel="noopener noreferrer">IntelliJ IDEA Download</a>
+        — Community 또는 Ultimate 중 환경에 맞는 에디션을 선택합니다.
+    </p>
+
+    <hr class="course-divider">
+
+    <h3 id="ij-s3">3. IntelliJ 환경 설정</h3>
+
+    <h6>Project Explorer</h6>
+    <figure>
+        <img th:src="@{/imgs/intellij1.png}" alt="IntelliJ Project Explorer 설정 예시">
+    </figure>
+
+    <h6>Rerun as soon as you save the code (저장 시 클래스·리소스 반영)</h6>
+    <ol>
+        <li><strong>Settings</strong> → <strong>Advanced Settings</strong> → Compiler → <em>Allow auto-make to start even if developed application is currently running</em> ✓</li>
+        <li><strong>Settings</strong> → <strong>Build, Execution, Deployment</strong> → <strong>Compiler</strong> → <em>Build project automatically</em> ✓</li>
+        <li><strong>Settings</strong>에서 <code>encoding</code> 검색 후 전역·프로젝트 인코딩을 <strong>UTF-8</strong>로 통일</li>
+        <li><strong>Run/Debug Configurations</strong> → 해당 Spring Boot 실행 항목 → <strong>Modify options</strong> → <strong>On 'Update' action</strong> → <em>Update classes and resources</em> ✓
+            <figure>
+                <img th:src="@{/imgs/intellij2.png}" alt="Run Configuration Update 옵션">
+            </figure>
+            <figure>
+                <img th:src="@{/imgs/intellij3.png}" alt="Update classes and resources 선택">
+            </figure>
+        </li>
+    </ol>
+
+    <div class="course-footer-actions">
+    <p style="font-size:0.88rem;color:#64748b;margin-bottom:0.5rem;">다른 환경 설정 가이드</p>
+    <p>
+        <a th:href="@{/go/setting/springai}">Spring AI</a> ·
+        <a th:href="@{/go/setting/openai}">OpenAI</a> ·
+        <a th:href="@{/go/setting/gemini}">Gemini</a> ·
+        <a th:href="@{/go/setting/ollama}">Ollama</a> ·
+        <a th:href="@{/go/setting/redis}">Redis</a> ·
+        <a th:href="@{/go/setting/postgresql}">PostgreSQL</a> ·
+        <a th:href="@{/go/setting/react}">React</a>
+    </p>
+    </div>
+
+    </div>
+    </div>
+
+</th:block>
+</html>

@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<th:block>
+
+    <style>
+        .course-main { max-width: 52rem; margin: 0 auto; padding: 0 0.25rem 2.5rem; font-size: 1rem; line-height: 1.65; color: #1e293b; }
+        .course-hero { margin-bottom: 1.25rem; padding-bottom: 1rem; border-bottom: 1px solid #e2e8f0; }
+        .course-hero h1 { font-size: clamp(1.25rem, 2.2vw, 1.65rem); font-weight: 700; letter-spacing: -0.02em; margin: 0; color: #0f172a; line-height: 1.3; }
+        .course-toc { background: linear-gradient(165deg, #f8fafc 0%, #f1f5f9 100%); border: 1px solid #e2e8f0; border-radius: 10px; padding: 1rem 1.25rem 1.1rem; margin-bottom: 1.25rem; }
+        .course-toc-title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b; margin: 0 0 0.6rem; }
+        .course-toc ol { margin: 0; padding-left: 1.2rem; }
+        .course-toc li { margin-bottom: 0.35rem; line-height: 1.45; }
+        .course-toc a { color: #1d4ed8; text-decoration: none; font-size: 0.9rem; font-weight: 700; }
+        .course-toc a:hover { text-decoration: underline; color: #1e40af; }
+        .course-overview { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 1.25rem 1.4rem 1.35rem; margin-bottom: 1.25rem; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06); }
+        .course-content h3 { font-size: 1.12rem; margin: 1.35rem 0 0.85rem; padding-bottom: 0.55rem; border-bottom: 2px solid #93c5fd; color: #0f172a; font-weight: 700; line-height: 1.4; }
+        .course-content > h3:first-of-type,
+        .course-content hr.course-divider + h3 { margin-top: 0; }
+        .course-content h4 { font-size: 1rem; margin: 1rem 0 0.5rem; color: #334155; font-weight: 600; }
+        .course-content h6 { font-size: 0.95rem; margin: 0.85rem 0 0.4rem; color: #334155; font-weight: 600; }
+        .course-divider { border: none; height: 1px; background: linear-gradient(90deg, transparent, #cbd5e1, transparent); margin: 1.5rem 0; }
+        .course-footer-actions { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #e2e8f0; }
+        ul { margin-left: 1.25rem; margin-bottom: 0.75rem; }
+        code { background: #f1f5f9; padding: 0.12em 0.38em; border-radius: 4px; font-size: 0.9em; color: #0f172a; }
+        p { margin-bottom: 0.85rem; }
+        .course-overview .meta { color: #475569; font-size: 0.95rem; margin-bottom: 0.75rem; }
+
+        /* Chapter 1 — Multi LLM 아키텍처 (ch4.html 파이프라인 스타일과 동일 계열) */
+        .c4-agents-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.5rem 0.45rem;
+            margin-top: 0.75rem;
+            padding-top: 0.35rem;
+        }
+        .c4-agent-pill {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 0.45rem 0.65rem 0.5rem;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            line-height: 1.35;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            min-width: 7.5rem;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+        }
+        .c4-agent-pill code {
+            font-size: 0.78rem;
+            font-weight: 600;
+            background: transparent;
+            padding: 0;
+            color: #0f172a;
+        }
+        .c4-agent-pill .c4-model {
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            margin-top: 0.25rem;
+            padding: 0.12rem 0.38rem;
+            border-radius: 4px;
+        }
+        .c4-model-llama { background: #ecfdf5; color: #047857; }
+        .c4-model-gpt { background: #eff6ff; color: #1d4ed8; }
+        .c4-model-gemini { background: #f5f3ff; color: #6d28d9; }
+        .c4-flow-footnote {
+            text-align: center;
+            font-size: 0.82rem;
+            color: #64748b;
+            margin: 1rem 0 0;
+            padding-top: 0.75rem;
+            border-top: 1px dashed #cbd5e1;
+        }
+        @media (min-width: 640px) {
+            .c4-agents-grid { max-width: 36rem; margin-left: auto; margin-right: auto; }
+        }
+        .c4-pipeline-wrap {
+            margin: 1rem 0 1.25rem;
+            padding: 1.25rem 1.15rem 1.4rem;
+            border-radius: 14px;
+            background: linear-gradient(165deg, #f8fafc 0%, #eef2ff 40%, #f1f5f9 100%);
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
+        }
+        .c4-pipeline-wrap .c4-flow-caption {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #64748b;
+            margin: 0 0 0.9rem;
+            text-align: center;
+        }
+        .c4-pipeline-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 24rem;
+            margin: 0 auto;
+        }
+        .c4-pipeline-step {
+            width: 100%;
+            border-radius: 11px;
+            padding: 0.65rem 0.9rem;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+        }
+        .c4-pipeline-step .c4-ps-kicker {
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #64748b;
+            margin-bottom: 0.2rem;
+        }
+        .c4-pipeline-step .c4-ps-title {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0;
+            line-height: 1.35;
+        }
+        .c4-pipeline-step .c4-ps-sub {
+            font-size: 0.74rem;
+            color: #64748b;
+            margin: 0.28rem 0 0;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        }
+        .c4-pipeline-step.c4-ps-user {
+            background: linear-gradient(180deg, #f8fafc 0%, #fff 100%);
+            border-color: #cbd5e1;
+        }
+        .c4-pipeline-step.c4-ps-main {
+            background: linear-gradient(135deg, #1e3a5f 0%, #1e293b 100%);
+            border-color: #334155;
+            color: #f8fafc;
+        }
+        .c4-pipeline-step.c4-ps-main .c4-ps-kicker { color: rgba(248, 250, 252, 0.75); }
+        .c4-pipeline-step.c4-ps-main .c4-ps-title { color: #f8fafc; }
+        .c4-pipeline-step.c4-ps-main .c4-ps-sub { color: rgba(248, 250, 252, 0.88); }
+        .c4-pipeline-step.c4-ps-registry {
+            border: 2px solid #38bdf8;
+            background: #fff;
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.1);
+        }
+        .c4-pipeline-step.c4-ps-registry .c4-ps-kicker { color: #0369a1; }
+        .c4-pipeline-step.c4-ps-registry .c4-ps-title { color: #0c4a6e; }
+        .c4-pipeline-step.c4-ps-subs {
+            border-style: dashed;
+            border-color: #94a3b8;
+            background: #fffefb;
+        }
+        .c4-pipeline-step.c4-ps-subs .c4-ps-kicker { color: #a16207; }
+        .c4-pipeline-step.c4-ps-merge {
+            background: linear-gradient(180deg, #fffbeb 0%, #fff 100%);
+            border-color: #fcd34d;
+        }
+        .c4-pipeline-step.c4-ps-merge .c4-ps-kicker { color: #b45309; }
+        .c4-pipeline-step.c4-ps-out {
+            background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%);
+            border: 2px solid #34d399;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.12);
+        }
+        .c4-pipeline-step.c4-ps-out .c4-ps-kicker { color: #047857; }
+        .c4-pipeline-step.c4-ps-out .c4-ps-title { color: #065f46; }
+        .c4-pipeline-arrow-sm {
+            padding: 0.28rem 0 0.32rem;
+            color: #94a3b8;
+            font-size: 1rem;
+            line-height: 1;
+        }
+    </style>
+
+    <div class="course-main">
+    <header class="course-hero">
+    <h1>Chapter 1. Multi LLM Architecture</h1>
+    <p style="margin:0.35rem 0 0; color:#475569; font-size:1.15rem; font-weight:700;">다중 모델 전략과 엔터프라이즈 AI 아키텍처 설계</p>
+    </header>
+
+    <div class="course-overview">
+    <p>
+        Chapter 1은 이후 워크플로 패턴(Chapter 2)·오케스트레이션(Chapter 3 이후)·에이전트 구조로 확장하기 위해 <strong>Multi LLM</strong>을 사용하는 전략에 대해 공부 합니다.<br>
+        Spring Boot / Spring AI 환경에서 여러 <code>ChatClient</code>·프로바이더를 동시에 두고, “어떤 요청에 어떤 모델을 쓸지”를 <strong>아키텍처 차원</strong>에서 정의하는 것이 목표입니다.
+        단순히 외부 API를 여러 개 호출하는 수준이 아니라, <strong>Routing·Fallback·Router·Security</strong>를 통해 품질·비용·안정성·규제 요구를 균형 있게 맞추는 흐름을 정리합니다.
+    </p>
+    <p>
+        <strong>단일 LLM만 사용할 때</strong>는 연동 모델이 하나이므로 구현·배포·관측이 단순하고, 일관된 인터페이스로 빠르게 프로덕트를 만들 수 있습니다.
+        다만 해당 모델의 약점·장애·요금·데이터 처리 정책이 곧 서비스 전체의 한계가 되며, 장애 시 대안 모델으로의 전환이나 비용 최적화를 아키텍처 레벨에서 분리하기 어렵습니다.
+    </p>
+    <p>
+        <strong>Multi LLM 아키텍처</strong>는 요청 유형·비용·지연·보안 등에 따라 모델을 선택·조합하고, 필요 시 Fallback으로 가용성을 보강하며, Router로 트래픽을 나누고, 스트리밍으로 응답 경험을 개선하며, Security 계층에서 민감 정보 처리를 분기할 수 있습니다.
+        그 대가로 설정·모니터링·정책 관리 등 <strong>운영 복잡도</strong>는 커지므로, 본 장 실습은 그 트레이드오프를 코드로 직접 비교·체험하는 데 초점을 둡니다.
+    </p>
+    <p>
+        실습 화면:
+        <a th:href="@{/go/ch1/1_multi_llm}">1. Multi LLM</a> ·
+        <a th:href="@{/go/ch1/2_multi_llm_stream}">2. Multi LLM Stream</a> ·
+        <a th:href="@{/go/ch1/3_fallback}">3. Fallback</a> ·
+        <a th:href="@{/go/ch1/4_router}">4. Router</a> ·
+        <a th:href="@{/go/ch1/5_security}">5. Security</a>
+    </p>
+    </div>
+
+    <nav class="course-toc" aria-label="목차">
+    <p class="course-toc-title">목차</p>
+    <ol>
+        <li><a href="#c1-s1">Multi LLM 개요</a></li>
+        <li><a href="#c1-s2">Multi LLM 아키텍처</a></li>
+        <li><a href="#c1-s3">Multi LLM을 사용하는 이유</a></li>
+        <li><a href="#c1-s4">Multi LLM의 장점</a></li>
+        <li><a href="#c1-s5">Multi LLM 실습 내용</a></li>
+        <li><a href="#c1-s6">정리</a></li>
+    </ol>
+    </nav>
+
+    <div class="course-content">
+    <hr class="course-divider">
+
+    <h3 id="c1-s1">1. Multi LLM 개요</h3>
+    <br>
+
+    <p>
+        <strong>Multi LLM 아키텍처</strong>는 하나의 애플리케이션에서 여러 대규모 언어 모델(LLM)을
+        전략적으로 선택 및 조합하여 사용하는 구조입니다.
+    </p>
+    <img th:src="@{/imgs/multillm.png}" width="600px;"><br><a href="https://docs.spring.io/spring-ai/reference/api/effective-agents.html">출처:docs.springai.io</a><br><br>
+
+
+    <p>
+        본 시스템은 GPT, Gemini, Llama 총 3개의 LLM을 활용하며,
+        요청 유형 및 실행 전략에 따라 최적의 모델을 선택하여 호출합니다.
+    </p>
+
+    <p>
+        이를 통해 성능, 비용, 응답 품질, 보안 요구사항을 종합적으로 고려한
+        <strong>유연하고 확장 가능한 AI 서비스 구조</strong>를 구현합니다.
+    </p>
+
+    <hr class="course-divider">
+
+    <h3 id="c1-s2">2. Multi LLM 아키텍처</h3>
+    <br>
+
+    <p>
+        Multi LLM 아키텍처는 단일 모델 의존 구조를 탈피하여
+        <strong>라우팅(Routing) + 전략(Strategy) + 장애 대응(Fallback) + 보안 정책(Security)</strong>
+        계층을 포함하는 구조입니다.
+    </p>
+
+    <div class="c4-pipeline-wrap" role="img" aria-label="Client부터 Unified Response까지 Multi LLM 계층 흐름">
+        <p class="c4-flow-caption">Multi LLM 계층 구조</p>
+        <div class="c4-pipeline-col">
+            <div class="c4-pipeline-step c4-ps-user">
+                <div class="c4-ps-kicker">입력</div>
+                <p class="c4-ps-title">Client</p>
+            </div>
+            <div class="c4-pipeline-arrow-sm" aria-hidden="true">↓</div>
+            <div class="c4-pipeline-step c4-ps-registry">
+                <div class="c4-ps-kicker">분류</div>
+                <p class="c4-ps-title">Request Classifier</p>
+                <p class="c4-ps-sub">요청 성격 분석</p>
+            </div>
+            <div class="c4-pipeline-arrow-sm" aria-hidden="true">↓</div>
+            <div class="c4-pipeline-step c4-ps-main">
+                <div class="c4-ps-kicker">라우팅</div>
+                <p class="c4-ps-title">Router Layer</p>
+                <p class="c4-ps-sub">전략에 따른 모델 선택</p>
+            </div>
+            <div class="c4-pipeline-arrow-sm" aria-hidden="true">↓</div>
+            <div class="c4-pipeline-step c4-ps-subs">
+                <div class="c4-ps-kicker">실행 계층</div>
+                <p class="c4-ps-title">Multi LLM</p>
+                <p class="c4-ps-sub">선택된 프로바이더 호출</p>
+                <div class="c4-agents-grid">
+                    <div class="c4-agent-pill">
+                        <code>GPT</code>
+                        <span class="c4-model c4-model-gpt">OpenAI</span>
+                    </div>
+                    <div class="c4-agent-pill">
+                        <code>Gemini</code>
+                        <span class="c4-model c4-model-gemini">Google</span>
+                    </div>
+                    <div class="c4-agent-pill">
+                        <code>Llama</code>
+                        <span class="c4-model c4-model-llama">Ollama</span>
+                    </div>
+                </div>
+            </div>
+            <div class="c4-pipeline-arrow-sm" aria-hidden="true">↓</div>
+            <div class="c4-pipeline-step c4-ps-merge">
+                <div class="c4-ps-kicker">횡단 관심사</div>
+                <p class="c4-ps-title">Stream / Fallback / Security</p>
+                <p class="c4-ps-sub">스트리밍 · 회복탄력성 · 민감정보 분기</p>
+            </div>
+            <div class="c4-pipeline-arrow-sm" aria-hidden="true">↓</div>
+            <div class="c4-pipeline-step c4-ps-out">
+                <div class="c4-ps-kicker">출력</div>
+                <p class="c4-ps-title">Unified Response</p>
+                <p class="c4-ps-sub">ChatResponse</p>
+            </div>
+        </div>
+        <p class="c4-flow-footnote"><strong>Client → Classifier → Router → Multi LLM → 횡단 계층 → 통합 응답</strong></p>
+    </div>
+
+    <p>
+        <strong>① Request Classifier</strong> : 요청의 성격(CREATIVE, TECHNICAL, GENERAL 등)을 분석<br>
+        <strong>② Router</strong> : 전략에 따라 최적의 LLM 선택<br>
+        <strong>③ Execution Layer</strong> : 선택된 모델 호출<br>
+        <strong>④ Fallback</strong> : 장애 발생 시 대체 모델 자동 전환<br>
+        <strong>⑤ Security Layer</strong> : 민감 정보 포함 여부에 따라 Local/External 모델 분리<br>
+        <strong>⑥ Unified Response</strong> : 모든 모델 응답을 공통 포맷으로 표준화
+    </p>
+
+    <p>
+        이 구조는 <strong>전략 패턴(Strategy Pattern)</strong>과
+        <strong>회복 탄력성(Resilience) 설계</strong>를 결합한 형태입니다.
+    </p>
+
+    <hr class="course-divider">
+
+    <h3 id="c1-s3">3. Multi LLM을 사용하는 이유</h3>
+    <br>
+
+    <p>
+        단일 LLM은 모든 요구사항을 완벽히 충족하기 어렵습니다.
+        각 모델은 강점과 약점이 존재합니다.
+    </p>
+
+    <ul>
+        <li><strong>모델 특성 차이</strong> — 창의성, 추론 능력, 코드 생성, 속도, 비용 구조가 다름</li>
+        <li><strong>비용 최적화</strong> — 고성능 모델은 비용이 높고, 경량 모델은 저비용</li>
+        <li><strong>성능 분산</strong> — 요청 유형에 따라 처리 부하를 분산</li>
+        <li><strong>벤더 종속성 감소</strong> — 특정 모델 또는 공급자 장애 시 서비스 지속 가능</li>
+        <li><strong>보안 요구 대응</strong> — 민감 데이터는 로컬 모델로 제한 가능</li>
+    </ul>
+
+    <p>
+        즉, Multi LLM은 <strong>품질, 비용, 안정성, 보안</strong>을 동시에 고려한 전략적 선택입니다.
+    </p>
+
+    <hr class="course-divider">
+
+    <h3 id="c1-s4">4. Multi LLM의 장점</h3>
+    <br>
+
+    <h6>1) 품질 최적화</h6>
+    <p>
+        요청 유형에 가장 적합한 모델을 사용하여 응답 정확도와 완성도를 향상시킵니다.
+    </p>
+
+    <h6>2) 비용 효율성</h6>
+    <p>
+        단순 요청은 경량 모델로 처리하고,
+        복잡한 요청만 고성능 모델을 사용하여 비용을 절감합니다.
+    </p>
+
+    <h6>3) 확장성(Scalability)</h6>
+    <p>
+        새로운 LLM이 등장하더라도 Router 계층에 전략만 추가하면
+        손쉽게 통합할 수 있습니다.
+    </p>
+
+    <h6>4) 장애 복원력(Resilience)</h6>
+    <p>
+        CircuitBreaker + Fallback 구조를 통해
+        특정 모델 장애 시 자동 대체 모델로 전환합니다.
+    </p>
+
+    <h6>5) 보안 강화</h6>
+    <p>
+        민감 정보는 외부 API로 전달하지 않고,
+        로컬 LLM으로 처리하여 데이터 유출 위험을 최소화합니다.
+    </p>
+
+    <h6>6) 사용자 경험 향상</h6>
+    <p>
+        Streaming 처리 및 응답 최적화를 통해
+        빠르고 안정적인 AI 상호작용을 제공합니다.
+    </p>
+
+    <hr class="course-divider">
+
+    <h3 id="c1-s5">5. Multi LLM 실습내용</h3>
+    <br>
+
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>File Name</th>
+            <th>Description</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        <tr>
+            <td>1. Multi LLM</td>
+            <td>
+                GPT, Gemini, Llama 3개의 LLM을 전략적으로 선택하여 호출하는
+                Multi LLM 기반 AI 서비스 구조입니다.
+            </td>
+        </tr>
+
+        <tr>
+            <td>2. Multi LLM Stream</td>
+            <td>
+                선택된 LLM의 응답을 Reactive Streams(Project Reactor) 기반으로
+                토큰 단위 실시간 스트리밍 처리합니다.
+            </td>
+        </tr>
+
+        <tr>
+            <td>3. Fallback</td>
+            <td>
+                Llama(Ollama) 장애 발생 시 GPT로 자동 전환하며,
+                Resilience4j CircuitBreaker를 적용한 장애 대응 구조입니다.
+            </td>
+        </tr>
+
+        <tr>
+            <td>4. Router</td>
+            <td>
+                요청 유형(CREATIVE, TECHNICAL, GENERAL 등)을 기반으로
+                최적의 LLM으로 동적 라우팅합니다.
+            </td>
+        </tr>
+
+        <tr>
+            <td>5. Security</td>
+            <td>
+                민감 정보 여부를 판별하여
+                Local LLM 또는 External LLM으로 분리 처리합니다.
+            </td>
+        </tr>
+
+        </tbody>
+    </table>
+
+    <hr class="course-divider">
+
+    <h3 id="c1-s6">6. 정리</h3>
+    <br>
+
+    <p>
+        Multi LLM 아키텍처는 단일 모델 중심 설계를 넘어,
+        전략적 모델 선택과 안정성을 결합한 고급 AI 시스템 설계 패턴입니다.
+    </p>
+
+    <hr class="course-divider">
+
+    <div class="course-footer-actions">
+    <p>
+        <a th:href="@{/go/ch1/desc}" class="btn btn-warning font-weight-bold">Chapter1. 상세 가이드 (Screen Description)</a>
+    </p>
+    <p>
+        다음 장: <a th:href="@{/go/ch2}">Chapter 2 — Agentic Workflow Patterns (워크플로 패턴)</a>
+    </p>
+    </div>
+
+    </div>
+    </div>
+
+</th:block>
+
+</html>
+
+
+

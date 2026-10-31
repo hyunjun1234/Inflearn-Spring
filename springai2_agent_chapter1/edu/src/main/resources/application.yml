@@ -1,0 +1,10 @@
+spring:
+  profiles:
+    active: dev
+
+strategic:
+  evaluator:
+    # 전략 보고서 승인 기준 점수(단일 설정값):
+    # - ch4~ch7 승인 판정 로직에서 공통으로 사용
+    # - report-evaluator 프롬프트(PASS 규칙)에도 동일 값 반영
+    approval-threshold: 75

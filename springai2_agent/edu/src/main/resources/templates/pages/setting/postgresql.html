@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<th:block>
+
+    <style>
+        .course-main { max-width: 52rem; margin: 0 auto; padding: 0 0.25rem 2.5rem; font-size: 1rem; line-height: 1.65; color: #1e293b; }
+        .course-hero { margin-bottom: 1.25rem; padding-bottom: 1rem; border-bottom: 1px solid #e2e8f0; }
+        .course-hero h1 { font-size: clamp(1.25rem, 2.2vw, 1.65rem); font-weight: 700; letter-spacing: -0.02em; margin: 0; color: #0f172a; line-height: 1.3; }
+        .course-toc { background: linear-gradient(165deg, #f8fafc 0%, #f1f5f9 100%); border: 1px solid #e2e8f0; border-radius: 10px; padding: 1rem 1.25rem 1.1rem; margin-bottom: 1.25rem; }
+        .course-toc-title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b; margin: 0 0 0.6rem; }
+        .course-toc ol { margin: 0; padding-left: 1.2rem; }
+        .course-toc li { margin-bottom: 0.35rem; line-height: 1.45; }
+        .course-toc a { color: #1d4ed8; text-decoration: none; font-size: 0.9rem; }
+        .course-toc a:hover { text-decoration: underline; color: #1e40af; }
+        .course-overview { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 1.25rem 1.4rem 1.35rem; margin-bottom: 1.25rem; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06); }
+        .course-content h3 { font-size: 1.12rem; margin: 1.35rem 0 0.85rem; padding-bottom: 0.55rem; border-bottom: 2px solid #93c5fd; color: #0f172a; font-weight: 700; line-height: 1.4; }
+        .course-content > h3:first-of-type,
+        .course-content hr.course-divider + h3 { margin-top: 0; }
+        .course-content h6 { font-size: 0.95rem; margin: 1rem 0 0.45rem; color: #334155; font-weight: 600; }
+        .course-divider { border: none; height: 1px; background: linear-gradient(90deg, transparent, #cbd5e1, transparent); margin: 1.5rem 0; }
+        .course-footer-actions { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #e2e8f0; }
+        ul, ol { margin-left: 1.25rem; margin-bottom: 0.75rem; }
+        code { background: #f1f5f9; padding: 0.12em 0.38em; border-radius: 4px; font-size: 0.9em; color: #0f172a; }
+        p { margin-bottom: 0.85rem; }
+        .course-overview .meta { color: #475569; font-size: 0.95rem; margin-bottom: 0.75rem; }
+        .course-content figure { margin: 0.75rem 0 1rem; }
+        .course-content figure img { display: block; max-width: 100%; height: auto; border-radius: 10px; border: 1px solid #e2e8f0; box-shadow: 0 2px 12px rgba(15, 23, 42, 0.06); }
+        .course-content pre { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 0.85rem 1rem; overflow-x: auto; font-size: 0.88rem; line-height: 1.5; margin: 0.75rem 0 1rem; }
+    </style>
+
+    <div class="course-main">
+    <header class="course-hero">
+    <h1>PostgreSQL 환경 설정</h1>
+    </header>
+
+    <div class="course-overview">
+    <p class="meta">
+        Docker · pgvector 이미지 · DB/사용자/포트 · Docker Desktop으로 기동 · IntelliJ 데이터 소스
+    </p>
+    <p>
+        본 과정은 <strong>PostgreSQL + pgvector</strong>를 Docker로 띄우는 방식을 사용합니다.
+        컨테이너 이름은 <code>pgvector-container</code>, 사용자 <code>user01</code>, 비밀번호 <code>111111</code>, DB 이름 <code>springai</code>, 포트 <code>5432</code>입니다.
+    </p>
+    </div>
+
+    <nav class="course-toc" aria-label="목차">
+    <p class="course-toc-title">목차</p>
+    <ol>
+        <li><a href="#pg-s1">Docker 설치</a></li>
+        <li><a href="#pg-s2">PostgreSQL(pgvector) 이미지 실행</a></li>
+        <li><a href="#pg-s3">서버 시작 / 중지</a></li>
+        <li><a href="#pg-s4">PostgreSQL과 IntelliJ 연동 - Ultimate 에디션</a></li>
+        <li><a href="#pg-s5">IntelliJ Community 에디션일 경우</a></li>
+    </ol>
+    </nav>
+
+    <div class="course-content">
+    <hr class="course-divider">
+
+    <h3 id="pg-s1">1. Docker 설치</h3>
+    <p>
+        <a href="https://docs.docker.com/get-started/get-docker/" target="_blank" rel="noopener noreferrer">Docker — Get Docker</a>
+        — OS에 맞는 <strong>Docker Desktop</strong>(또는 Linux의 Docker Engine)을 설치합니다. 설치 후 터미널에서 <code>docker version</code>으로 클라이언트와 엔진이 모두 응답하는지 확인하세요.
+    </p>
+
+    <h6>설치 시 주의 사항</h6>
+    <ul>
+        <li><strong>Windows</strong>: Docker Desktop은 보통 <strong>WSL 2</strong> 기반입니다. BIOS/UEFI에서 가상화(VT-x/AMD-V)가 켜져 있어야 하고, WSL2 설치·업데이트는 공식 가이드를 따릅니다.</li>
+        <li><strong>리소스</strong>: Docker Desktop → <strong>Settings → Resources</strong>에서 CPU·메모리·디스크를 할당합니다. PostgreSQL·pgvector 이미지와 데이터 볼륨은 디스크를 꾸준히 사용합니다.</li>
+        <li><strong>포트</strong>: 다음 절에서 쓰는 <code>5432</code>가 로컬에 이미 설치된 PostgreSQL·다른 DB와 겹치지 않는지 확인합니다.</li>
+        <li><strong>회사망·보안</strong>: 프록시/VPN/백신이 Docker Hub 접속이나 <code>docker pull</code>을 막을 수 있습니다. 필요하면 IT 정책에 맞게 설정합니다.</li>
+        <li><strong>관리자 권한</strong>: 설치·업데이트 시 관리자 권한이 필요할 수 있습니다.</li>
+    </ul>
+
+    <h6>문제 발생 시 해결 방안</h6>
+    <ul>
+        <li><code>docker</code>를 찾을 수 없음 → Docker Desktop이 설치되어 있고 <strong>실행 중</strong>인지(시스템 트레이) 확인합니다.</li>
+        <li><code>Cannot connect to the Docker daemon</code> → Docker Desktop을 완전히 종료 후 다시 실행하거나 PC 재부팅 후 재시도합니다.</li>
+        <li><code>port is already allocated</code> → <code>5432</code>를 쓰는 프로세스·컨테이너를 종료하거나, 다음 절의 <code>docker run</code>에서 호스트 포트만 다른 값(예: <code>-p 5433:5432</code>)으로 바꿉니다. 이 경우 애플리케이션·IntelliJ의 JDBC URL 포트도 같이 맞춥니다.</li>
+        <li>이미지 <code>pull</code> 실패 → 네트워크·DNS·방화벽을 확인하고, 잠시 후 재시도하거나 Docker 공식 문서의 네트워크/프록시 항목을 참고합니다.</li>
+        <li>WSL 관련 오류(Windows) → Docker Desktop → <strong>Settings → Resources → WSL integration</strong>에서 배포판 연동을 켜고, <code>wsl --update</code> 등으로 환경을 점검합니다.</li>
+    </ul>
+
+    <hr class="course-divider">
+
+    <h3 id="pg-s2">2. PostgreSQL(pgvector) 이미지 실행</h3>
+        <strong>Docker Desktop을 실행</strong> 후 명령 프롬프트에서 이미지를 받은 다음 실행 합니다.
+        <pre>
+docker run -d --name pgvector-container -e POSTGRES_USER=user01 -e POSTGRES_PASSWORD=111111 -e POSTGRES_DB=springai -p 5432:5432 pgvector/pgvector:pg17</pre>
+
+    <hr class="course-divider">
+
+    <h3 id="pg-s3">3. PostgreSQL 서버 시작 / 중지</h3>
+    <p>Docker Desktop → <strong>Containers</strong>에서 Actions의 Start / Stop으로 시작·중지합니다.</p>
+    <p>문제가 있으면 컨테이너와 이미지를 삭제한 뒤 2번을 다시 실행합니다.</p>
+    <figure>
+        <img th:src="@{/imgs/docker.png}" alt="Docker Desktop Containers 화면 예시">
+    </figure>
+
+    <hr class="course-divider">
+
+    <h3 id="pg-s4">4. PostgreSQL과 IntelliJ 연동 - Ultimate 에디션</h3>
+    <p>IntelliJ 우측 DB 아이콘 → Data Source → <strong>PostgreSQL</strong></p>
+    <figure>
+        <img th:src="@{/imgs/postgre1.png}" alt="IntelliJ PostgreSQL 데이터 소스">
+    </figure>
+    <p>사용자 <code>user01</code>, 비밀번호 <code>111111</code> 입력</p>
+    <figure>
+        <img th:src="@{/imgs/postgre2.png}" alt="접속 정보 입력">
+    </figure>
+    <p>JDBC 드라이버 설치</p>
+    <figure>
+        <img th:src="@{/imgs/postgre3.png}" alt="JDBC 드라이버 설치">
+    </figure>
+    <p>연결 완료</p>
+    <figure>
+        <img th:src="@{/imgs/postgre4.png}" alt="PostgreSQL 연결 완료">
+    </figure>
+
+    <hr class="course-divider">
+
+    <h3 id="pg-s5">5. IntelliJ Community 에디션일 경우</h3>
+    <p>Community 에디션에는 Ultimate 수준의 DB 도구가 없을 수 있으므로, 아래 <strong>무료·오픈소스</strong> 클라이언트로 PostgreSQL에 접속해 데이터를 확인할 수 있습니다.</p>
+    <ul>
+        <li><a href="https://www.pgadmin.org/" target="_blank" rel="noopener noreferrer">pgAdmin</a> — 공식 GUI. 기능이 많고, 초보자에게는 조금 무거울 수 있음.</li>
+        <li><a href="https://dbeaver.io/" target="_blank" rel="noopener noreferrer">DBeaver Community</a> — PostgreSQL뿐 아니라 여러 DB를 한 앱에서 다루기 좋음.</li>
+        <li><a href="https://www.beekeeperstudio.io/" target="_blank" rel="noopener noreferrer">Beekeeper Studio</a> — 가볍고 UI가 단순한 편.</li>
+        <li><a href="https://www.heidisql.com/" target="_blank" rel="noopener noreferrer">HeidiSQL</a> — Windows에서 쓰기 편한 클라이언트 중 하나.</li>
+    </ul>
+
+    <div class="course-footer-actions">
+    <p style="font-size:0.88rem;color:#64748b;margin-bottom:0.5rem;">다른 환경 설정 가이드</p>
+    <p>
+        <a th:href="@{/go/setting/intellij}">IntelliJ</a> ·
+        <a th:href="@{/go/setting/springai}">Spring AI</a> ·
+        <a th:href="@{/go/setting/openai}">OpenAI</a> ·
+        <a th:href="@{/go/setting/gemini}">Gemini</a> ·
+        <a th:href="@{/go/setting/ollama}">Ollama</a> ·
+        <a th:href="@{/go/setting/redis}">Redis</a> ·
+        <a th:href="@{/go/setting/react}">React</a>
+    </p>
+    </div>
+
+    </div>
+    </div>
+
+</th:block>
+</html>

@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<th:block>
+
+    <style>
+        .course-main { max-width: 52rem; margin: 0 auto; padding: 0 0.25rem 2.5rem; font-size: 1rem; line-height: 1.65; color: #1e293b; }
+        .course-hero { margin-bottom: 1.25rem; padding-bottom: 1rem; border-bottom: 1px solid #e2e8f0; }
+        .course-hero h1 { font-size: clamp(1.25rem, 2.2vw, 1.65rem); font-weight: 700; letter-spacing: -0.02em; margin: 0; color: #0f172a; line-height: 1.3; }
+        .course-toc { background: linear-gradient(165deg, #f8fafc 0%, #f1f5f9 100%); border: 1px solid #e2e8f0; border-radius: 10px; padding: 1rem 1.25rem 1.1rem; margin-bottom: 1.25rem; }
+        .course-toc-title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b; margin: 0 0 0.6rem; }
+        .course-toc ol { margin: 0; padding-left: 1.2rem; }
+        .course-toc li { margin-bottom: 0.35rem; line-height: 1.45; }
+        .course-toc a { color: #1d4ed8; text-decoration: none; font-size: 0.9rem; }
+        .course-toc a:hover { text-decoration: underline; color: #1e40af; }
+        .course-overview { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 1.25rem 1.4rem 1.35rem; margin-bottom: 1.25rem; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06); }
+        .course-content h3 { font-size: 1.12rem; margin: 1.35rem 0 0.85rem; padding-bottom: 0.55rem; border-bottom: 2px solid #93c5fd; color: #0f172a; font-weight: 700; line-height: 1.4; }
+        .course-content > h3:first-of-type,
+        .course-content hr.course-divider + h3 { margin-top: 0; }
+        .course-content h4 { font-size: 1rem; margin: 1rem 0 0.5rem; color: #334155; font-weight: 600; }
+        .course-divider { border: none; height: 1px; background: linear-gradient(90deg, transparent, #cbd5e1, transparent); margin: 1.5rem 0; }
+        .course-footer-actions { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #e2e8f0; }
+        ul, ol { margin-left: 1.25rem; margin-bottom: 0.75rem; }
+        code { background: #f1f5f9; padding: 0.12em 0.38em; border-radius: 4px; font-size: 0.9em; color: #0f172a; }
+        p { margin-bottom: 0.85rem; }
+        .course-overview .meta { color: #475569; font-size: 0.95rem; margin-bottom: 0.75rem; }
+        .desc-overview-lead { margin-bottom: 0.9rem; }
+        .desc-overview-outro { margin-bottom: 0.5rem; }
+
+        .c4-flow-wrap {
+            margin: 1rem 0 1.25rem;
+            padding: 1.35rem 1.25rem 1.5rem;
+            border-radius: 14px;
+            background: linear-gradient(160deg, #f0f9ff 0%, #f8fafc 45%, #f1f5f9 100%);
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 24px rgba(15, 23, 42, 0.06);
+        }
+        .c4-flow-wrap .c4-flow-caption {
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #64748b;
+            margin: 0 0 1rem;
+            text-align: center;
+        }
+        .c4-flow-col { display: flex; flex-direction: column; align-items: center; gap: 0; }
+        .c4-flow-arrow {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0.35rem 0 0.45rem;
+            color: #94a3b8;
+            font-size: 1.1rem;
+            line-height: 1;
+        }
+        .c4-flow-arrow span { font-size: 0.65rem; font-weight: 600; letter-spacing: 0.06em; color: #94a3b8; margin-top: 0.2rem; }
+        .c4-card {
+            width: 100%;
+            max-width: 22rem;
+            border-radius: 12px;
+            padding: 0.85rem 1rem;
+            text-align: center;
+            border: 1px solid transparent;
+        }
+        .c4-card-main {
+            background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%);
+            color: #f8fafc;
+            border-color: #1e293b;
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.25);
+        }
+        .c4-card-main .c4-card-kicker { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.85; margin-bottom: 0.35rem; }
+        .c4-card-main .c4-card-title { font-size: 1.02rem; font-weight: 700; margin: 0; line-height: 1.35; }
+        .c4-card-main .c4-card-sub { font-size: 0.78rem; opacity: 0.88; margin: 0.4rem 0 0; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+        .c4-card-registry {
+            background: #fff;
+            border: 2px solid #38bdf8;
+            box-shadow: 0 4px 14px rgba(14, 165, 233, 0.12);
+        }
+        .c4-card-registry .c4-card-kicker { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #0369a1; margin-bottom: 0.3rem; }
+        .c4-card-registry .c4-card-title { font-size: 0.98rem; font-weight: 700; color: #0c4a6e; margin: 0; }
+        .c4-card-registry .c4-card-sub { font-size: 0.78rem; color: #64748b; margin: 0.35rem 0 0; }
+        .c4-agents-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.5rem 0.45rem;
+            margin-top: 0.75rem;
+            padding-top: 0.35rem;
+        }
+        .c4-agent-pill {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 0.45rem 0.65rem 0.5rem;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            line-height: 1.35;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            min-width: 7.5rem;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+        }
+        .c4-agent-pill code { font-size: 0.78rem; font-weight: 600; background: transparent; padding: 0; color: #0f172a; }
+        .c4-agent-pill .c4-model { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.04em; margin-top: 0.25rem; padding: 0.12rem 0.38rem; border-radius: 4px; }
+        .c4-model-llama { background: #ecfdf5; color: #047857; }
+        .c4-model-gpt { background: #eff6ff; color: #1d4ed8; }
+        .c4-model-gemini { background: #f5f3ff; color: #6d28d9; }
+        .c4-agent-pill .c4-node-subagent {
+            display: block;
+            font-size: 0.72rem;
+            color: #475569;
+            margin-top: 0.35rem;
+            line-height: 1.4;
+        }
+        .c4-agent-pill .c4-node-subagent code { font-size: 0.85em; }
+        .c4-flow-footnote {
+            text-align: center;
+            font-size: 0.82rem;
+            color: #64748b;
+            margin: 1rem 0 0;
+            padding-top: 0.75rem;
+            border-top: 1px dashed #cbd5e1;
+        }
+        @media (min-width: 640px) {
+            .c4-agents-grid { max-width: 36rem; margin-left: auto; margin-right: auto; }
+        }
+
+        .c4-pipeline-wrap {
+            margin: 1rem 0 1.25rem;
+            padding: 1.25rem 1.15rem 1.4rem;
+            border-radius: 14px;
+            background: linear-gradient(165deg, #f8fafc 0%, #eef2ff 40%, #f1f5f9 100%);
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
+        }
+        .c4-pipeline-wrap .c4-flow-caption {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #64748b;
+            margin: 0 0 0.9rem;
+            text-align: center;
+        }
+        .c4-pipeline-col { display: flex; flex-direction: column; align-items: center; max-width: 24rem; margin: 0 auto; }
+        .c4-pipeline-step {
+            width: 100%;
+            border-radius: 11px;
+            padding: 0.65rem 0.9rem;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+        }
+        .c4-pipeline-step .c4-ps-kicker { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #64748b; margin-bottom: 0.2rem; }
+        .c4-pipeline-step .c4-ps-title { font-size: 0.92rem; font-weight: 700; color: #0f172a; margin: 0; line-height: 1.35; }
+        .c4-pipeline-step .c4-ps-sub { font-size: 0.74rem; color: #64748b; margin: 0.28rem 0 0; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+        .c4-pipeline-step.c4-ps-user { background: linear-gradient(180deg, #f8fafc 0%, #fff 100%); border-color: #cbd5e1; }
+        .c4-pipeline-step.c4-ps-main {
+            background: linear-gradient(135deg, #1e3a5f 0%, #1e293b 100%);
+            border-color: #334155;
+            color: #f8fafc;
+        }
+        .c4-pipeline-step.c4-ps-main .c4-ps-kicker { color: rgba(248, 250, 252, 0.75); }
+        .c4-pipeline-step.c4-ps-main .c4-ps-title { color: #f8fafc; }
+        .c4-pipeline-step.c4-ps-main .c4-ps-sub { color: rgba(248, 250, 252, 0.88); }
+        .c4-pipeline-step.c4-ps-registry { border: 2px solid #38bdf8; background: #fff; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.1); }
+        .c4-pipeline-step.c4-ps-registry .c4-ps-kicker { color: #0369a1; }
+        .c4-pipeline-step.c4-ps-registry .c4-ps-title { color: #0c4a6e; }
+        .c4-pipeline-step.c4-ps-subs { border-style: dashed; border-color: #94a3b8; background: #fffefb; }
+        .c4-pipeline-step.c4-ps-subs .c4-ps-kicker { color: #a16207; }
+        .c4-pipeline-step.c4-ps-merge { background: linear-gradient(180deg, #fffbeb 0%, #fff 100%); border-color: #fcd34d; }
+        .c4-pipeline-step.c4-ps-merge .c4-ps-kicker { color: #b45309; }
+        .c4-pipeline-step.c4-ps-out {
+            background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%);
+            border: 2px solid #34d399;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.12);
+        }
+        .c4-pipeline-step.c4-ps-out .c4-ps-kicker { color: #047857; }
+        .c4-pipeline-step.c4-ps-out .c4-ps-title { color: #065f46; }
+        .c4-pipeline-arrow-sm { padding: 0.28rem 0 0.32rem; color: #94a3b8; font-size: 1rem; line-height: 1; }
+
+        .c4-lab-step {
+            margin: 0.85rem 0 1rem;
+            padding: 0.9rem 1rem;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+        }
+        .c4-lab-step .lab-n {
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 0.06em;
+            color: #0369a1;
+            margin-bottom: 0.35rem;
+        }
+        .c4-lab-step .lab-title { font-weight: 700; color: #0f172a; margin-bottom: 0.35rem; }
+        .c4-lab-step p:last-child { margin-bottom: 0; }
+        .c4-pipeline-wrap.c4-pipeline-stack-ch4 .c4-pipeline-col { max-width: 26rem; }
+    </style>
+
+    <div class="course-main">
+    <header class="course-hero">
+    <h1>Chapter 5 실습 가이드 — Tool-Orchestrated Multi-Agent (Tool로 실행 층 분리)</h1>
+    </header>
+
+    <div class="course-overview">
+    <p class="desc-overview-lead">
+        Chapter 4에서는 <strong>역할 키로 서브에이전트를 직접 조회</strong>해서 진행 했습니다.<br>
+        Chapter 5는 그 위에 <strong>도구 전용 추상화</strong>를 둡니다. 같은 전략 분석 흐름(라우팅, 단순/전략 분기, 병렬 분석, 평가·개선)을
+        <strong>이름으로 등록된 “도구”</strong>를 통해 호출하고, 각 도구 안은 다시 이전 장과 같이 <strong>서브에이전트 레지스트리</strong>에 위임하는 이중 층입니다.
+        관측은 여전히 <strong>HTTP 경계</strong>와 <strong>Redis·SSE 단계 이벤트</strong>로 묶습니다. 다만 <strong>할 일 스냅샷을 Redis로 보내는 Todo 이벤트</strong>는 이 장 경로에는 두지 않습니다.
+        이후 장에서는 도구 대신 <strong>Task·Markdown·에이전트 런타임</strong>으로 옮기고, 더 나아가 <strong>그래프 엔진</strong>으로 분기·병렬을 표현합니다.
+    </p>
+
+    <p>
+        <a th:href="@{/go/ch5/1_strategic_analysis}" class="btn btn-primary font-weight-bold">실습 화면 열기</a>
+        &nbsp;
+        <a th:href="@{/go/ch5}" class="btn btn-outline-secondary">Chapter 5 본문 보기</a>
+    </p>
+    </div>
+
+    <nav class="course-toc" aria-label="목차">
+    <p class="course-toc-title">목차</p>
+    <ol>
+        <li><a href="#d5-s1">진행 흐름</a></li>
+        <li><a href="#d5-s2">구조 — 오케스트레이터 · ToolRegistry · StrategicTool</a></li>
+        <li><a href="#d5-s3">도구 빈 · SubAgent 키 · 모델</a></li>
+        <li><a href="#d5-s4">API·DB·RAG 기반 컨텍스트 주입(Context injection)과 SubAgent 호출</a></li>
+        <li><a href="#d5-s5">다른 Chapter와 이어지는 맥락</a></li>
+    </ol>
+    </nav>
+
+    <div class="course-content">
+    <hr class="course-divider">
+
+    <h3 id="d5-s1">1. 진행 흐름</h3>
+
+    <div class="c4-pipeline-wrap c4-pipeline-stack-ch4" role="img" aria-label="Ch5Controller부터 ToolRegistry와 SubAgent까지">
+        <p class="c4-flow-caption">서버 호출 스택 (실습 코드 기준)</p>
+        <div class="c4-pipeline-col">
+            <div class="c4-pipeline-step c4-ps-user">
+                <div class="c4-ps-kicker">실습 UI</div>
+                <p class="c4-ps-title">pages/ch5/1_strategic_analysis.html</p>
+                <p class="c4-ps-sub">폼 → POST /ch5/strategic-analysis</p>
+            </div>
+            <div class="c4-pipeline-arrow-sm" aria-hidden="true">↓</div>
+            <div class="c4-pipeline-step c4-ps-user">
+                <div class="c4-ps-kicker">REST</div>
+                <p class="c4-ps-title">Ch5Controller#strategicAnalysis</p>
+                <p class="c4-ps-sub">StrategicAnalysisAgentToolTaskService 로 위임</p>
+            </div>
+            <div class="c4-pipeline-arrow-sm" aria-hidden="true">↓</div>
+            <div class="c4-pipeline-step c4-ps-main">
+                <div class="c4-ps-kicker">래핑</div>
+                <p class="c4-ps-title">StrategicAnalysisAgentToolTaskService</p>
+                <p class="c4-ps-sub">executeWithMonitoring — STARTED · AGENT · COMPLETED</p>
+            </div>
+            <div class="c4-pipeline-arrow-sm" aria-hidden="true">↓</div>
+            <div class="c4-pipeline-step c4-ps-main">
+                <div class="c4-ps-kicker">오케스트레이터</div>
+                <p class="c4-ps-title">StrategicAnalysisAgentToolOrchestrator</p>
+                <p class="c4-ps-sub">executeWithMonitoring — 라우팅 · 병렬 분석 · 평가·최적화 루프</p>
+            </div>
+            <div class="c4-pipeline-arrow-sm" aria-hidden="true">↓</div>
+            <div class="c4-pipeline-step c4-ps-registry">
+                <div class="c4-ps-kicker">조회</div>
+                <p class="c4-ps-title">ToolRegistry</p>
+                <p class="c4-ps-sub">require(StrategicAgentKeys.ROUTING 등) → StrategicTool#execute</p>
+            </div>
+            <div class="c4-pipeline-arrow-sm" aria-hidden="true">↓</div>
+            <div class="c4-pipeline-step c4-ps-subs">
+                <div class="c4-ps-kicker">실행</div>
+                <p class="c4-ps-title">StrategicTool → SubAgentRegistry → SubAgent</p>
+                <p class="c4-ps-sub">routing · simple-query · technical-analysis · market-analysis · report-evaluator · report-optimizer(도구)</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="c4-lab-step">
+        <div class="lab-n">실습 STEP A</div>
+        <div class="lab-title">요청 · 응답 · 진행</div>
+        <p>
+            <code>POST /ch5/strategic-analysis</code>(<code>application/x-www-form-urlencoded</code>)에 <code>prompt</code>, <code>workflowId</code>(UUID).
+            응답 본문은 최종 문자열, 중간 단계는 <code>GET /api/workflow/stream/{workflowId}</code> SSE로 확인합니다.
+        </p>
+    </div>
+    <div class="c4-lab-step">
+        <div class="lab-n">실습 STEP B</div>
+        <div class="lab-title">SSE → POST 순서</div>
+        <p>
+            스크립트는 SSE를 <strong>먼저</strong> 연 뒤 POST를 보냅니다. 그래야 <code>STARTED</code>·<code>ROUTING</code> 같은 초반 이벤트가 로그에 남습니다.
+        </p>
+    </div>
+    <div class="c4-lab-step">
+        <div class="lab-n">실습 STEP C</div>
+        <div class="lab-title">이벤트 필드</div>
+        <p>
+            SSE JSON에 <code>step</code>·<code>message</code> 등이 붙습니다. 바깥 래핑은 <code>STARTED</code>·<code>AGENT</code>·<code>COMPLETED</code>·<code>ERROR</code>, 안쪽 본문은 대략 <code>ROUTING</code> → <code>SIMPLE</code> 또는 <code>STRATEGIC</code> 분기로 이어집니다(<a href="#d5-s2">§2</a> 다이어그램·<a href="#d5-s3">§3</a> 표와 대조. 단계 이름 축은 <a th:href="|@{/go/ch4/desc}#d4-s3|">Ch4 실습 가이드 §3</a>과 같습니다).
+        </p>
+    </div>
+
+    <hr class="course-divider">
+
+    <h3 id="d5-s2">2. 구조 — 오케스트레이터 · ToolRegistry · StrategicTool</h3>
+
+    <div class="c4-flow-wrap" role="img" aria-label="Tool 오케스트레이터에서 ToolRegistry를 거쳐 StrategicTool로 분기하는 구조">
+        <p class="c4-flow-caption">실행 흐름</p>
+        <div class="c4-flow-col">
+            <div class="c4-card c4-card-main">
+                <div class="c4-card-kicker">Main Orchestrator</div>
+                <p class="c4-card-title">에이전트 역할 오케스트레이터</p>
+                <p class="c4-card-sub">StrategicAnalysisAgentToolOrchestrator</p>
+            </div>
+            <div class="c4-flow-arrow" aria-hidden="true">↓<span>이름으로 조회</span></div>
+            <div class="c4-card c4-card-registry">
+                <div class="c4-card-kicker">Registry</div>
+                <p class="c4-card-title">ToolRegistry</p>
+                <p class="c4-card-sub">name() → StrategicTool 빈 매핑</p>
+            </div>
+            <div class="c4-flow-arrow" aria-hidden="true">↓<span>도구 실행 → 레지스트리 위임</span></div>
+            <div class="c4-agents-grid">
+                <div class="c4-agent-pill">
+                    <code>RoutingTool</code>
+                    <span class="c4-node-subagent"><code>routing</code></span>
+                    <span class="c4-model c4-model-llama">Llama</span>
+                </div>
+                <div class="c4-agent-pill">
+                    <code>SimpleQueryTool</code>
+                    <span class="c4-node-subagent"><code>simple-query</code></span>
+                    <span class="c4-model c4-model-llama">Llama</span>
+                </div>
+                <div class="c4-agent-pill">
+                    <code>TechnicalAnalysisTool</code>
+                    <span class="c4-node-subagent"><code>technical-analysis</code></span>
+                    <span class="c4-model c4-model-gpt">GPT</span>
+                </div>
+                <div class="c4-agent-pill">
+                    <code>MarketAnalysisTool</code>
+                    <span class="c4-node-subagent"><code>market-analysis</code></span>
+                    <span class="c4-model c4-model-gemini">Gemini</span>
+                </div>
+                <div class="c4-agent-pill">
+                    <code>ReportEvaluatorTool</code>
+                    <span class="c4-node-subagent"><code>report-evaluator</code></span>
+                    <span class="c4-model c4-model-gemini">Gemini</span>
+                </div>
+                <div class="c4-agent-pill">
+                    <code>ReportOptimizerTool</code>
+                    <span class="c4-node-subagent"><code>report-optimizer</code></span>
+                    <span class="c4-model c4-model-gpt">GPT</span>
+                </div>
+            </div>
+        </div>
+        <p class="c4-flow-footnote">
+            각 <code>StrategicTool</code>은 <code>subAgentRegistry.require(…)</code>에 도구 <code>name()</code>과 같은 키를 넘깁니다(예: <code>require("routing")</code>).
+            <code>ReportOptimizerTool</code>의 <code>execute(report, feedback)</code>도 동일 키 <code>report-optimizer</code>로 합쳐진 입력을 넘깁니다.
+        </p>
+    </div>
+
+    <hr class="course-divider">
+
+    <h3 id="d5-s3">3. 도구 빈 · SubAgent 키 · 모델</h3>
+    <p>
+        각 <code>StrategicTool</code>은 <code>Tool#name()</code>과 <strong>같은 문자열</strong>을 <code>SubAgentRegistry#require(…)</code>에 넘겨,
+        동일 키로 등록된 <code>SubAgent</code> 빈에 LLM 호출을 위임합니다(패키지 <code>com.ai.app.agent.subagent</code>).
+    </p>
+
+    <table class="table table-bordered table-sm">
+        <thead class="thead-light">
+        <tr>
+            <th><code>StrategicTool</code></th>
+            <th>레지스트리 키<br><small class="text-muted font-weight-normal">(<code>Tool#name()</code> = <code>SubAgent#name()</code>)</small></th>
+            <th>위임 <code>SubAgent</code></th>
+            <th>모델 (대표 <code>@Qualifier</code>)</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><code>RoutingTool</code></td>
+            <td><code>routing</code></td>
+            <td><code>RoutingSubagent</code></td>
+            <td>Llama (실패 시 GPT)</td>
+        </tr>
+        <tr>
+            <td><code>SimpleQueryTool</code></td>
+            <td><code>simple-query</code></td>
+            <td><code>SimpleQuerySubagent</code></td>
+            <td>Llama</td>
+        </tr>
+        <tr>
+            <td><code>TechnicalAnalysisTool</code></td>
+            <td><code>technical-analysis</code></td>
+            <td><code>TechnicalAnalysisSubagent</code></td>
+            <td>GPT (실패 시 Gemini)</td>
+        </tr>
+        <tr>
+            <td><code>MarketAnalysisTool</code></td>
+            <td><code>market-analysis</code></td>
+            <td><code>MarketAnalysisSubagent</code></td>
+            <td>Gemini</td>
+        </tr>
+        <tr>
+            <td><code>ReportEvaluatorTool</code></td>
+            <td><code>report-evaluator</code></td>
+            <td><code>ReportEvaluatorSubagent</code></td>
+            <td>GPT</td>
+        </tr>
+        <tr>
+            <td><code>ReportOptimizerTool</code></td>
+            <td><code>report-optimizer</code></td>
+            <td><code>ReportOptimizerSubagent</code></td>
+            <td>GPT</td>
+        </tr>
+        </tbody>
+    </table>
+    <p class="small text-muted mb-0">
+        호출 형태는 도구마다 조금씩 다릅니다. 예: <code>ReportOptimizerTool</code>은 초안·평가문을 합쳐 <code>ReportOptimizerSubagent.combinedUserMessageForRegistry(…)</code> 규칙으로 한 문자열을 만든 뒤 <code>execute</code>합니다.
+    </p>
+
+    <hr class="course-divider">
+
+    <h3 id="d5-s4">4. API·DB·RAG 기반 컨텍스트 주입(Context injection)과 SubAgent 호출</h3>
+    <p>
+        <strong>Tool 레이어</strong>를 두는 이유 중 하나는, LLM만으로는 갖기 어려운 <strong>외부 근거·실시간 상태</strong>를 끌어와
+        서브에이전트 호출의 <strong>입력(프롬프트 본문)</strong>에 섞을 수 있기 때문입니다.
+        REST API, 데이터베이스, 벡터 스토어(RAG) 등으로 수집한 문자열을 한 덩어리로 묶은 뒤 <code>SubAgent#execute(user, system)</code>에 넘기면,
+        동일한 레지스트리 키(<code>market-analysis</code> 등)를 유지한 채 <strong>근거 있는 분석</strong>으로 확장할 수 있습니다.
+    </p>
+    <p>
+        <code>MarketAnalysisTool.java</code> 클래스 주석에는 이런 확장을 가정한 설명이 들어 있습니다.
+        외부 API / Database / Vector Store(RAG)에서 모은 시장 데이터·리포트를 프롬프트에 포함하는 예시가 <strong>주석으로만</strong> 붙어 있으며,
+        Chapter 5에서 “Tool + RAG/DB 연동” 패턴을 설명할 때 참고용으로 쓸 수 있다고 적혀 있습니다.
+    </p>
+    <h4>예시 1 — API / Database → 통합 프롬프트 → SubAgent</h4>
+    <p>
+        파일 하단 블록 주석의 <strong>예시 1</strong>은 가상의 <code>MarketPriceClient</code>, <code>TrendRepository</code>로
+        가격·프로모션 정보와 내부 실적·트렌드를 조회한 다음, <code>[사용자 요청]</code>·<code>[외부 가격/프로모션 데이터]</code>·<code>[내부 트렌드/실적 데이터]</code> 섹션으로 나눈
+        <strong>단일 user 메시지</strong>를 만든 뒤 <code>subAgentRegistry.require(name()).execute(prompt, systemMessage())</code>로 넘기는 흐름입니다.
+        즉 <strong>데이터 수집은 Tool(또는 Tool이 호출하는 서비스)</strong>, <strong>문장 생성은 SubAgent</strong>에 두는 분리입니다.
+    </p>
+    <h4>예시 2 — Vector Store(RAG) → 컨텍스트 주입 → SubAgent</h4>
+    <p>
+        <strong>예시 2</strong>는 <code>RagSearchService</code>로 벡터 검색 결과를 <code>context</code> 문자열로 만든 뒤,
+        사용자 질문과 함께 프롬프트를 구성하고, 필요 시 <code>strategic-rag-search</code> 같은 <strong>별도 서브에이전트 키</strong>를
+        <code>subAgentRegistry.require(&quot;strategic-rag-search&quot;)</code>로 호출하는 패턴을 보여 줍니다.
+    </p>
+    <p class="small text-muted mb-0">
+        현재 실습에 포함된 <code>execute(String input)</code> 구현은 사용자 입력만 넘기는 최소 경로이고,
+        위 주석은 <strong>향후 API·DB·RAG 와 같은 다양한 외부 데이터</strong> 연동 시 사용이 가능 합니다. <br>
+        오케스트레이터가 단계만 고정하고, “무엇을 프롬프트에 넣을지”를 Tool 안에서 다양한게 추가 할 수 있습니다.
+    </p>
+
+    <hr class="course-divider">
+
+    <h3 id="d5-s5">5. 다른 Chapter와 이어지는 맥락</h3>
+    <p>마지막으로, 지금 배운 내용이 앞뒤 장에서 어떻게 확장되는지만 짚고 마무리합니다.</p>
+    <ul>
+        <li><strong>Chapter 4</strong> — <code>Ch4Controller</code> → <code>StrategicAnalysisAgentService#executeWithMonitoring</code> → <code>StrategicAnalysisAgentOrchestrator</code> → <code>SubAgentRegistry</code> → <code>SubAgent</code>.</li>
+        <li><strong>Chapter 5 (지금 실습)</strong> — <code>Ch5Controller</code> → <code>StrategicAnalysisAgentToolTaskService</code> → <code>StrategicAnalysisAgentToolOrchestrator</code> → 동일한 Tool·SubAgent 스택.</li>
+        <li><strong>Chapter 6</strong> — <code>Ch6Controller</code> → <code>com.ai.chapter6.service.StrategicAnalysisAgentToolTaskService</code> → <code>StrategicAnalysisTaskToolOrchestrator</code> → TaskTool·Markdown 런타임(<code>ToolRegistry</code> 없음).</li>
+        <li><strong>Chapter 7</strong> — <code>Ch7Controller</code> → <code>StrategicAnalysisDagWorkflowService</code> → <code>DagWorkflowEngine</code> → <code>WorkflowNode</code> 내부 <code>SubAgentRegistry</code>(DAG가 순서·병렬 담당).</li>
+    </ul>
+
+    <div class="course-footer-actions">
+    <p>
+        <a th:href="@{/go/ch5/1_strategic_analysis}" class="btn btn-primary font-weight-bold">실습 다시 하기 — Strategic Analysis (Tool)</a>
+        &nbsp;
+        <a th:href="@{/go/ch5}" class="btn btn-outline-primary">Chapter 5 본문으로 돌아가기</a>
+    </p>
+    </div>
+
+    </div>
+    </div>
+
+</th:block>
+</html>

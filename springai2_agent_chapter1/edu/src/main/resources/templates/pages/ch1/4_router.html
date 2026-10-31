@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<th:block>
+    <script>
+        /*
+         * router 객체
+         *
+         * ✔ 목적
+         * - 사용자의 질문을 서버로 전달
+         * - 서버의 Router가 적절한 LLM 또는 모듈을 선택
+         * - 결과를 받아 화면에 출력
+         *
+         * ✔ 학습 포인트
+         * 1. 기본 fetch POST 통신 구조
+         * 2. application/x-www-form-urlencoded 전송 방식
+         * 3. text/plain 응답 처리 방식
+         * 4. 간단한 요청-응답 구조 (Streaming 아님)
+         *
+         * 👉 strategic_analysis 예제와 비교:
+         * - Router는 단순 요청/응답 구조
+         * - Streaming/SSE 없음
+         * - 전체 응답을 한 번에 수신
+         */
+
+        router = {
+
+            // 서버의 Router 엔드포인트
+            // 서버는 이 URL에서 질문을 받아
+            // 내부적으로 적절한 LLM 또는 서비스로 라우팅
+            url: '/ch1/router',
+
+            /*
+             * 초기화 함수
+             * - 페이지 로드시 실행
+             * - 버튼 클릭 이벤트 연결
+             * - 스피너 초기 숨김 처리
+             */
+            init:function(){
+                // Send 버튼 클릭 시 send() 실행
+                document.querySelector("#send_btn").addEventListener("click", ()=>{
+                    this.send();
+                })
+
+                // 로딩 스피너 초기 상태: 숨김
+                document.querySelector("#spinner").style.cssText = "visibility:hidden;";
+            },
+
+            /*
+             * 질문 전송 메인 로직
+             *
+             * 실행 흐름:
+             * 1. 로딩 표시
+             * 2. 사용자 질문 화면 출력
+             * 3. 서버에 POST 요청
+             * 4. 전체 응답 텍스트 수신
+             * 5. 화면에 출력
+             */
+            send:async function(){
+
+                // 1️⃣ 로딩 표시
+                document.querySelector('#spinner').style.cssText = "visibility:visible;";
+
+                // 2️⃣ 입력창에서 질문 가져오기
+                let question = document.querySelector('#question').value;
+
+                /*
+                 * 사용자 질문 UI 생성
+                 * - 채팅 형태의 화면 구성
+                 * - 현재 시간 표시
+                 */
+                const questionArea = document.createElement("div");
+                questionArea.innerHTML = `
+                <div class="d-flex justify-content-between">
+                    <p class="small mb-1">User</p>
+                    <p class="small mb-1 text-muted">`
+                    +new Date().toLocaleTimeString('ko-kr')+
+                    `</p>
+                </div>
+                <div class="d-flex flex-row justify-content-start">
+                    <img src="/imgs/user.jpg"
+                         alt="User" style="width: 45px; height: 100%;">
+                    <div>
+                        <p class="small p-2 ms-3 mb-3 rounded-3
+                                   bg-body-tertiary bg-warning">`
+                    +question+
+                    `</p>
+                    </div>
+                </div>
+            `;
+
+                document.querySelector('#result').prepend(questionArea);
+
+                /*
+                 * 3️⃣ 서버에 POST 요청
+                 *
+                 * ✔ Content-Type
+                 *   application/x-www-form-urlencoded
+                 *   → key=value&key2=value2 형식
+                 *
+                 * ✔ Accept
+                 *   text/plain
+                 *   → 순수 텍스트 응답 요청
+                 *
+                 * ※ Streaming이 아닌 일반 응답 구조
+                 */
+                const response = await fetch(this.url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'Accept': 'text/plain'
+                    },
+                    body: new URLSearchParams({
+                        prompt: question
+                    })
+                });
+
+                /*
+                 * 4️⃣ 서버 응답을 전체 텍스트로 수신
+                 * - response.text()는 응답을 모두 받은 후 반환
+                 * - Streaming과의 차이점 강조
+                 */
+                const responseText = await response.text();
+
+                // 5️⃣ 화면 출력
+                this.responseDisplay(responseText);
+            },
+
+            /*
+             * 서버 응답을 화면에 출력
+             *
+             * ✔ Router 구조 특징
+             * - 서버에서 이미 LLM 선택 완료
+             * - 최종 결과만 반환
+             * - 클라이언트는 단순 출력 역할
+             */
+            responseDisplay:function(result){
+
+                // 로딩 종료
+                document.querySelector("#spinner").style.cssText = "visibility:hidden;";
+
+                // 챗봇 응답 UI 생성
+                const responseArea = document.createElement("div");
+                responseArea.innerHTML = `
+                <div class="d-flex justify-content-between">
+                    <p class="small mb-1 text-muted">`
+                    +new Date().toLocaleTimeString('ko-kr')+
+                    `</p>
+                    <p class="small mb-1">Chatbot</p>
+                </div>
+                <div class="d-flex flex-row justify-content-end mb-4 pt-1">
+                    <div class="small p-2 me-3 mb-3 rounded-3 bg-info"
+                         style="overflow: auto">
+                        <pre class="text-white"
+                             style="font-weight: bold">`
+                    +result+
+                    `</pre>
+                    </div>
+                    <img src="/imgs/chatbot.png"
+                         alt="Chat Bot"
+                         style="width: 45px; height: 100%;">
+                </div>
+            `;
+
+                document.querySelector('#result').prepend(responseArea);
+            }
+        }
+
+        // 페이지 로드시 초기화 실행
+        window.onload = function(){
+            router.init();
+        }
+    </script>
+
+
+
+    <div class="col-sm-10">
+        <h2 class="text-center">4. Router</h2>
+        <div class="container py-2">
+            <div class="alert alert-light border small shadow-sm mb-3" role="note">
+                <p class="mb-2 font-weight-bold">입력 예시 (RouterService 분류: CREATIVE / TECHNICAL / GENERAL — 화면 기본값과 같은 문장을 붙여 넣어 볼 수 있습니다)</p>
+                <ul class="mb-0 pl-3">
+                    <li class="mb-2">
+                        <span class="badge badge-secondary mr-1">예시 1 · CREATIVE · 기본값</span>
+                        <span class="text-muted small">(창의·코딩·복잡 추론 → GPT 우선)</span><br/>
+                        <code class="small text-dark" style="color: #212529 !important;">이차 방정식에 대한 기본 예제를 만들어줘</code>
+                    </li>
+                    <li class="mb-2">
+                        <span class="badge badge-secondary mr-1">예시 2 · TECHNICAL</span>
+                        <span class="text-muted small">(기술 명세·긴 문서·구글 서비스 → Gemini 우선)</span><br/>
+                        <code class="small text-dark" style="color: #212529 !important;">Google Cloud BigQuery 파티션 테이블 설계 시 비용과 쿼리 성능을 동시에 고려하는 기술 가이드를 문서 형태로 정리해줘</code>
+                    </li>
+                    <li class="mb-0">
+                        <span class="badge badge-secondary mr-1">예시 3 · GENERAL</span>
+                        <span class="text-muted small">(단순 질의·일반 사실·일상 대화 → Llama 기본)</span><br/>
+                        <code class="small text-dark" style="color: #212529 !important;">수도권 지하철 2호선이 처음 개통한 연도를 한 문장으로 알려줘</code>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="container py-5">
+
+            <div class="row d-flex justify-content-center">
+                <div class="col-sm-10">
+                    <button class="btn btn-primary" disabled id="spinner">
+                        <span class="spinner-border spinner-border-sm" ></span>
+                        Loading..
+                    </button>
+
+                    <div class="card">
+                        <div class="card-header text-muted d-flex justify-content-start align-items-center p-3">
+                            <div class="input-group mb-0">
+                                <input  id="question" type="text" class="form-control" placeholder="Type message" value="이차 방정식에 대한 기본 예제를 만들어줘"
+                                        aria-label="Recipient's username" aria-describedby="button-addon2" />
+                                <button type="button" class="btn btn-primary" id="send_btn">Send</button>
+                            </div>
+                        </div>
+                        <div id="result" class="card-body" data-mdb-perfect-scrollbar-init >
+
+
+                        </div> <!-- end result -->
+                    </div> <!-- end card -->
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+</html>

@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<th:block>
+
+    <style>
+        .course-main { max-width: 52rem; margin: 0 auto; padding: 0 0.25rem 2.5rem; font-size: 1rem; line-height: 1.65; color: #1e293b; }
+        .course-hero { margin-bottom: 1.25rem; padding-bottom: 1rem; border-bottom: 1px solid #e2e8f0; }
+        .course-hero h1 { font-size: clamp(1.25rem, 2.2vw, 1.65rem); font-weight: 700; letter-spacing: -0.02em; margin: 0; color: #0f172a; line-height: 1.3; }
+        .course-toc { background: linear-gradient(165deg, #f8fafc 0%, #f1f5f9 100%); border: 1px solid #e2e8f0; border-radius: 10px; padding: 1rem 1.25rem 1.1rem; margin-bottom: 1.25rem; }
+        .course-toc-title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b; margin: 0 0 0.6rem; }
+        .course-toc ol { margin: 0; padding-left: 1.2rem; }
+        .course-toc li { margin-bottom: 0.35rem; line-height: 1.45; }
+        .course-toc a { color: #1d4ed8; text-decoration: none; font-size: 0.9rem; font-weight: 700; }
+        .course-toc a:hover { text-decoration: underline; color: #1e40af; }
+        .course-overview { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 1.25rem 1.4rem 1.35rem; margin-bottom: 1.25rem; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06); }
+        .course-content h3 { font-size: 1.12rem; margin: 1.35rem 0 0.85rem; padding-bottom: 0.55rem; border-bottom: 2px solid #93c5fd; color: #0f172a; font-weight: 700; line-height: 1.4; }
+        .course-content hr.course-divider + h3 { margin-top: 0; }
+        .course-content h4 { font-size: 1rem; margin: 1rem 0 0.5rem; color: #334155; font-weight: 600; }
+        .course-divider { border: none; height: 1px; background: linear-gradient(90deg, transparent, #cbd5e1, transparent); margin: 1.5rem 0; }
+        .course-footer-actions { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #e2e8f0; }
+        ul { margin-left: 1.25rem; margin-bottom: 0.75rem; }
+        code { background: #f1f5f9; padding: 0.12em 0.38em; border-radius: 4px; font-size: 0.9em; color: #0f172a; }
+        p { margin-bottom: 0.85rem; }
+        table { font-size: 0.95rem; }
+        .course-overview .meta { color: #475569; font-size: 0.95rem; margin-bottom: 0.75rem; }
+        .course-overview .note { font-size: 0.88rem; color: #64748b; margin-bottom: 0.65rem; line-height: 1.55; }
+        .course-overview .note:last-of-type { margin-bottom: 0; }
+
+        /* Flow diagrams — Chapter 4~6과 동일 계열 */
+        .course-flow-pipeline {
+            margin: 1rem 0 1.25rem;
+            padding: 1.25rem 1.15rem 1.4rem;
+            border-radius: 14px;
+            background: linear-gradient(165deg, #f8fafc 0%, #eef2ff 40%, #f1f5f9 100%);
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
+        }
+        .course-flow-pipeline .course-flow-caption {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #64748b;
+            margin: 0 0 0.9rem;
+            text-align: center;
+        }
+        .course-flow-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 24rem;
+            margin: 0 auto;
+        }
+        .course-flow-col-wide { max-width: 28rem; }
+        .course-flow-step {
+            width: 100%;
+            border-radius: 11px;
+            padding: 0.65rem 0.9rem;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+        }
+        .course-flow-step .course-flow-kicker {
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #64748b;
+            margin-bottom: 0.2rem;
+        }
+        .course-flow-step .course-flow-title {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0;
+            line-height: 1.35;
+        }
+        .course-flow-step .course-flow-sub {
+            font-size: 0.74rem;
+            color: #64748b;
+            margin: 0.28rem 0 0;
+        }
+        .course-flow-step.course-flow-user {
+            background: linear-gradient(180deg, #f8fafc 0%, #fff 100%);
+            border-color: #cbd5e1;
+        }
+        .course-flow-step.course-flow-llm {
+            background: linear-gradient(135deg, #1e3a5f 0%, #1e293b 100%);
+            border-color: #334155;
+            color: #f8fafc;
+        }
+        .course-flow-step.course-flow-llm .course-flow-kicker { color: rgba(248, 250, 252, 0.75); }
+        .course-flow-step.course-flow-llm .course-flow-title { color: #f8fafc; }
+        .course-flow-step.course-flow-runtime {
+            border: 2px solid #8b5cf6;
+            background: linear-gradient(180deg, #faf5ff 0%, #fff 100%);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.12);
+        }
+        .course-flow-step.course-flow-runtime .course-flow-kicker { color: #6d28d9; }
+        .course-flow-step.course-flow-runtime .course-flow-title { color: #4c1d95; }
+        .course-flow-step.course-flow-tool {
+            border: 2px solid #38bdf8;
+            background: #fff;
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.1);
+        }
+        .course-flow-step.course-flow-tool .course-flow-kicker { color: #0369a1; }
+        .course-flow-step.course-flow-tool .course-flow-title { color: #0c4a6e; }
+        .course-flow-step.course-flow-planner {
+            background: linear-gradient(135deg, #5b21b6 0%, #7c3aed 100%);
+            border-color: #6d28d9;
+            color: #faf5ff;
+            box-shadow: 0 6px 16px rgba(124, 58, 237, 0.25);
+        }
+        .course-flow-step.course-flow-planner .course-flow-kicker { color: rgba(250, 245, 255, 0.85); }
+        .course-flow-step.course-flow-planner .course-flow-title { color: #fff; }
+        .course-flow-step.course-flow-engine {
+            background: linear-gradient(180deg, #fff7ed 0%, #fff 100%);
+            border: 2px solid #fb923c;
+            box-shadow: 0 4px 12px rgba(251, 146, 60, 0.15);
+        }
+        .course-flow-step.course-flow-engine .course-flow-kicker { color: #c2410c; }
+        .course-flow-step.course-flow-engine .course-flow-title { color: #9a3412; }
+        .course-flow-step.course-flow-dag {
+            border-style: dashed;
+            border-color: #818cf8;
+            background: #eef2ff;
+        }
+        .course-flow-step.course-flow-dag .course-flow-kicker { color: #4338ca; }
+        .course-flow-step.course-flow-merge {
+            background: linear-gradient(180deg, #fffbeb 0%, #fff 100%);
+            border-color: #fcd34d;
+        }
+        .course-flow-step.course-flow-merge .course-flow-kicker { color: #b45309; }
+        .course-flow-step.course-flow-out {
+            background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%);
+            border: 2px solid #34d399;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.12);
+        }
+        .course-flow-step.course-flow-out .course-flow-kicker { color: #047857; }
+        .course-flow-step.course-flow-out .course-flow-title { color: #065f46; }
+        .course-flow-arrow {
+            padding: 0.28rem 0 0.32rem;
+            color: #94a3b8;
+            font-size: 1rem;
+            line-height: 1;
+        }
+        .course-flow-h {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem 0.35rem;
+            margin: 0.75rem 0 1rem;
+            padding: 0.9rem 1rem;
+            border-radius: 12px;
+            background: linear-gradient(165deg, #f8fafc 0%, #f1f5f9 100%);
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.05);
+        }
+        .course-flow-h .course-flow-chip {
+            padding: 0.38rem 0.7rem;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            color: #0f172a;
+        }
+        .course-flow-h .course-flow-h-arrow { color: #94a3b8; font-size: 0.95rem; font-weight: 600; }
+        .course-flow-branch-box {
+            margin: 0.75rem 0 1rem;
+            padding: 0.85rem 1rem 0.95rem;
+            border-radius: 12px;
+            background: linear-gradient(165deg, #f8fafc 0%, #f1f5f9 100%);
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.05);
+            text-align: center;
+        }
+        .course-flow-branch-box .course-flow-h-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem 0.35rem;
+        }
+        .course-flow-branch-box .course-flow-chip {
+            padding: 0.38rem 0.7rem;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            color: #0f172a;
+        }
+        .course-flow-branch-box .course-flow-h-arrow { color: #94a3b8; font-size: 0.95rem; font-weight: 600; }
+        .course-flow-branch-box .course-flow-branch-keys {
+            margin: 0.6rem 0 0;
+            padding-top: 0.55rem;
+            border-top: 1px dashed #cbd5e1;
+            font-size: 0.875rem;
+            color: #64748b;
+            line-height: 1.45;
+        }
+        .course-flow-compare { margin: 0.75rem 0 1rem; }
+        .course-flow-compare .small-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #64748b;
+            margin-bottom: 0.35rem;
+        }
+
+        /* Chapter 5 개요와 동일 계열: course-overview 안 요약 카드 */
+        .c2-field-section { margin-top: 0; margin-bottom: 0; }
+        .c2-field-section .c2-field-kicker {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #64748b;
+            margin: 1rem 0 0.4rem;
+        }
+        .c2-field-section .c2-field-kicker--top { margin-top: 0.35rem; }
+        .c2-field-section ul.c2-field-list,
+        .c2-field-section ol.c2-field-list { margin: 0.25rem 0 0.7rem; padding-left: 1.15rem; }
+        .c2-field-section ul.c2-field-list > li,
+        .c2-field-section ol.c2-field-list > li { margin-bottom: 0.42rem; line-height: 1.5; }
+        .c2-field-section .c2-field-focus {
+            margin-top: 0.5rem;
+            margin-bottom: 0.85rem;
+            padding: 0.85rem 1rem;
+            background: linear-gradient(165deg, #f8fafc 0%, #eff6ff 100%);
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            color: #334155;
+        }
+        .c2-field-section .c2-field-focus p { margin-bottom: 0.5rem; }
+        .c2-field-section .c2-field-focus p:last-child { margin-bottom: 0; }
+        .c2-field-section .c2-field-focus ul:last-child { margin-bottom: 0; }
+        .c2-field-section .c2-field-lead {
+            font-size: 1.02rem;
+            color: #0f172a;
+            font-weight: 600;
+            line-height: 1.5;
+            margin-bottom: 0.65rem;
+        }
+
+        /* Chapter 7 — DAG 개념 한눈에 (ch4 Agent 요약 박스와 동일 계열) */
+        .c7-dag-concept-callout {
+            font-size: 0.88rem;
+            line-height: 1.55;
+            margin: 0 0 1.25rem;
+            padding: 0.9rem 1.1rem 1rem;
+            border-radius: 10px;
+            border: 1px solid #a5b4fc;
+            background: linear-gradient(165deg, #eef2ff 0%, #e0e7ff 42%, #f8fafc 100%);
+            color: #312e81;
+            box-shadow: 0 2px 8px rgba(67, 56, 202, 0.08);
+        }
+        .c7-dag-concept-callout strong { color: #3730a3; }
+        .c7-dag-concept-callout code {
+            background: rgba(255, 255, 255, 0.88);
+            color: #4338ca;
+        }
+        .c7-dag-concept-callout .c7-dag-kicker {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #4338ca;
+            margin: 0 0 0.55rem;
+        }
+        .c7-dag-concept-callout > p { margin: 0 0 0.45rem; }
+        .c7-dag-concept-callout > p:last-child { margin-bottom: 0; }
+        .c7-dag-concept-callout .c7-dag-lead {
+            font-size: 0.95rem;
+            margin: 0.65rem 0 0.35rem;
+            color: #3730a3;
+            font-weight: 600;
+        }
+        .c7-dag-concept-callout ul { margin: 0.35rem 0 0.5rem; padding-left: 1.15rem; }
+        .c7-dag-concept-callout ul li { margin-bottom: 0.3rem; }
+        .c7-dag-concept-callout .c7-dag-compare {
+            display: grid;
+            gap: 0.45rem;
+            margin-top: 0.35rem;
+        }
+        @media (min-width: 640px) {
+            .c7-dag-concept-callout .c7-dag-compare { grid-template-columns: 1fr 1fr; }
+        }
+        .c7-dag-concept-callout .c7-dag-compare > div {
+            padding: 0.5rem 0.65rem;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.75);
+            border: 1px solid rgba(67, 56, 202, 0.22);
+            font-size: 0.84rem;
+        }
+        .c7-dag-concept-callout .c7-dag-compare .c7-dag-col-narrow { border-color: rgba(185, 28, 28, 0.22); }
+        .c7-dag-concept-callout .c7-dag-compare .c7-dag-col-wide { border-color: rgba(22, 163, 74, 0.26); }
+    </style>
+
+    <div class="course-main">
+    <header class="course-hero">
+    <h1>Chapter 7. DAG-Orchestrated Multi-Agent</h1>
+    <p style="margin:0.35rem 0 0; color:#475569; font-size:1.15rem; font-weight:700;">엔터프라이즈급 DAG 기반 AI Workflow 설계</p>
+    </header>
+
+    <div class="c7-dag-concept-callout" role="region" aria-label="DAG 개념 요약">
+        <p class="c7-dag-kicker">DAG 개념 요약</p>
+        <p><strong>DAG(Directed Acyclic Graph, 방향 비순환 그래프)</strong>는 <strong>방향이 있는 간선</strong>으로 이어진 작업(정점)들 사이에 <strong>순환(돌아오는 길)이 없는 그래프</strong>를 뜻합니다. “선행 작업이 끝나야 다음 작업을 실행할 수 있다”는 <strong>의존 관계</strong>만 화살표로 이었을 때, 어떤 노드에서 출발해도 자기 자신으로 되돌아오는 경로가 없으면 그 구조가 DAG입니다.</p>
+        <p>그래프 이론·조합 최적화에서 방향 그래프의 한 종류로 오래 연구되어 왔고, 컴퓨터 과학에서는 <strong>위상 정렬·임계 경로·작업 스케줄링</strong>의 전형적인 모델입니다. <strong>역사적으로 널리 쓰인 사례</strong>로는 <strong>컴파일 파이프라인</strong>(전처리→컴파일→링크 등 단계 의존성), Unix 계열 <strong>Make</strong>가 표현하는 <strong>파일 단위 빌드 의존 그래프</strong>, 패키지·모듈의 <strong>버전 의존성 그래프</strong>, 데이터 엔지니어링의 <strong>Airflow·Prefect</strong> 등에서의 <strong>ETL·배치 워크플로 DAG</strong>, 빅데이터 프레임워크의 <strong>실행 계획(연산 DAG)</strong>, 일부 ML·실험 파이프라인에서의 <strong>단계 기록·재현</strong> 등을 들 수 있습니다.</p>
+        <p>본 과정에서는 멀티 에이전트 전략 분석 흐름을 같은 방식으로 설명하기 위해 <strong><code>DagWorkflowEngine</code></strong>이라는 이름과 <strong><code>WorkflowNode</code> 단위 실행</strong>을 두었고, 그 개념을 <strong>Chapter 7에서 코드와 함께 처음 명시적으로</strong> 다룹니다.</p>
+
+        <p class="c7-dag-lead">꼭 DAG가 필요한가?</p>
+        <div class="c7-dag-compare">
+            <div class="c7-dag-col-narrow">
+                <strong>덜 필요한 경우</strong><br>
+                위에서 아래로 <strong>한 줄 순서</strong>만 있으면, 리스트형 오케스트레이션으로도 충분합니다.
+            </div>
+            <div class="c7-dag-col-wide">
+                <strong>DAG가 유리한 경우</strong><br>
+                <strong>분기</strong>(SIMPLE / STRATEGIC), <strong>병렬</strong>(서로 기다릴 필요 없음), <strong>합류</strong>(여러 결과가 모여야 다음), <strong>조건부 반복</strong>(평가→개선)처럼 “누가 누구를 기다리는지”를 그림으로 박아 두고 싶을 때입니다.
+            </div>
+        </div>
+
+        <p class="c7-dag-lead">Chapter 7에서 DAG를 다루는 이유</p>
+        <ul>
+            <li><strong>앞 장과의 대비</strong> — Ch4~6은 주로 <strong>고정 단계·호출 순서</strong>에 초점이 있습니다. Ch7은 <strong>분기 + 병렬 + 합류 + 루프</strong>가 한 요청 안에 같이 나오는 전략 분석 흐름을 <strong>그래프로 표현</strong>합니다.</li>
+            <li><strong>실전 모양</strong> — 기술·시장 분석은 <strong>동시에</strong> 돌리고, 통합·평가는 그 결과가 <strong>모인 뒤</strong>에 이어지는 식의 의존 관계가 자연스럽습니다.</li>
+            <li><strong>다음 장으로</strong> — Ch7은 그래프를 <strong>자바로 조립</strong>해 보고, Ch8에서는 같은 아이디어를 <strong>YAML(DSL)로 빼서 선언적으로</strong> 옮깁니다.</li>
+        </ul>
+
+        <p class="c7-dag-lead">한 줄로 정리</p>
+        <p class="mb-0">DAG는 “작업들 사이의 <strong>의존 관계와 병렬</strong>”을 한눈에 고정하는 표현이고, 본 장은 그걸 <code>WorkflowNode</code>와 <code>DagWorkflowEngine</code>으로 돌려 <strong>Ch8 선언적 워크플로</strong>로 이어가기 위한 디딤돌입니다.</p>
+    </div>
+
+    <div class="course-overview c2-field-section">
+
+    <p class="c2-field-lead">
+        Chapter 5에서는 <strong>Java 오케스트레이터</strong>와 <code>ToolRegistry</code>로 라우팅·병렬 분석·평가 등 <strong>단계·Tool 호출 순서</strong>를 코드에 고정하는 전략 분석 흐름을 봤습니다.
+        본 장은 그 <strong>같은 전략 분석 파이프라인</strong>을 <strong>ToolRegistry·전략 Tool 호출 체인</strong> 대신
+        <strong>DAG(Directed Acyclic Graph, 방향 비순환 그래프)</strong>—<code>WorkflowNode</code>와 간선—으로 풀고,
+        전용 엔진 <code>DagWorkflowEngine</code>이 그래프를 읽어 <strong>실행 가능한 노드를 스케줄링</strong>하는 형태로 <strong>바꾼 것</strong>을 다룹니다.
+    </p>
+
+    <div class="c2-field-focus">
+        <p>
+            <strong>Chapter 5와 비교</strong>하면, 단계 제어는 여전히 “언제 무엇을 돌릴지”를 정하는 일이지만,
+            Ch5는 <strong>Java 오케스트레이터가 <code>ToolRegistry.require(…)</code>로 Tool을 직접 호출</strong>하는 <strong>명령형 체인</strong>에 가깝습니다.
+            본 장은 그 제어를 <strong>DAG</strong>로 옮깁니다 — <strong>작업은 <code>WorkflowNode</code></strong>, <strong>“먼저 끝난 뒤에 다음”·병렬 분기</strong>는 <strong>방향 간선</strong>으로 적어 두고, <strong>순환은 없게(acyclic)</strong> 두어 실행 순서가 그래프에서 바로 읽히게 합니다.
+        </p>
+        <p class="mb-0">
+            <strong>이중 구조</strong> — <strong>엔진</strong>(<code>DagWorkflowEngine</code>)은 이 그래프를 읽어 <strong>스케줄·동기화·의존성 해소</strong>까지 맡고,
+            <strong>노드</strong> 본문의 LLM 작업은 Chapter 4·5와 같이 <code>SubAgentRegistry</code>를 경유한 SubAgent로 <strong>멀티-LLM</strong>을 수행합니다.
+        </p>
+    </div>
+
+    <p class="c2-field-kicker c2-field-kicker--top">엔진이 맡는 세 가지 (용어)</p>
+    <ul class="c2-field-list">
+        <li><strong>스케줄</strong> — 그래프에서 <em>지금 돌려도 되는 노드</em>를 골라 실행 큐에 넣는 일입니다.
+            <code>DagWorkflowEngine</code>은 요청마다 라우터 → (SIMPLE이면 단순 응답만 / STRATEGIC이면 기술·시장 병렬 → 병합 → 평가·최적화 루프 등) 경로를 따라 다음 노드를 단계적으로 택합니다.</li>
+        <li><strong>동기화</strong> — 여러 노드가 동시에 돌 때(예: 기술·시장 분석) <strong>모두 끝난 뒤에만</strong> 병합·후속 단계로 넘어가게 맞춥니다.
+            본 저장소는 <code>CompletableFuture</code>로 병렬을 걸고 완료를 기다려 산출물을 한 시점에 모읍니다.</li>
+        <li><strong>의존성 해소</strong> — “선행 노드가 끝나야 이 노드를 실행할 수 있다”는 조건이 <strong>만족될 때만</strong> 해당 노드를 실행 가능으로 둡니다.
+            DAG는 순환이 없으므로 선행이 풀릴 때마다 다음 후보가 열리는 식으로 조건이 해소됩니다.</li>
+    </ul>
+
+    <p class="c2-field-kicker">Chapter 1~6 오케스트레이션 축 (성숙도·표현력이 커지는 순)</p>
+    <ol class="c2-field-list mb-2">
+        <li><strong>Agent + SubAgent (Chapter 4)</strong> — Main(Main agent, Orchestrator agent)와 <code>SubAgentRegistry</code> 이름 조회; 멀티-LLM을 역할 단위로 나눈 <strong>단일 제품형</strong> 구조</li>
+        <li><strong>Agent + Tool (Chapter 5)</strong> — <code>ToolRegistry</code>로 실행 계층을 나누고, <strong>Java 오케스트레이터가 단계·Tool 호출 순서를 코드로 고정</strong></li>
+        <li><strong>Agent Runtime (Chapter 6)</strong> — agent-utils의 Task·Think–Act–Observe, <code>TaskTool</code>로 Markdown 서브에이전트 조율</li>
+        <li><strong>DAG 기반 워크플로 (본 장)</strong> — 노드·의존성 그래프를 <strong>코드로 조립</strong>하고 <code>DagWorkflowEngine</code>이 실행·병렬·합류를 제어</li>
+    </ol>
+
+    <div class="c2-field-focus">
+        <p class="mb-1"><strong>참고 — 생태계·배치와의 구분</strong></p>
+        <ul class="c2-field-list mb-0">
+            <li><strong>생태계</strong>: 파이썬 <strong>LangGraph</strong>(LangChain 계열)처럼 노드·엣지 위에 상태를 흘리며 그래프를 도는 접근이, 본 장의 <strong>DAG 오케스트레이션 + SubAgent</strong>와 개념적으로 가깝습니다. API·런타임은 Spring/JVM 기준입니다.</li>
+            <li><strong>배치 스케줄러</strong>: Airflow·Prefect 등은 <strong>정해진 배치·스케줄·데이터 파이프라인</strong>에 치우친 경우가 많습니다. 본 장 엔진은 <strong>요청 단위</strong>로 그래프를 돌리고, 노드 안에 LLM·SubAgent·도구가 섞인 <strong>에이전트 워크플로</strong>를 둡니다. 목적·운영 모델만 구분해 두면 됩니다.</li>
+        </ul>
+    </div>
+
+    <p>
+        <strong>한 줄 요약</strong> — Chapter 5에서 코드로 고정했던 전략 분석 워크플로를 <strong>DAG·노드·간선</strong>으로 다시 표현하고, <code>DagWorkflowEngine</code>이 <strong>스케줄·동기화·의존성</strong>을 맡으며, 노드 안의 추론은 Chapter 4와 같은 <strong>SubAgent·Multi-LLM</strong>으로 수행하는 장입니다.
+    </p>
+
+    <p class="mb-0">
+        실습 화면: <a th:href="@{/go/ch7/1_strategic_analysis}">Strategic Analysis (DAG)</a>
+    </p>
+    </div>
+
+    <nav class="course-toc" aria-label="목차">
+    <p class="course-toc-title">목차</p>
+    <ol>
+        <li><a href="#c7-s1">개념 정리 (DAG 개념)</a></li>
+        <li><a href="#c7-s2">DAG 방식의 차이</a></li>
+        <li><a href="#c7-s3">네 가지 구조 비교</a></li>
+        <li><a href="#c7-s4">Tool과 Node의 대응 (Chapter 5 vs 7)</a></li>
+        <li><a href="#c7-s5">언제 DAG가 필요한가</a></li>
+        <li><a href="#c7-s6">난이도 비교 및 장단점</a></li>
+        <li><a href="#c7-s7">핵심 결론</a></li>
+    </ol>
+    </nav>
+
+    <div class="course-content">
+    <hr class="course-divider">
+
+    <h3 id="c7-s1">1. 개념 정리 (DAG 개념)</h3>
+    <p><strong>DAG(Directed Acyclic Graph, 방향 비순환 그래프)</strong>는 <strong>정점(노드)</strong>과 <strong>방향이 있는 간선(의존성)</strong>으로 이뤄진 그래프 구조인데, <strong>어떤 노드에서 다시 자기 자신으로 돌아오는 순환 경로가 없다는 것</strong>이 핵심입니다.</p>
+    <ul>
+        <li><strong>Node(노드)</strong>: 하나의 작업 단계 또는 처리 단위를 의미합니다. 이 예제에서는 라우팅, 단순 응답, 기술 분석, 시장 분석, 보고서 병합, 평가, 최적화 루프 등입니다.</li>
+        <li><strong>Edge(간선)</strong>: “어떤 노드가 끝나야 다음 노드를 실행할 수 있는지”를 나타내는 <strong>의존 관계</strong>입니다.</li>
+        <li><strong>Acyclic(비순환)</strong>: 노드들을 따라가다 보면 절대 다시 원래 노드로 되돌아오지 않습니다. 덕분에 <strong>실행 순서를 위에서 아래로(topological order) 명확히 정할 수 있고, 무한 루프에 빠지지 않도록 설계</strong>할 수 있습니다.</li>
+    </ul>
+    <p>이 구조를 워크플로에 적용하면, “<strong>어떤 일을 어떤 순서·병렬·합성 규칙으로 실행할지</strong>”를 <strong>그래프 자체에 기록</strong>할 수 있습니다. 코드에서는 <code>WorkflowNode</code> 들이 DAG의 노드 역할을 하고, 각 노드는 <code>inputs</code>/<code>outputs</code>·의존성 정보로 서로 연결됩니다.</p>
+    <p class="small text-muted">
+        <strong>에이전트 관점에서의 DAG</strong>:
+        DAG는 “하나의 거대한 에이전트”가 어떤 순서로 생각하고 도구를 쓸지를 암시해 두는 것이 아니라,
+        <strong>여러 작은 에이전트/노드가 어떤 순서와 병렬 패턴으로 실행될지를 그래프로 고정해 두는 방식</strong>입니다.
+        이 장의 <code>DagWorkflowEngine</code>은 이 그래프를 읽어 “지금 실행 가능한 노드”를 찾아 병렬/순차 실행하고, 모든 의존 노드가 끝났을 때 다음 노드를 스케줄링합니다.
+    </p>
+
+    <div class="course-flow-pipeline" role="img" aria-label="전략 분석 DAG 예시">
+        <div class="course-flow-col course-flow-col-wide">
+            <!-- Level 1 -->
+            <div class="course-flow-step course-flow-user">
+                <div class="course-flow-kicker">입력</div>
+                <p class="course-flow-title">User 질문</p>
+                <p class="course-flow-sub">전략 분석 요청</p>
+            </div>
+            <div class="course-flow-arrow" aria-hidden="true">↓</div>
+
+            <!-- Level 2: Engine -->
+            <div class="course-flow-step course-flow-engine">
+                <div class="course-flow-kicker">엔진</div>
+                <p class="course-flow-title">DagWorkflowEngine</p>
+                <p class="course-flow-sub">실행 가능한 노드 스케줄링</p>
+            </div>
+            <div class="course-flow-arrow" aria-hidden="true">↓</div>
+
+            <!-- Level 3: Router -->
+            <div class="course-flow-step course-flow-dag">
+                <div class="course-flow-kicker">노드</div>
+                <p class="course-flow-title">RouterNode</p>
+                <p class="course-flow-sub">SIMPLE / STRATEGIC 분기 · <code>routing</code></p>
+            </div>
+            <div class="course-flow-arrow" aria-hidden="true">↓</div>
+
+            <!-- Level 4: Branch (SIMPLE vs STRATEGIC) -->
+            <div class="course-flow-branch-box" role="img" aria-label="SIMPLE / STRATEGIC 분기">
+                <div class="course-flow-h-row">
+                    <span class="course-flow-chip">SIMPLE → SimpleQueryNode</span>
+                    <span class="course-flow-h-arrow">또는</span>
+                    <span class="course-flow-chip">STRATEGIC → 병렬 분석 노드들</span>
+                </div>
+                <p class="course-flow-branch-keys">
+                    SIMPLE: <code>simple-query</code> · STRATEGIC: 병렬 <code>technical-analysis</code> ∥ <code>market-analysis</code>
+                </p>
+            </div>
+
+            <!-- Level 5: Parallel tech / market -->
+            <div class="course-flow-col course-flow-col-wide">
+                <div class="course-flow-step course-flow-dag">
+                    <div class="course-flow-kicker">노드</div>
+                    <p class="course-flow-title">TechnicalAnalysisNode</p>
+                    <p class="course-flow-sub">기술 분석 · <code>technical-analysis</code></p>
+                </div>
+                <div class="course-flow-arrow" aria-hidden="true">||</div>
+                <div class="course-flow-step course-flow-dag">
+                    <div class="course-flow-kicker">노드</div>
+                    <p class="course-flow-title">MarketAnalysisNode</p>
+                    <p class="course-flow-sub">시장 분석 · <code>market-analysis</code></p>
+                </div>
+            </div>
+
+            <div class="course-flow-arrow" aria-hidden="true">↓</div>
+
+            <!-- Level 6: Merge -->
+            <div class="course-flow-step course-flow-merge">
+                <div class="course-flow-kicker">노드</div>
+                <p class="course-flow-title">MergeReportNode</p>
+                <p class="course-flow-sub">기술/시장 결과 병합 · 레지스트리 호출 없음</p>
+            </div>
+            <div class="course-flow-arrow" aria-hidden="true">↓</div>
+
+            <!-- Level 7: Evaluate / Optimize loop (개념적으로) -->
+            <div class="course-flow-step course-flow-engine">
+                <div class="course-flow-kicker">루프</div>
+                <p class="course-flow-title">EvaluationNode → OptimizationNode</p>
+                <p class="course-flow-sub">최대 N회 반복, PASS 시 종료 · <code>report-evaluator</code> / <code>ReportOptimizerSubagent</code></p>
+            </div>
+            <div class="course-flow-arrow" aria-hidden="true">↓</div>
+
+            <!-- Final -->
+            <div class="course-flow-step course-flow-out">
+                <div class="course-flow-kicker">출력</div>
+                <p class="course-flow-title">최종 전략 보고서</p>
+            </div>
+        </div>
+    </div>
+    <p class="small text-muted">
+        이 예시는 <code>WorkflowNode</code> 들이 DAG 위에 배치되는 모습을 단순화한 그림입니다.
+        각 노드가 실행될 때의 LLM 위임은 <code>SubAgentRegistry</code> 키(위 그림의 <code>code</code>)로, Chapter 4 실습과 동일한 이름 규칙을 따릅니다.
+        화살표는 항상 한 방향(위 → 아래 또는 왼쪽 → 오른쪽)으로만 이어져 다시 위로 올라가지 않기 때문에
+        <strong>Acyclic(비순환)</strong> 특성을 만족하고, <strong>실행 순서를 위에서 아래로(topological order) 명확하게 정할 수 있습니다.</strong>
+    </p>
+
+    <hr class="course-divider">
+
+    <h3 id="c7-s2">2. DAG 방식의 차이</h3>
+    <p>먼저, 이 과정에서 다룬 기존 구조(Chapter 4·5·6)를 간단히 다시 보면 다음과 같습니다.</p>
+    <div class="course-flow-compare">
+        <p class="small-label mb-1">Chapter 4 — Agent + SubAgent</p>
+        <div class="course-flow-h" role="img" aria-label="Ch4: 자바 오케스트레이터와 SubAgent 흐름">
+            <span class="course-flow-chip">질문</span>
+            <span class="course-flow-h-arrow">→</span>
+            <span class="course-flow-chip">Java 오케스트레이터</span>
+            <span class="course-flow-h-arrow">→</span>
+            <span class="course-flow-chip">SubAgent 호출<br>(역할별 LLM)</span>
+            <span class="course-flow-h-arrow">→</span>
+            <span class="course-flow-chip">결과</span>
+        </div>
+    </div>
+    <div class="course-flow-compare">
+        <p class="small-label mb-1">Chapter 5 — Agent + Tool</p>
+        <div class="course-flow-h" role="img" aria-label="Ch5: 오케스트레이터와 Tool 흐름">
+            <span class="course-flow-chip">질문</span>
+            <span class="course-flow-h-arrow">→</span>
+            <span class="course-flow-chip">Java 오케스트레이터</span>
+            <span class="course-flow-h-arrow">→</span>
+            <span class="course-flow-chip">Tool 실행<br>(서비스·리소스 연동)</span>
+            <span class="course-flow-h-arrow">→</span>
+            <span class="course-flow-chip">결과</span>
+        </div>
+    </div>
+    <div class="course-flow-compare">
+        <p class="small-label mb-1">Chapter 6 — Agent Runtime (Task)</p>
+        <div class="course-flow-h" role="img" aria-label="Ch6: Task 기반 Agent Runtime 흐름">
+            <span class="course-flow-chip">질문</span>
+            <span class="course-flow-h-arrow">→</span>
+            <span class="course-flow-chip">Java 오케스트레이터</span>
+            <span class="course-flow-h-arrow">→</span>
+            <span class="course-flow-chip">Agent Runtime<br>(Task·TaskTool·TodoWrite)</span>
+            <span class="course-flow-h-arrow">→</span>
+            <span class="course-flow-chip">결과</span>
+        </div>
+    </div>
+    <p>하지만 <strong>DAG</strong>는 완전히 다릅니다.</p>
+    <div class="course-flow-compare">
+        <p class="small-label mb-1">DAG (워크플로 중심)</p>
+        <div class="course-flow-h" role="img" aria-label="DAG 엔진이 워크플로를 생성하고 실행한 뒤 결과">
+            <span class="course-flow-chip">질문</span>
+            <span class="course-flow-h-arrow">→</span>
+            <span class="course-flow-chip">DAG 엔진 <span class="small text-muted">(워크플로 생성·실행)</span><br><code class="small">DagWorkflowEngine</code></span>
+            <span class="course-flow-h-arrow">→</span>
+            <span class="course-flow-chip">결과</span>
+        </div>
+    </div>
+    <p><strong>즉 핵심 변화</strong></p>
+    <p><strong>오케스트레이터/Agent Runtime 중심 단계 실행 → DAG 엔진이 워크플로를 생성·실행하는 구조</strong></p>
+
+    <hr class="course-divider">
+
+    <h3 id="c7-s3">3. 네 가지 구조 비교</h3>
+
+    <h4>① Agent만 사용하는 구조</h4>
+    <div class="course-flow-pipeline" role="img" aria-label="Agent만: 질문 LLM 답변">
+        <p class="course-flow-caption">① Agent-only</p>
+        <div class="course-flow-col">
+            <div class="course-flow-step course-flow-user">
+                <div class="course-flow-kicker">입력</div>
+                <p class="course-flow-title">User 질문</p>
+            </div>
+            <div class="course-flow-arrow" aria-hidden="true">↓</div>
+            <div class="course-flow-step course-flow-llm">
+                <div class="course-flow-kicker">모델</div>
+                <p class="course-flow-title">LLM</p>
+            </div>
+            <div class="course-flow-arrow" aria-hidden="true">↓</div>
+            <div class="course-flow-step course-flow-out">
+                <div class="course-flow-kicker">출력</div>
+                <p class="course-flow-title">답변 생성</p>
+            </div>
+        </div>
+    </div>
+    <p><strong>특징</strong></p>
+    <ul>
+        <li>가장 단순</li>
+        <li>추론만 가능</li>
+        <li>실행 기능 없음</li>
+    </ul>
+
+    <h4>② Agent + Tool 구조</h4>
+    <div class="course-flow-pipeline" role="img" aria-label="Agent와 Tool">
+        <p class="course-flow-caption">② Agent + Tool</p>
+        <div class="course-flow-col">
+            <div class="course-flow-step course-flow-user">
+                <div class="course-flow-kicker">입력</div>
+                <p class="course-flow-title">User 질문</p>
+            </div>
+            <div class="course-flow-arrow" aria-hidden="true">↓</div>
+            <div class="course-flow-step course-flow-llm">
+                <div class="course-flow-kicker">추론</div>
+                <p class="course-flow-title">LLM</p>
+            </div>
+            <div class="course-flow-arrow" aria-hidden="true">↓</div>
+            <div class="course-flow-step course-flow-tool">
+                <div class="course-flow-kicker">실행</div>
+                <p class="course-flow-title">Tool 실행</p>
+            </div>
+            <div class="course-flow-arrow" aria-hidden="true">↓</div>
+            <div class="course-flow-step course-flow-out">
+                <div class="course-flow-kicker">출력</div>
+                <p class="course-flow-title">결과 반환</p>
+            </div>
+        </div>
+    </div>
+    <p><strong>특징</strong></p>
+    <ul>
+        <li>실제 서비스 가능</li>
+        <li>정확도 상승</li>
+        <li>구조 단순</li>
+    </ul>
+
+    <h4>③ Agent Runtime (TaskTool 등) — Task 기반 오케스트레이션 (Chapter 6과 동일)</h4>
+    <div class="course-flow-pipeline" role="img" aria-label="Agent Runtime과 Task">
+        <p class="course-flow-caption">③ Agent Runtime</p>
+        <div class="course-flow-col course-flow-col-wide">
+            <div class="course-flow-step course-flow-user">
+                <div class="course-flow-kicker">입력</div>
+                <p class="course-flow-title">User 질문</p>
+            </div>
+            <div class="course-flow-arrow" aria-hidden="true">↓</div>
+            <div class="course-flow-step course-flow-runtime">
+                <div class="course-flow-kicker">엔진</div>
+                <p class="course-flow-title">Agent Runtime</p>
+            </div>
+            <div class="course-flow-arrow" aria-hidden="true">↓</div>
+            <div class="course-flow-step course-flow-tool">
+                <div class="course-flow-kicker">선택</div>
+                <p class="course-flow-title">Tool 자동 선택</p>
+            </div>
+            <div class="course-flow-arrow" aria-hidden="true">↓</div>
+            <div class="course-flow-step course-flow-merge">
+                <div class="course-flow-kicker">순차</div>
+                <p class="course-flow-title">여러 Tool 순차 실행</p>
+            </div>
+            <div class="course-flow-arrow" aria-hidden="true">↓</div>
+            <div class="course-flow-step course-flow-out">
+                <div class="course-flow-kicker">집계</div>
+                <p class="course-flow-title">결과 통합</p>
+            </div>
+        </div>
+    </div>
+    <p><strong>특징</strong></p>
+    <ul>
+        <li>자동 Tool 실행</li>
+        <li>반복 실행 가능</li>
+        <li>SubAgent 가능</li>
+    </ul>
+
+    <h4>④ DAG 기반 Agent Workflow</h4>
+    <div class="course-flow-pipeline" role="img" aria-label="DAG: 라우팅부터 엔진과 합성까지">
+        <p class="course-flow-caption">④ DAG Workflow</p>
+        <div class="course-flow-col course-flow-col-wide">
+            <div class="course-flow-step course-flow-user">
+                <div class="course-flow-kicker">입력</div>
+                <p class="course-flow-title">User 질문</p>
+            </div>
+            <div class="course-flow-arrow" aria-hidden="true">↓</div>
+            <div class="course-flow-step course-flow-planner">
+                <div class="course-flow-kicker">분기</div>
+                <p class="course-flow-title">Router / 라우팅 노드</p>
+                <p class="course-flow-sub">예: RouterNode · SIMPLE / STRATEGIC</p>
+            </div>
+            <div class="course-flow-arrow" aria-hidden="true">↓</div>
+            <div class="course-flow-step course-flow-engine">
+                <div class="course-flow-kicker">DAG 엔진</div>
+                <p class="course-flow-title">DagWorkflowEngine</p>
+                <p class="course-flow-sub">워크플로 생성(DAG 조립)·실행 · 스케줄 · WorkflowNode</p>
+            </div>
+            <div class="course-flow-arrow" aria-hidden="true">↓</div>
+            <div class="course-flow-step course-flow-out">
+                <div class="course-flow-kicker">출력</div>
+                <p class="course-flow-title">결과</p>
+            </div>
+        </div>
+    </div>
+    <p><strong>특징</strong></p>
+    <ul>
+        <li>완전한 Workflow 시스템</li>
+        <li>대규모 서비스 구조</li>
+    </ul>
+
+    <hr class="course-divider">
+
+    <h3 id="c7-s4">4. Tool과 Node의 대응 (Chapter 5 vs 7)</h3>
+
+    <h4>Chapter 5의 Tool</h4>
+    <ul>
+        <li><strong>역할</strong>: 외부 연동·부작용은 <code>@Tool</code>·<code>ToolRegistry</code>로 실행 계층에 두고, <strong>Java 오케스트레이터가 어떤 Tool을 어떤 순서로 부를지 고정</strong>합니다.</li>
+        <li><strong>흐름</strong>: 사용자 질문 → 오케스트레이터가 단계별로 Tool·SubAgent 호출 → 컨텍스트에 쌓인 결과로 최종 답 생성.</li>
+        <li><strong>실습 맥락</strong>: <code>StrategicAnalysisOrchestrator</code>, <code>@Tool</code>, <code>ToolRegistry</code> 등으로 Java에서 오케스트레이션하는 예에 가깝습니다.</li>
+        <li><strong>특징</strong>: LLM이 임의로 Tool 순서를 짓기보다, <strong>코드에 적힌 워크플로</strong> 안에서 Tool과 추론이 맞물립니다.</li>
+    </ul>
+
+    <h4>Chapter 7의 Node (<code>WorkflowNode</code>)</h4>
+    <ul>
+        <li><strong>역할</strong>: 전체 일을 DAG(방향 비순환 그래프)로 쪼인 워크플로의 한 단계입니다. 각 노드는 라우팅·단순 응답·병렬 분석·합치기·평가/최적화 루프 등 그래프 상의 위치가 정해져 있습니다.</li>
+        <li><strong>흐름</strong>: 질문 → <strong>DAG 엔진</strong>(<code>DagWorkflowEngine</code>)이 워크플로를 <strong>생성·실행</strong>(노드 스케줄·의존성 반영) → 결과.</li>
+        <li>문서 표현대로 Agent가 실행이 아니라 워크플로 엔진이 실행에 가깝습니다.</li>
+        <li><strong>실습 맥락</strong>: <code>DagWorkflowEngine</code>, <code>WorkflowNode</code>, <code>CompletableFuture</code>로 의존성 조립·병렬 등 실행 제어가 Tool 중심 모델보다 명확합니다.</li>
+    </ul>
+
+    <h4>한 줄로 비교</h4>
+    <div class="table-responsive">
+        <table class="table table-bordered table-sm">
+            <thead class="thead-light">
+            <tr>
+                <th>구분</th>
+                <th>Ch5 Tool</th>
+                <th>Ch7 Node</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>무엇의 단위인가</td>
+                <td><code>ToolRegistry</code>에 등록된 실행 단위(도구)</td>
+                <td>그래프의 한 칸(단계·분기·병렬의 단위)</td>
+            </tr>
+            <tr>
+                <td>누가 흐름을 잡나</td>
+                <td>Java 오케스트레이터가 단계·Tool 호출 순서를 고정</td>
+                <td>DAG 엔진이 노드·의존성에 따라 실행</td>
+            </tr>
+            <tr>
+                <td>강점</td>
+                <td>실행 계층 분리, 서비스 연동에 적합</td>
+                <td>병렬·분기·루프 등 워크플로 제어·재현성</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <p class="small mb-0">
+        5장은 <code>ToolRegistry</code>와 Java 오케스트레이터로 단계 순서를 고정한 워크플로이고, 7장은 같은 역할을 <code>WorkflowNode</code>로 나눈 DAG·엔진 학습으로 이어지는 관계입니다.
+    </p>
+
+    <div class="course-flow-compare mt-3">
+        <p class="small-label mb-1">Chapter 5 Tool-Orchestrated vs Chapter 7 DAG-Orchestrated</p>
+        <div style="display:flex; flex-wrap:wrap; gap:0.75rem; justify-content:space-between;">
+            <!-- Left: Ch5 Tool-Orchestrated -->
+            <div class="course-flow-pipeline" style="flex:1 1 250px;" role="img" aria-label="Chapter 5 Tool-Orchestrated 구조">
+                <p class="course-flow-caption">Ch5 — Tool-Orchestrated</p>
+                <div class="course-flow-col">
+                    <div class="course-flow-step course-flow-stack">
+                        <div class="course-flow-kicker">Web</div>
+                        <p class="course-flow-title">Ch5Controller</p>
+                    </div>
+                    <div class="course-flow-arrow" aria-hidden="true">↓</div>
+                    <div class="course-flow-step course-flow-stack">
+                        <div class="course-flow-kicker">Service</div>
+                        <p class="course-flow-title">StrategicAnalysisAgentToolTaskService</p>
+                    </div>
+                    <div class="course-flow-arrow" aria-hidden="true">↓</div>
+                    <div class="course-flow-step course-flow-stack">
+                        <div class="course-flow-kicker">오케스트레이션</div>
+                        <p class="course-flow-title">StrategicAnalysisAgentToolOrchestrator</p>
+                    </div>
+                    <div class="course-flow-arrow" aria-hidden="true">↓</div>
+                    <div class="course-flow-step course-flow-tool">
+                        <div class="course-flow-kicker">도구</div>
+                        <p class="course-flow-title">RoutingTool / SimpleQueryTool / …</p>
+                        <p class="course-flow-sub">ToolRegistry.require(키)로 직접 호출</p>
+                    </div>
+                    <div class="course-flow-arrow" aria-hidden="true">↓</div>
+                    <div class="course-flow-step course-flow-out">
+                        <div class="course-flow-kicker">출력</div>
+                        <p class="course-flow-title">최종 보고서</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Ch7 DAG-Orchestrated -->
+            <div class="course-flow-pipeline" style="flex:1 1 250px;" role="img" aria-label="Chapter 7 DAG-Orchestrated 구조">
+                <p class="course-flow-caption">Ch7 — DAG-Orchestrated</p>
+                <div class="course-flow-col course-flow-col-wide">
+                    <div class="course-flow-step course-flow-stack">
+                        <div class="course-flow-kicker">Web</div>
+                        <p class="course-flow-title">Ch7Controller</p>
+                    </div>
+                    <div class="course-flow-arrow" aria-hidden="true">↓</div>
+                    <div class="course-flow-step course-flow-stack">
+                        <div class="course-flow-kicker">Service</div>
+                        <p class="course-flow-title">StrategicAnalysisDagWorkflowService</p>
+                    </div>
+                    <div class="course-flow-arrow" aria-hidden="true">↓</div>
+                    <div class="course-flow-step course-flow-engine">
+                        <div class="course-flow-kicker">엔진</div>
+                        <p class="course-flow-title">DagWorkflowEngine</p>
+                        <p class="course-flow-sub">노드 의존성에 따라 스케줄·병렬 실행</p>
+                    </div>
+                    <div class="course-flow-arrow" aria-hidden="true">↓</div>
+                    <div class="course-flow-step course-flow-dag">
+                        <div class="course-flow-kicker">노드들</div>
+                        <p class="course-flow-title">
+                            RouterNode → SimpleQueryNode / TechnicalAnalysisNode / MarketAnalysisNode → MergeReportNode → EvaluationNode → OptimizationNode
+                        </p>
+                    </div>
+                    <div class="course-flow-arrow" aria-hidden="true">↓</div>
+                    <div class="course-flow-step course-flow-out">
+                        <div class="course-flow-kicker">출력</div>
+                        <p class="course-flow-title">최종 전략 보고서</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <p class="small text-muted mb-0">
+        왼쪽(Ch5)은 Java 오케스트레이터가 <code>ToolRegistry</code>를 통해
+        “어떤 Tool을 어떤 순서로 부를지” 직접 코드로 제어하는 구조이고,
+        오른쪽(Ch7)은 같은 역할을 하는 단계를 <code>WorkflowNode</code>로 나눠
+        <code>DagWorkflowEngine</code>이 <strong>그래프(DAG) 기반으로 실행 순서·병렬·의존성을 관리</strong>하는 구조입니다.
+    </p>
+
+    <hr class="course-divider">
+
+    <h3 id="c7-s5">5. 언제 DAG가 필요한가</h3>
+    <p><strong>언제 DAG가 좋은지</strong>를 정리해 보면 다음과 같습니다.</p>
+    <ul>
+        <li><strong>DAG를 쓰는 게 좋은 상황</strong>
+            <ul>
+                <li>단계가 많고, <strong>선후관계·병렬·합류·단계별 오류 처리</strong>(예: 평가/최적화 반복)를 코드로 엄격하게 관리해야 할 때</li>
+                <li>“이 워크플로가 어제도, 다음 달에도 <strong>같은 순서와 병렬 패턴</strong>으로 돌아가야 한다”는 <strong>재현성/운영 요구</strong>가 있을 때</li>
+                <li>여러 팀/서비스가 얽힌 <strong>대규모 분석 파이프라인, 리포트 생성 배치, 복수 데이터 소스 조합</strong>처럼
+                    “<strong>한눈에 흐름을 보여줘야 하는 경우</strong>”</li>
+            </ul>
+        </li>
+        <li><strong>DAG가 과한 경우</strong>
+            <ul>
+                <li>단계가 2~4개 정도로 단순하고, 병렬/분기가 거의 없을 때</li>
+                <li>“한 번 질문 → 한 번 답변” 또는 “에이전트 1~2개 정도가 Tool 몇 개 쓰는 수준”일 때</li>
+                <li>아직 실험 단계라, <strong>빠르게 형태를 바꾸면서 시도해 보고 싶은 POC(개념 증명)/프로토타입</strong>일 때</li>
+            </ul>
+        </li>
+    </ul>
+    <p class="small text-muted mb-2">
+        <strong>Spring AI 기준 단계별 추천</strong>
+    </p>
+    <ul class="small">
+        <li><strong>1단계: 단일 Agent + Tool (Ch3~Ch5 스타일)</strong><br>
+            대부분의 CRUD 백엔드 + 간단한 AI 기능, FAQ/요약/검색 정도는 여기서 충분합니다.<br>
+            Spring AI <code>ChatClient</code> + <code>@Tool</code> / 커스텀 Service 조합.</li>
+        <li><strong>2단계: Agent Runtime / TaskTool (Ch6 스타일)</strong><br>
+            <strong>Think–Act–Observe 루프, Task 상태, 서브에이전트, 멀티 LLM 전략</strong>이 필요하면 이 층을 채택합니다.<br>
+            <a href="https://springaicommunity.mintlify.app/projects/incubating/spring-ai-agent-utils" target="_blank" rel="noopener noreferrer"><code>spring-ai-agent-utils</code></a> + <code>TaskTool</code> + Markdown 서브에이전트.</li>
+        <li><strong>3단계: DAG-Orchestrated Workflow (Ch7 스타일)</strong><br>
+            위 두 단계를 이미 쓰고 있고, “<strong>실행 순서를 그래프로 고정하고, 병렬/의존성/모니터링(필요 시 재시도 정책)을 강하게 설계</strong>해야 하는 수준”일 때 도입하는 단계입니다.</li>
+        <li><strong>4단계: 선언적 YAML + 검증 (Ch8·Ch9 스타일)</strong><br>
+            같은 DAG 실행 아이디어를 <strong>YAML(DSL)로 정의</strong>하고(Chapter 8), 필요하면 Chapter 9처럼 <strong>로딩 파이프라인에 검증층</strong>을 두어 스케줄링 전에 선언 오류를 걸러 운영 안정성을 높입니다. 엔진·DSL 어휘는 <code>YamlDagWorkflowEngine</code>으로 Ch8·9에서 동일하게 쓰는 형태에 가깝습니다.</li>
+    </ul>
+
+    <hr class="course-divider">
+
+    <h3 id="c7-s6">6. 난이도 비교 및 장단점</h3>
+    <p class="text-muted small mb-1">4가지 구조의 난이도와 실무 장단점을 한 번에 비교한 표입니다.</p>
+    <div class="table-responsive">
+        <table class="table table-bordered table-sm">
+            <thead class="thead-light">
+            <tr>
+                <th>구분</th>
+                <th>Agent만 사용</th>
+                <th>Agent + Tool</th>
+                <th>Agent Runtime<br><span class="small">(TaskTool 등)</span></th>
+                <th>DAG Workflow</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>구현 난이도</td>
+                <td>⭐ (초급)</td>
+                <td>⭐⭐ (중급)</td>
+                <td>⭐⭐⭐ (중급~고급)</td>
+                <td>⭐⭐⭐⭐ (실무 고급)</td>
+            </tr>
+            <tr>
+                <td>실무·서비스 적합성</td>
+                <td>낮음</td>
+                <td>중간</td>
+                <td>높음</td>
+                <td>매우 높음</td>
+            </tr>
+            <tr>
+                <td>정확도 (도구·데이터 반영)</td>
+                <td>낮음</td>
+                <td>높음</td>
+                <td>매우 높음</td>
+                <td>매우 높음</td>
+            </tr>
+            <tr>
+                <td>Workflow 제어</td>
+                <td>없음</td>
+                <td>거의 없음</td>
+                <td>낮음</td>
+                <td>매우 높음</td>
+            </tr>
+            <tr>
+                <td>병렬·다단계 실행</td>
+                <td>불가능</td>
+                <td>제한적</td>
+                <td>가능</td>
+                <td>완전 가능</td>
+            </tr>
+            <tr>
+                <td>재현성</td>
+                <td>낮음</td>
+                <td>보통</td>
+                <td>보통</td>
+                <td>높음</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <hr class="course-divider">
+
+    <h3 id="c7-s7">7. 핵심 결론</h3>
+    <p>결론적으로 실무에서는 다음과 같은 형태로 수렴하는 경우가 많습니다.</p>
+    <div class="course-flow-pipeline" role="img" aria-label="라우팅이 다양한 실행 경로로 분기하는 예시">
+        <p class="course-flow-caption">실무 최종 형태 (라우팅·난이도 기준 분기)</p>
+        <div class="course-flow-col course-flow-col-wide">
+            <!-- Router / policy -->
+            <div class="course-flow-step course-flow-planner">
+                <div class="course-flow-kicker">분기</div>
+                <p class="course-flow-title">요청 라우터</p>
+                <p class="course-flow-sub">난이도·패턴 분석 (예: RouterNode, 별도 Planner)</p>
+            </div>
+            <div class="course-flow-arrow" aria-hidden="true">↓</div>
+
+            <!-- Branch: Simple / Medium / Complex -->
+            <div class="course-flow-h" role="img" aria-label="요청 복잡도에 따른 실행 경로 분기">
+                <span class="course-flow-chip">
+                    단순 (Simple)
+                    <span class="d-block small text-muted">→ Agent + Tool (Ch3~5)</span>
+                </span>
+                <span class="course-flow-h-arrow">또는</span>
+                <span class="course-flow-chip">
+                    중간 (Medium)
+                    <span class="d-block small text-muted">→ Agent Runtime / TaskTool (Ch6)</span>
+                </span>
+                <span class="course-flow-h-arrow">또는</span>
+                <span class="course-flow-chip">
+                    복잡 (Complex)
+                    <span class="d-block small text-muted">→ DAG Workflow + Engine (Ch7)</span>
+                </span>
+            </div>
+        </div>
+    </div>
+    <p>즉 <strong>AI + Workflow Engine</strong> 조합을 쓰되, <strong>모든 요청을 DAG로 보내는 것이 아니라</strong> 라우팅·정책 계층이 난이도·요구사항에 따라
+        <strong>Agent+Tool / Agent Runtime / DAG</strong> 중 적절한 경로로 분기시키는 구조가 실무에서 가장 자연스럽습니다.</p>
+    <p class="small text-muted mb-1">
+        <strong>단일 서비스 기준으로 보면</strong>, 대부분은 <strong>1단계(Agent+Tool)</strong> 또는 <strong>2단계(Agent Runtime)</strong> 정도에서 머무는 경우가 많고,
+        정말 복잡한 코어 워크플로 일부에만 <strong>3단계(DAG)</strong>를 도입하는 식으로 “부분 적용”하는 패턴이 많습니다.
+        이 장의 핵심 메시지는 “장기적으로 보면, 실무에서 자주 보는 구조는
+        <strong>LLM(Agent) + Tool + Agent Runtime + (필요한 일부 흐름에 대해) DAG 같은 워크플로 엔진</strong>을 조합한 모습”에 가깝다는 것입니다.
+        즉, <strong>회사 전체 관점의 아키텍처</strong>로 보면 네 단계 모두 등장할 수 있지만,
+        각 기능/마이크로서비스별로는 그 중 <strong>필요한 레벨까지만 선택해서 쓴다</strong>고 이해하시면 됩니다.
+    </p>
+
+    <hr class="course-divider">
+
+    <div class="course-footer-actions">
+    <p>
+        <a th:href="@{/go/ch7/desc}" class="btn btn-warning font-weight-bold">Chapter7. 상세 가이드 (Screen Description)</a>
+    </p>
+    <p>
+        이전 장: <a th:href="@{/go/ch6}">Chapter 6 — Task-Orchestrated Multi-Agent</a>
+    </p>
+    <p>
+        다음 장: <a th:href="@{/go/ch8}">Chapter 8 — Declarative Agent Workflow with YAML</a>
+    </p>
+    </div>
+
+    </div>
+    </div>
+
+</th:block>
+</html>

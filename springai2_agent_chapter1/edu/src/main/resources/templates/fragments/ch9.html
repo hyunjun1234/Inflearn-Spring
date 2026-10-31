@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<th:block>
+
+    <style>
+        .course-main { max-width: 52rem; margin: 0 auto; padding: 0 0.25rem 2.5rem; font-size: 1rem; line-height: 1.65; color: #1e293b; }
+        .course-hero { margin-bottom: 1.25rem; padding-bottom: 1rem; border-bottom: 1px solid #e2e8f0; }
+        .course-hero h1 { font-size: clamp(1.25rem, 2.2vw, 1.65rem); font-weight: 700; letter-spacing: -0.02em; margin: 0; color: #0f172a; line-height: 1.3; }
+        .course-toc { background: linear-gradient(165deg, #f8fafc 0%, #f1f5f9 100%); border: 1px solid #e2e8f0; border-radius: 10px; padding: 1rem 1.25rem 1.1rem; margin-bottom: 1.25rem; }
+        .course-toc-title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b; margin: 0 0 0.6rem; }
+        .course-toc ol { margin: 0; padding-left: 1.2rem; }
+        .course-toc li { margin-bottom: 0.35rem; line-height: 1.45; }
+        .course-toc a { color: #1d4ed8; text-decoration: none; font-size: 0.9rem; font-weight: 700; }
+        .course-toc a:hover { text-decoration: underline; color: #1e40af; }
+        .course-overview { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 1.25rem 1.4rem 1.35rem; margin-bottom: 1.25rem; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06); }
+        .course-content h3 { font-size: 1.12rem; margin: 1.35rem 0 0.85rem; padding-bottom: 0.55rem; border-bottom: 2px solid #93c5fd; color: #0f172a; font-weight: 700; line-height: 1.4; }
+        .course-content hr.course-divider + h3 { margin-top: 0; }
+        .course-content h4 { font-size: 1rem; margin: 1rem 0 0.5rem; color: #334155; font-weight: 600; }
+        .course-divider { border: none; height: 1px; background: linear-gradient(90deg, transparent, #cbd5e1, transparent); margin: 1.5rem 0; }
+        .course-footer-actions { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #e2e8f0; }
+        ul { margin-left: 1.25rem; margin-bottom: 0.75rem; }
+        code { background: #f1f5f9; padding: 0.12em 0.38em; border-radius: 4px; font-size: 0.9em; color: #0f172a; }
+        p { margin-bottom: 0.85rem; }
+        table { font-size: 0.95rem; }
+        .course-overview .meta { color: #475569; font-size: 0.95rem; margin-bottom: 0.75rem; }
+        .course-overview .note { font-size: 0.88rem; color: #64748b; margin-bottom: 0.65rem; line-height: 1.55; }
+        .course-overview .note:last-of-type { margin-bottom: 0; }
+
+        /* Flow diagrams — Chapter 4~7과 동일 계열 */
+        .course-flow-pipeline {
+            margin: 1rem 0 1.25rem;
+            padding: 1.25rem 1.15rem 1.4rem;
+            border-radius: 14px;
+            background: linear-gradient(165deg, #f8fafc 0%, #eef2ff 40%, #f1f5f9 100%);
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
+        }
+        .course-flow-pipeline .course-flow-caption {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #64748b;
+            margin: 0 0 0.9rem;
+            text-align: center;
+        }
+        .course-flow-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 24rem;
+            margin: 0 auto;
+        }
+        .course-flow-col-wide { max-width: 28rem; }
+        .course-flow-step {
+            width: 100%;
+            border-radius: 11px;
+            padding: 0.65rem 0.9rem;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+        }
+        .course-flow-step .course-flow-kicker {
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #64748b;
+            margin-bottom: 0.2rem;
+        }
+        .course-flow-step .course-flow-title {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0;
+            line-height: 1.35;
+        }
+        .course-flow-step .course-flow-sub {
+            font-size: 0.74rem;
+            color: #64748b;
+            margin: 0.28rem 0 0;
+        }
+        .course-flow-step.course-flow-user {
+            background: linear-gradient(180deg, #f8fafc 0%, #fff 100%);
+            border-color: #cbd5e1;
+        }
+        .course-flow-step.course-flow-llm {
+            background: linear-gradient(135deg, #1e3a5f 0%, #1e293b 100%);
+            border-color: #334155;
+            color: #f8fafc;
+        }
+        .course-flow-step.course-flow-llm .course-flow-kicker { color: rgba(248, 250, 252, 0.75); }
+        .course-flow-step.course-flow-llm .course-flow-title { color: #f8fafc; }
+        .course-flow-step.course-flow-runtime {
+            border: 2px solid #8b5cf6;
+            background: linear-gradient(180deg, #faf5ff 0%, #fff 100%);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.12);
+        }
+        .course-flow-step.course-flow-runtime .course-flow-kicker { color: #6d28d9; }
+        .course-flow-step.course-flow-runtime .course-flow-title { color: #4c1d95; }
+        .course-flow-step.course-flow-tool {
+            border: 2px solid #38bdf8;
+            background: #fff;
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.1);
+        }
+        .course-flow-step.course-flow-tool .course-flow-kicker { color: #0369a1; }
+        .course-flow-step.course-flow-tool .course-flow-title { color: #0c4a6e; }
+        .course-flow-step.course-flow-planner {
+            background: linear-gradient(135deg, #5b21b6 0%, #7c3aed 100%);
+            border-color: #6d28d9;
+            color: #faf5ff;
+            box-shadow: 0 6px 16px rgba(124, 58, 237, 0.25);
+        }
+        .course-flow-step.course-flow-planner .course-flow-kicker { color: rgba(250, 245, 255, 0.85); }
+        .course-flow-step.course-flow-planner .course-flow-title { color: #fff; }
+        .course-flow-step.course-flow-engine {
+            background: linear-gradient(180deg, #fff7ed 0%, #fff 100%);
+            border: 2px solid #fb923c;
+            box-shadow: 0 4px 12px rgba(251, 146, 60, 0.15);
+        }
+        .course-flow-step.course-flow-engine .course-flow-kicker { color: #c2410c; }
+        .course-flow-step.course-flow-engine .course-flow-title { color: #9a3412; }
+        .course-flow-step.course-flow-dag {
+            border-style: dashed;
+            border-color: #818cf8;
+            background: #eef2ff;
+        }
+        .course-flow-step.course-flow-dag .course-flow-kicker { color: #4338ca; }
+        .course-flow-step.course-flow-merge {
+            background: linear-gradient(180deg, #fffbeb 0%, #fff 100%);
+            border-color: #fcd34d;
+        }
+        .course-flow-step.course-flow-merge .course-flow-kicker { color: #b45309; }
+        .course-flow-step.course-flow-out {
+            background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%);
+            border: 2px solid #34d399;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.12);
+        }
+        .course-flow-step.course-flow-out .course-flow-kicker { color: #047857; }
+        .course-flow-step.course-flow-out .course-flow-title { color: #065f46; }
+        .course-flow-arrow {
+            padding: 0.28rem 0 0.32rem;
+            color: #94a3b8;
+            font-size: 1rem;
+            line-height: 1;
+        }
+        .course-flow-h {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem 0.35rem;
+            margin: 0.75rem 0 1rem;
+            padding: 0.9rem 1rem;
+            border-radius: 12px;
+            background: linear-gradient(165deg, #f8fafc 0%, #f1f5f9 100%);
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.05);
+        }
+        .course-flow-h .course-flow-chip {
+            padding: 0.38rem 0.7rem;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            color: #0f172a;
+        }
+        .course-flow-h .course-flow-h-arrow { color: #94a3b8; font-size: 0.95rem; font-weight: 600; }
+        .course-flow-branch-box {
+            margin: 0.75rem 0 1rem;
+            padding: 0.85rem 1rem 0.95rem;
+            border-radius: 12px;
+            background: linear-gradient(165deg, #f8fafc 0%, #f1f5f9 100%);
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.05);
+            text-align: center;
+        }
+        .course-flow-branch-box .course-flow-h-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem 0.35rem;
+        }
+        .course-flow-branch-box .course-flow-chip {
+            padding: 0.38rem 0.7rem;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            color: #0f172a;
+        }
+        .course-flow-branch-box .course-flow-h-arrow { color: #94a3b8; font-size: 0.95rem; font-weight: 600; }
+        .course-flow-branch-box .course-flow-branch-keys {
+            margin: 0.6rem 0 0;
+            padding-top: 0.55rem;
+            border-top: 1px dashed #cbd5e1;
+            font-size: 0.875rem;
+            color: #64748b;
+            line-height: 1.45;
+        }
+        .course-flow-compare { margin: 0.75rem 0 1rem; }
+        .course-flow-compare .small-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #64748b;
+            margin-bottom: 0.35rem;
+        }
+        .course-ch8-ch9-compare {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin: 1rem 0 1rem;
+            align-items: stretch;
+        }
+        .course-ch8-ch9-compare .compare-lane {
+            flex: 1 1 280px;
+            min-width: 260px;
+            max-width: 100%;
+        }
+        .course-ch8-ch9-compare .compare-lane-title {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #64748b;
+            margin: 0 0 0.55rem;
+        }
+        .course-ch8-ch9-compare .course-flow-pipeline {
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+    </style>
+
+    <div class="course-main">
+    <header class="course-hero">
+    <h1>Chapter 9. Validated Agent Workflow DSL</h1>
+    <p style="margin:0.35rem 0 0; color:#475569; font-size:1.15rem; font-weight:700;">
+        스키마·의존성 검증으로 신뢰하는 YAML 워크플로 DSL
+    </p>
+    </header>
+
+    <div class="course-overview">
+    <p class="meta">
+        이 장의 <strong>전제이자 가장 큰 특징</strong>은 <strong>실행 엔진은 바꾸지 않는다</strong>는 점입니다.
+        <code>YamlDagWorkflowEngine</code>과 Chapter 8과 <strong>같은 DSL 어휘</strong>(<code>nodes</code>·<code>dependsOn</code>·<code>handler</code> 등)를 쓰고, 워크플로를 늘리는 주된 수단은 역시 <strong>DSL 문서(YAML)만 추가·수정</strong>하는 것입니다.
+        Chapter 9가 새로 내세우는 것은 <strong>다른 엔진이 아니라</strong>, <code>chapter9/dagworkflow/*.yml</code>을 읽은 뒤 <code>WorkflowDefinitionValidator</code>를 통과한 정의만 캐시해 <strong>스케줄링에 넣기 전에</strong> 오타·잘못된 <code>dependsOn</code>·사이클·필수 필드 누락 같은 <strong>선언 오류</strong>를 걸러 내는 <strong>로딩 파이프라인의 검증층</strong>입니다.
+    </p>
+    <p>
+        <strong>Chapter 9와 Chapter 8의 차이</strong>는 “엔진을 다시 짠다”가 아니라, 위 <strong>전제(엔진·DSL 동일, YAML로만 확장)</strong>를 유지한 채 <strong>로딩 직후 <code>WorkflowDefinitionValidator</code>로 선언 오류를 걸러 주느냐</strong>입니다.
+        Chapter 9에서 더해지는 것은 <strong>검증층 + <code>chapter9/dagworkflow/</code> 경로의 검증 로더</strong>뿐입니다.
+    </p>
+    <p>
+        <strong>YAML(DSL)</strong>은 사람과 팀이 읽고 쓰는 <strong>정의 표면</strong>이고,
+        <strong>DAG</strong>는 엔진이 의존성을 해석해 얻는 <strong>실행용 방향 비순환 그래프</strong>입니다.
+        로더가 YAML을 <code>WorkflowDefinition</code>으로 옮기고, <code>YamlDagWorkflowEngine</code>이 그 위에서 실행 순서를 정합니다.
+        Chapter 8은 DSL로 정의하는 단계, Chapter 9는 <code>WorkflowDefinitionValidator</code>로 <strong>그 정의가 안전한 DAG로 해석되는지</strong> 검증하는 단계입니다.
+    </p>
+    <ul class="mb-2">
+        <li><strong>정의(Definition)</strong> — Chapter 8과 같은 DSL 스키마(<code>id</code>, <code>nodes</code>, <code>dependsOn</code>, <code>handler</code> …). 필드 요약·주석 예시는 <strong>Chapter 8 §3</strong>, 도입에 유리한 상황은 <strong>Chapter 8 §6</strong>에 있습니다.</li>
+        <li><strong>검증(Validation)</strong> — <code>WorkflowDefinitionValidator#validate</code>가 오타·잘못된 <code>dependsOn</code>·사이클·필수 필드 누락 등 구조·DAG 무결성을 확인합니다.</li>
+        <li><strong>실행(Execution)</strong> — 검증을 통과한 정의만 <code>YamlDagWorkflowEngine</code>으로 전달됩니다.</li>
+    </ul>
+    <p class="note">
+        <strong>참고</strong>: Chapter 9 로더를 확장하면 <code>*.json</code>으로도 같은 DSL(노드·의존성·핸들러)을 정의해 실행할 수 있습니다.
+        다만 DAG 워크플로 정의는 팀 협업·가독성·주석 작성이 쉬워서 현업에서도 보통 <strong>YAML</strong>을 더 많이 사용합니다.
+    </p>
+    </div>
+
+    <nav class="course-toc" aria-label="목차">
+    <p class="course-toc-title">목차</p>
+    <ol>
+        <li><a href="#c9-s1">개념 정리(검증 추가)</a></li>
+        <li><a href="#c9-s2">코드 기반 DAG vs YAML 기반 DAG</a></li>
+        <li><a href="#c9-s4">Chapter 8 vs 9 핵심 차이</a></li>
+        <li><a href="#c9-s5">최종 핵심 요약</a></li>
+    </ol>
+    </nav>
+
+    <div class="course-content">
+    <hr class="course-divider">
+
+    <h3 id="c9-s1">1. 개념 정리(검증 추가)</h3>
+    <p>
+        Chapter 7은 DAG를 <strong>코드로 직접 구성</strong>한 것이고,
+        Chapter 8은 <strong>동일한 DAG를 YAML DSL로 정의</strong>한 것입니다.
+    </p>
+    <p>
+        Chapter 9에서는 이 YAML을 <code>classpath:chapter9/dagworkflow/</code>에서 읽은 뒤,
+        <code>WorkflowDefinitionValidator</code>로 구조를 검증하고 <strong>통과한 경우에만</strong> 실행에 사용합니다.
+    </p>
+    <p>
+        실행 자체는 Chapter 8과 동일하게 <code>YamlDagWorkflowEngine</code>을 그대로 재사용합니다.
+    </p>
+    <p>
+        즉, <strong>엔진·DSL 어휘·YAML로만 확장한다는 전제는 Chapter 8과 같고</strong>, Chapter 9는 그 위에 <strong>로딩 파이프라인의 검증층</strong>만 더한 구조입니다.
+    </p>
+    <p>Chapter 8·9의 흐름은 <strong>YAML(DSL) → (Ch9에서 검증) → DAG 해석 → 실행 엔진 → 노드 실행 → 결과</strong>로 정리할 수 있습니다.</p>
+    <p>계층적으로는 다음 세 층으로 나눌 수 있습니다.</p>
+    <ul>
+        <li><strong>Definition Loader</strong> — YAML을 읽어 <code>WorkflowDefinition</code>으로 변환합니다. Ch9에서는 <code>ValidatedYamlWorkflowDefinitionLoader</code>가 검증 후 캐시합니다.</li>
+        <li><strong>Execution Engine</strong> — DAG 의존성을 해석하고 실행 순서를 정합니다(위상 정렬·Kahn 등). <code>YamlDagWorkflowEngine</code>이 담당합니다.</li>
+        <li><strong>Node Handler</strong> — SubAgent, Tool, LLM 등 실제 로직을 수행합니다.</li>
+    </ul>
+    <p><strong>Chapter 8 vs 9 — 실행 경로 비교</strong> 아래 그림에서 차이는 <strong>로딩 단계</strong>뿐이고, <code>YamlDagWorkflowEngine</code> 이하(엔진·노드·결과)는 동일합니다.</p>
+    <div class="course-ch8-ch9-compare" role="img" aria-label="Chapter 8과 9 실행 구조 비교">
+        <div class="compare-lane">
+            <p class="compare-lane-title">Chapter 8</p>
+            <div class="course-flow-pipeline">
+                <div class="course-flow-col course-flow-col-wide">
+                    <div class="course-flow-step course-flow-dag">
+                        <div class="course-flow-kicker">정의</div>
+                        <p class="course-flow-title">YAML (DSL)</p>
+                        <p class="course-flow-sub">classpath:chapter8/dagworkflow/*.yml</p>
+                    </div>
+                    <div class="course-flow-arrow" aria-hidden="true">↓</div>
+                    <div class="course-flow-step course-flow-dag">
+                        <div class="course-flow-kicker">로딩</div>
+                        <p class="course-flow-title">YamlWorkflowDefinitionLoader</p>
+                        <p class="course-flow-sub">파싱 → WorkflowDefinition (별도 검증 없음)</p>
+                    </div>
+                    <div class="course-flow-arrow" aria-hidden="true">↓</div>
+                    <div class="course-flow-step course-flow-engine">
+                        <div class="course-flow-kicker">엔진</div>
+                        <p class="course-flow-title">YamlDagWorkflowEngine</p>
+                        <p class="course-flow-sub"><code>@Qualifier("ch8Engine")</code></p>
+                    </div>
+                    <div class="course-flow-arrow" aria-hidden="true">↓</div>
+                    <div class="course-flow-step course-flow-runtime">
+                        <div class="course-flow-kicker">노드</div>
+                        <p class="course-flow-title">WorkflowNode / NodeHandler</p>
+                        <p class="course-flow-sub">SubAgent · Tool · LLM</p>
+                    </div>
+                    <div class="course-flow-arrow" aria-hidden="true">↓</div>
+                    <div class="course-flow-step course-flow-out">
+                        <div class="course-flow-kicker">출력</div>
+                        <p class="course-flow-title">최종 결과</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="compare-lane">
+            <p class="compare-lane-title">Chapter 9</p>
+            <div class="course-flow-pipeline">
+                <div class="course-flow-col course-flow-col-wide">
+                    <div class="course-flow-step course-flow-dag">
+                        <div class="course-flow-kicker">정의</div>
+                        <p class="course-flow-title">YAML (DSL)</p>
+                        <p class="course-flow-sub">classpath:chapter9/dagworkflow/*.yml</p>
+                    </div>
+                    <div class="course-flow-arrow" aria-hidden="true">↓</div>
+                    <div class="course-flow-step course-flow-merge">
+                        <div class="course-flow-kicker">로딩 + 검증</div>
+                        <p class="course-flow-title">ValidatedYamlWorkflowDefinitionLoader</p>
+                        <p class="course-flow-sub"><code>WorkflowDefinitionValidator</code> 통과 시만 캐시</p>
+                    </div>
+                    <div class="course-flow-arrow" aria-hidden="true">↓</div>
+                    <div class="course-flow-step course-flow-engine">
+                        <div class="course-flow-kicker">엔진</div>
+                        <p class="course-flow-title">YamlDagWorkflowEngine</p>
+                        <p class="course-flow-sub"><code>@Qualifier("ch9Engine")</code> · Ch8과 동일 클래스</p>
+                    </div>
+                    <div class="course-flow-arrow" aria-hidden="true">↓</div>
+                    <div class="course-flow-step course-flow-runtime">
+                        <div class="course-flow-kicker">노드</div>
+                        <p class="course-flow-title">WorkflowNode / NodeHandler</p>
+                        <p class="course-flow-sub">SubAgent · Tool · LLM</p>
+                    </div>
+                    <div class="course-flow-arrow" aria-hidden="true">↓</div>
+                    <div class="course-flow-step course-flow-out">
+                        <div class="course-flow-kicker">출력</div>
+                        <p class="course-flow-title">최종 결과</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <p class="small text-muted">
+        검증 실패 시 Ch9는 엔진까지 내려가지 않고 로딩 단계에서 오류로 처리합니다. 엔진·노드 레지스트리는 양쪽이 공유합니다.
+    </p>
+
+    <hr class="course-divider">
+
+    <h3 id="c9-s2">2. 코드 기반 DAG vs YAML 기반 DAG</h3>
+    <p>코드 기반 DAG(Chapter 7)과 YAML 기반 DAG(Chapter 8·9)를 비교하면 다음과 같습니다.</p>
+    <div class="table-responsive">
+        <table class="table table-bordered table-sm">
+            <thead class="thead-light">
+            <tr>
+                <th>구분</th>
+                <th>코드 기반 DAG (Ch7)</th>
+                <th>YAML 기반 DAG (Ch8/9)</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>정의 방식</td>
+                <td>Java 코드</td>
+                <td>YAML DSL</td>
+            </tr>
+            <tr>
+                <td>변경 방식</td>
+                <td>코드 수정 + 배포</td>
+                <td>YAML 수정</td>
+            </tr>
+            <tr>
+                <td>유연성</td>
+                <td>구조 변경이 무거움</td>
+                <td>구조 변경이 매우 쉬움</td>
+            </tr>
+            <tr>
+                <td>가시성</td>
+                <td>코드 추적 필요</td>
+                <td>YAML로 한눈에 파악</td>
+            </tr>
+            <tr>
+                <td>검증</td>
+                <td>컴파일 기반</td>
+                <td>Ch9에서 Validator로 구조 검증</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <p>
+        <strong>핵심 차이</strong>를 한 줄로 정리하면, <strong>DAG</strong>는 엔진 내부의 실행 구조이고,
+        <strong>YAML</strong>은 사람이 워크플로를 적는 DSL(정의 표면)입니다.
+    </p>
+    <p class="small text-muted">
+        Ch7에서는 같은 의존성 그래프를 코드로, Ch8·9에서는 YAML(DSL)로 표현합니다. Ch9는 DSL이 그래프로 옮겨지기 전·직후 <strong>무결성을 검증</strong>합니다.
+    </p>
+
+    <hr class="course-divider">
+
+    <h3 id="c9-s3">3. 실무 적용 시나리오</h3>
+    <p class="small text-muted mb-1">
+        YAML DSL을 쓰기 좋은 <strong>상황·동기</strong>는 <strong>Chapter 8</strong> §6에서 다룹니다. 이 절은 그다음 단계로, 검증·운영 관점의 <strong>적용 예</strong>에 가깝습니다.
+    </p>
+    <p>
+        아래는 “우리 서비스에서도 이렇게 쓸 수 있겠다”고 상상하기 쉬운 예입니다.
+    </p>
+    <ul>
+        <li><strong>리포트·분석 파이프라인을 YAML로 나누기</strong> — 예: <code>weekly-report.yml</code>, <code>deep-dive.yml</code>처럼 파일만 나누어 두고, 같은 엔진이 정의 ID만 바꿔 실행합니다. 팀별·제품별로 정의를 분리하기 좋습니다.</li>
+        <li><strong>고객사·테넌트마다 흐름이 조금씩 다를 때</strong> — 공통 노드·핸들러는 코드로 두고, <strong>고객사별 YAML</strong>만 다르게 두면 커스터마이징 범위가 명확해집니다.</li>
+        <li><strong>A/B 테스트·점진적 롤아웃</strong> — “A안 YAML / B안 YAML”을 두고 요청이나 설정에 따라 어떤 정의를 불러올지 바꿉니다. 코드 배포 없이 실험 구성을 바꾸기 쉽습니다.</li>
+    </ul>
+    <p class="small text-muted">
+        운영 환경에서는 Git으로 YAML 변경 이력을 남기고, PR·CI에서 검증(Chapter 9의 Validator와 같은 규칙을 CLI로)까지 묶는 경우가 많습니다.
+    </p>
+
+    <hr class="course-divider">
+
+    <h3 id="c9-s4">4. Chapter 8 vs 9 핵심 차이</h3>
+    <p>
+        <strong>전제이자 가장 큰 특징</strong>은 <strong>실행 엔진은 바꾸지 않고</strong> <code>YamlDagWorkflowEngine</code>·Chapter 8과 <strong>같은 DSL 어휘</strong>를 쓰며, 워크플로 확장은 <strong>DSL(YAML) 문서만</strong>으로 한다는 점입니다.
+        그 위에서 Chapter 8은 “설계도(YAML)를 그리는 단계”, Chapter 9는 그 설계도가 <strong>실제로 지을 수 있는 형태인지</strong>—오타·잘못된 <code>dependsOn</code>·사이클·필수 필드 누락 등—를 <strong>스케줄링에 넣기 전</strong>에 점검하는 단계에 가깝습니다.
+    </p>
+    <div class="table-responsive">
+        <table class="table table-bordered table-sm">
+            <thead class="thead-light">
+            <tr>
+                <th>구분</th>
+                <th>Chapter 8</th>
+                <th>Chapter 9</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>역할</td>
+                <td>DSL 정의 — 워크플로를 YAML로 적는다</td>
+                <td>DSL 검증 — 적은 내용이 안전한지 본다</td>
+            </tr>
+            <tr>
+                <td>상태</td>
+                <td>일단 실행은 시도할 수 있다</td>
+                <td>검증을 통과한 것만 안심하고 실행한다</td>
+            </tr>
+            <tr>
+                <td>검증</td>
+                <td>없음 (잘못된 YAML도 로딩·실행 중에야 터질 수 있음)</td>
+                <td>구조 + DAG 검증 (노드 id, <code>dependsOn</code>, 사이클 등)</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <p>
+        정리하면, Chapter 8은 <strong>워크플로를 “만드는” 단계</strong>이고,
+        Chapter 9는 그 정의를 <strong>“믿고 돌려도 되는지 확인하는” 단계</strong>입니다. 둘 다 있으면 선언적 설계와 운영 안정성을 같이 가져가기 쉽습니다.
+    </p>
+
+    <hr class="course-divider">
+
+    <h3 id="c9-s5">5. 최종 핵심 요약</h3>
+    <ul>
+        <li><strong>전제</strong>: <strong>실행 엔진은 바꾸지 않는다</strong>. <code>YamlDagWorkflowEngine</code>과 Chapter 8과 <strong>같은 DSL 어휘</strong>로, 워크플로를 늘리는 주된 수단은 <strong>DSL 문서(YAML)만</strong> 추가·수정하는 것이다.</li>
+        <li><strong>무엇을 할지</strong>는 사람이 읽기 쉬운 <strong>YAML(DSL)</strong>에 적는다.</li>
+        <li><strong>언제 어떤 노드를 돌릴지</strong>는 <strong>DAG 엔진</strong>인 <code>YamlDagWorkflowEngine</code>이 의존성을 보고 결정한다.</li>
+        <li><strong>Chapter 9</strong>가 더하는 것은 다른 엔진이 아니라, <code>chapter9/dagworkflow/*.yml</code>을 읽은 뒤 <code>WorkflowDefinitionValidator</code>를 통과한 정의만 캐시해 <strong>스케줄링 전에</strong> 선언 오류를 걸러 내는 <strong>로딩 파이프라인의 검증층</strong>이다.</li>
+    </ul>
+    <p>
+        즉, <strong>정의(DSL) · 실행(DAG 엔진) · 안전장치(로딩 시 검증)</strong> 세 가지를 나누어 생각하면 이 장의 그림이 한 번에 정리됩니다.
+    </p>
+
+    <hr class="course-divider">
+
+    <div class="course-footer-actions">
+    <p>
+        <a th:href="@{/go/ch9/desc}" class="btn btn-warning font-weight-bold">Chapter9. 상세 가이드 (Screen Description)</a>
+    </p>
+    <p>
+        이전 장: <a th:href="@{/go/ch8}">Chapter 8 — Declarative Agent Workflow with YAML</a>
+    </p>
+    </div>
+
+    </div>
+    </div>
+
+</th:block>
+</html>

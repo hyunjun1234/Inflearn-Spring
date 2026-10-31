@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+
+
+<th:block>
+    <script>
+        /*
+         * strategic_analysis 객체
+         * - 전략 분석 요청을 서버로 전송하고
+         * - SSE(Server-Sent Events)로 진행 상태를 실시간 수신하며
+         * - NDJSON 스트리밍 응답을 화면에 출력하는 모듈
+         *
+         * ✔ 학습 포인트
+         * 1. fetch + ReadableStream 기반 스트리밍 처리
+         * 2. SSE(Server-Sent Events)를 통한 실시간 상태 모니터링
+         * 3. 비동기 흐름 제어 (async/await)
+         * 4. workflowId 기반 클라이언트-서버 매칭 구조
+         */
+        ch4_strategic_analysis = {
+
+            // 전략 분석 요청을 처리하는 서버 엔드포인트
+            url:'/ch4/strategic-analysis',
+
+            // 서버가 Workflow 진행 상태를 SSE로 push 해주는 엔드포인트
+            sseUrl: '/api/workflow/stream/',
+
+            /*
+             * 초기화 함수
+             * - 페이지 로드 시 실행
+             * - 버튼 클릭 이벤트 등록
+             * - 로딩 스피너 초기 숨김 처리
+             */
+            init:function(){
+                document.querySelector("#send_btn").addEventListener("click", ()=>{
+                    this.send();
+                })
+                document.querySelector("#spinner").style.cssText = "visibility:hidden;";
+            },
+
+            /*
+             * 사용자 질문을 화면에 출력하는 UI 생성 함수
+             * - 채팅 UI 구조를 동적으로 생성
+             * - 현재 시간 표시
+             */
+            makeQuestionHtml:function(question){
+
+            },
+
+            /*
+             * 챗봇 응답이 출력될 HTML 영역 생성
+             * - 고유 ID 생성
+             * - 이후 스트리밍 데이터가 이 영역에 append 됨
+             */
+            makeResponseHtml: async function(){
+
+            },
+
+            /*
+             * 질문 전송 메인 로직
+             *
+             * 실행 순서:
+             * 1. 로딩 표시
+             * 2. 질문 출력
+             * 3. workflowId 생성 (서버와 연결할 고유 식별자)
+             * 4. SSE 연결 (진행 상태 실시간 수신)
+             * 5. fetch 요청 (실제 분석 시작)
+             * 6. 스트리밍 응답 화면 출력
+             */
+            send:async function(){
+
+            },
+
+            /*
+             * Workflow 진행 상태 UI 생성
+             * - SSE 수신 로그를 출력할 영역
+             */
+            makeStatusArea: function(workflowId) {
+
+            },
+
+            /*
+             * SSE(Server-Sent Events) 연결
+             *
+             * ✔ 특징
+             * - 서버 → 클라이언트 단방향 스트리밍
+             * - 실시간 상태 로그 수신
+             * - Workflow 단계별 진행 표시
+             */
+            connectSSE: async function(workflowId) {
+
+            },
+
+            /*
+             * NDJSON 스트리밍 응답 처리
+             *
+             * ✔ fetch()의 ReadableStream 사용
+             * ✔ reader.read() 반복 호출
+             * ✔ 서버에서 오는 데이터를 chunk 단위로 출력
+             */
+            responseDisplay:async function(targetId, response) {
+
+            }
+        }
+
+        // 페이지 로드 시 초기화
+        window.onload = function(){
+            ch4_strategic_analysis.init();
+        }
+    </script>
+
+
+
+    <div class="col-sm-10">
+        <h2 class="text-center">1. Strategic Analysis</h2>
+        <div class="container py-5">
+
+            <div class="row d-flex justify-content-center">
+                <div class="col-sm-10">
+                    <button class="btn btn-primary" disabled id="spinner">
+                        <span class="spinner-border spinner-border-sm" ></span>
+                        Loading..
+                    </button>
+                    <div class="card">
+                        <div class="card-header text-muted d-flex justify-content-start align-items-center p-3">
+                            <div class="input-group mb-0">
+                                <input  id="question" type="text" class="form-control" placeholder="Type message" value="도심형 항공 모빌리티(UAM) 서비스의 국내 도입을 위한 기술적 과제와 예상 수익 모델을 분석해줘."
+                                        aria-label="Recipient's username" aria-describedby="button-addon2" />
+                                <button type="button" class="btn btn-primary" id="send_btn">Send</button>
+                            </div>
+                        </div>
+                        <div id="result" class="card-body" data-mdb-perfect-scrollbar-init >
+
+
+                        </div> <!-- end result -->
+                    </div> <!-- end card -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+</th:block>
+
+</html>

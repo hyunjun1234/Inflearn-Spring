@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<th:block>
+    <style>
+        .ch2-desc-desc-cell .ch2-desc-h2 {
+            display: block;
+            margin: 0 0 0.35rem;
+            font-size: inherit;
+        }
+        .ch2-desc-desc-cell .ch2-desc-gap {
+            margin-bottom: 0.85rem;
+        }
+        .ch2-flow-wrap {
+            margin: 0.45rem 0 0.75rem;
+            padding: 0.7rem 0.6rem 0.8rem;
+            max-width: 22rem;
+            border-radius: 12px;
+            background: linear-gradient(165deg, #f8fafc 0%, #eef2ff 50%, #f1f5f9 100%);
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 12px rgba(15, 23, 42, 0.05);
+            font-size: 0.82rem;
+        }
+        .ch2-flow-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .ch2-flow-step {
+            width: 100%;
+            text-align: center;
+            border-radius: 9px;
+            padding: 0.42rem 0.55rem;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            line-height: 1.35;
+        }
+        .ch2-flow-step .ch2-ft {
+            font-weight: 700;
+            color: #0f172a;
+            display: block;
+        }
+        .ch2-flow-step .ch2-fs {
+            font-size: 0.72rem;
+            color: #64748b;
+            margin-top: 0.12rem;
+            display: block;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        }
+        .ch2-flow-step.ch2-f-ll {
+            border-color: #cbd5e1;
+            background: linear-gradient(180deg, #f8fafc 0%, #fff 100%);
+        }
+        .ch2-flow-step.ch2-f-gpt {
+            background: linear-gradient(135deg, #1e3a5f 0%, #1e293b 100%);
+            border-color: #334155;
+            color: #f8fafc;
+        }
+        .ch2-flow-step.ch2-f-gpt .ch2-ft { color: #f8fafc; }
+        .ch2-flow-step.ch2-f-gpt .ch2-fs { color: rgba(248, 250, 252, 0.88); }
+        .ch2-flow-step.ch2-f-gem {
+            border: 2px solid #38bdf8;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(14, 165, 233, 0.08);
+        }
+        .ch2-flow-step.ch2-f-out {
+            border: 2px solid #34d399;
+            background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%);
+        }
+        .ch2-flow-step.ch2-f-out .ch2-ft { color: #065f46; }
+        .ch2-flow-step.ch2-f-out .ch2-fs { color: #047857; }
+        .ch2-flow-arrow {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            padding: 0.1rem 0;
+            line-height: 1;
+        }
+        .ch2-flow-row {
+            display: flex;
+            gap: 0.35rem;
+            width: 100%;
+            justify-content: center;
+            flex-wrap: wrap;
+            align-items: stretch;
+        }
+        .ch2-flow-row .ch2-flow-step {
+            flex: 1 1 5.2rem;
+            min-width: 4.8rem;
+            max-width: 7rem;
+            padding: 0.35rem 0.4rem;
+        }
+        .ch2-flow-row .ch2-flow-step .ch2-fs { font-size: 0.65rem; }
+        .ch2-flow-branch {
+            display: flex;
+            gap: 0.35rem;
+            width: 100%;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 0.15rem;
+        }
+        .ch2-flow-branch-col {
+            flex: 1 1 4.5rem;
+            min-width: 4.2rem;
+            max-width: 6.5rem;
+            border: 1px dashed #cbd5e1;
+            border-radius: 8px;
+            padding: 0.3rem 0.25rem 0.35rem;
+            background: rgba(255, 255, 255, 0.85);
+            text-align: center;
+        }
+        .ch2-flow-branch-lbl {
+            font-size: 0.58rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #64748b;
+            margin-bottom: 0.25rem;
+        }
+        .ch2-flow-loop {
+            font-size: 0.7rem;
+            color: #b45309;
+            text-align: center;
+            margin: 0.15rem 0 0.1rem;
+            font-weight: 600;
+        }
+        .ch2-flow-sub {
+            font-size: 0.68rem;
+            color: #64748b;
+            text-align: center;
+            margin: 0 0 0.35rem;
+            line-height: 1.35;
+        }
+    </style>
+    <h4>Chapter 2. Agentic Workflow Patterns (워크플로 패턴)</h4>
+
+    <br>
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>Workflow</th>
+            <th>Description</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        <!-- 1. Chain Workflow -->
+        <tr>
+            <td><strong>1. Chain Workflow</strong></td>
+            <td class="ch2-desc-desc-cell">
+                <strong class="ch2-desc-h2">설명</strong>
+                <div class="ch2-desc-gap">
+                    LLaMA → GPT → Gemini 순으로 한 단계의 출력이 다음 단계 입력이 되는 <b>순차 체인</b>입니다.
+                    아이디어에서 키워드를 뽑고, 홍보 문구를 쓰고, 톤·번역을 다듬는 흐름을 한 API로 묶습니다.
+                </div>
+                <strong class="ch2-desc-h2">동작 흐름</strong>
+                <div class="ch2-flow-wrap" role="img" aria-label="Chain 순차: LLaMA 키워드 → GPT 홍보 문구 → Gemini 검수">
+                    <div class="ch2-flow-col">
+                        <div class="ch2-flow-step ch2-f-ll"><span class="ch2-ft">1 · LLaMA</span><span class="ch2-fs">키워드 추출 · user(rawIdea)</span></div>
+                        <div class="ch2-flow-arrow" aria-hidden="true">↓</div>
+                        <div class="ch2-flow-step ch2-f-gpt"><span class="ch2-ft">2 · GPT</span><span class="ch2-fs">홍보 문구 · user(키워드)</span></div>
+                        <div class="ch2-flow-arrow" aria-hidden="true">↓</div>
+                        <div class="ch2-flow-step ch2-f-gem"><span class="ch2-ft">3 · Gemini</span><span class="ch2-fs">검수·번역 · 이전 단계 출력</span></div>
+                    </div>
+                </div>
+                <div class="ch2-desc-gap">
+                    <b>1)</b> <b>LLaMA</b> — 키워드·핵심어 추출(경량 1차 정제)<br>
+                    <b>2)</b> <b>GPT</b> — 마케팅 카피·홍보 문구 생성<br>
+                    <b>3)</b> <b>Gemini</b> — 문맥 검수·품질 보정·다국어(번역) 처리
+                </div>
+                <strong>REST</strong>: <code>POST /ch2/chain-workflow</code> · <code>prompt</code>
+            </td>
+        </tr>
+
+        <!-- 2. Parallelization Workflow -->
+        <tr>
+            <td><strong>2. Parallelization Workflow</strong></td>
+            <td class="ch2-desc-desc-cell">
+                <strong class="ch2-desc-h2">설명</strong>
+                <div class="ch2-desc-gap">
+                    기술·시장·글로벌 관점을 <b>동시에</b> 뽑은 뒤, GPT가 한 장의 종합 리포트로 합칩니다.
+                    <code>ParallelWorkflowService</code> 기준 병렬 전체 대기 타임아웃은 약 <b>130초</b>이며, 예외·로깅을 포함한 실습용 구현입니다.
+                </div>
+                <strong class="ch2-desc-h2">동작 흐름</strong>
+                <div class="ch2-flow-wrap" role="img" aria-label="병렬 3분석 후 GPT 종합">
+                    <div class="ch2-flow-col">
+                        <p class="ch2-flow-sub">CompletableFuture · FixedThreadPool(3) · timeout ~130s</p>
+                        <div class="ch2-flow-row">
+                            <div class="ch2-flow-step ch2-f-ll"><span class="ch2-ft">LLaMA</span><span class="ch2-fs">기술 분석</span></div>
+                            <div class="ch2-flow-step ch2-f-gpt"><span class="ch2-ft">GPT</span><span class="ch2-fs">시장 분석</span></div>
+                            <div class="ch2-flow-step ch2-f-gem"><span class="ch2-ft">Gemini</span><span class="ch2-fs">글로벌</span></div>
+                        </div>
+                        <div class="ch2-flow-arrow" aria-hidden="true">↓ join</div>
+                        <div class="ch2-flow-step ch2-f-gpt"><span class="ch2-ft">GPT</span><span class="ch2-fs">최종 종합 보고서 → AnalysisResult</span></div>
+                    </div>
+                </div>
+                <div class="ch2-desc-gap">
+                    <b>병렬</b> — <b>LLaMA</b>(기술) · <b>GPT</b>(시장) · <b>Gemini</b>(글로벌) 동시 호출<br>
+                    <b>집계</b> — 세 결과를 모은 뒤 <b>GPT</b>가 최종 종합 보고서 작성<br>
+                    응답은 JSON <code>AnalysisResult</code>(기술/시장/글로벌/최종 필드)
+                </div>
+                <strong>REST</strong>: <code>POST /ch2/parallel-workflow</code> · <code>prompt</code>
+            </td>
+        </tr>
+
+        <!-- 3. Routing Workflow -->
+        <tr>
+            <td><strong>3. Routing Workflow</strong></td>
+            <td class="ch2-desc-desc-cell">
+                <strong class="ch2-desc-h2">설명</strong>
+                <div class="ch2-desc-gap">
+                    입력을 먼저 <b>유형(SIMPLE / COMPLEX / SEARCH)</b>으로 나누고, 그에 맞는 ChatClient만 태우는 패턴입니다.
+                    캐시로 같은 질문의 반복 호출을 줄입니다.
+                </div>
+                <strong class="ch2-desc-h2">동작 흐름</strong>
+                <div class="ch2-flow-wrap" role="img" aria-label="캐시 → LLaMA 라우팅 → 모델 분기 → 캐시 저장">
+                    <div class="ch2-flow-col">
+                        <div class="ch2-flow-step ch2-f-out"><span class="ch2-ft">캐시</span><span class="ch2-fs">ConcurrentHashMap · 히트 시 즉시 반환</span></div>
+                        <div class="ch2-flow-arrow" aria-hidden="true">↓ miss</div>
+                        <div class="ch2-flow-step ch2-f-ll"><span class="ch2-ft">LLaMA Router</span><span class="ch2-fs">SIMPLE | COMPLEX | SEARCH</span></div>
+                        <div class="ch2-flow-arrow" aria-hidden="true">↓ routingMap</div>
+                        <div class="ch2-flow-branch">
+                            <div class="ch2-flow-branch-col">
+                                <div class="ch2-flow-branch-lbl">SIMPLE</div>
+                                <div class="ch2-flow-step ch2-f-ll"><span class="ch2-ft">Llama</span></div>
+                            </div>
+                            <div class="ch2-flow-branch-col">
+                                <div class="ch2-flow-branch-lbl">COMPLEX</div>
+                                <div class="ch2-flow-step ch2-f-gpt"><span class="ch2-ft">GPT</span></div>
+                            </div>
+                            <div class="ch2-flow-branch-col">
+                                <div class="ch2-flow-branch-lbl">SEARCH</div>
+                                <div class="ch2-flow-step ch2-f-gem"><span class="ch2-ft">Gemini</span></div>
+                            </div>
+                        </div>
+                        <div class="ch2-flow-arrow" aria-hidden="true">↓</div>
+                        <div class="ch2-flow-step ch2-f-out"><span class="ch2-ft">응답</span><span class="ch2-fs">캐시 저장 후 반환</span></div>
+                    </div>
+                </div>
+                <div class="ch2-desc-gap">
+                    <b>1)</b> 캐시 히트 시 즉시 반환<br>
+                    <b>2)</b> <b>LLaMA</b> 라우터로 분류(실패 시 <b>COMPLEX</b>로 간주 → GPT)<br>
+                    <b>3)</b> 맵/테이블로 모델 선택(미정 문자열은 <code>getOrDefault</code>로 GPT)<br>
+                    <b>4)</b> SIMPLE→Llama, COMPLEX→GPT, SEARCH→Gemini 호출<br>
+                    <b>5)</b> 응답 캐시 저장
+                </div>
+                <strong>REST</strong>: <code>POST /ch2/routing-workflow</code> · <code>prompt</code>
+            </td>
+        </tr>
+
+        <!-- 4. Orchestrator-Workers -->
+        <tr>
+            <td><strong>4. Orchestrator-Workers</strong></td>
+            <td class="ch2-desc-desc-cell">
+                <strong class="ch2-desc-h2">설명</strong>
+                <div class="ch2-desc-gap">
+                    <b>GPT</b>가 계획을 짜고 최종 보고까지 맡고, <b>LLaMA·Gemini</b>는 Worker로 하위 작업을 <b>병렬</b> 처리합니다.
+                    예외 처리와 단계 로그가 포함된 협업 구조입니다.
+                </div>
+                <strong class="ch2-desc-h2">동작 흐름</strong>
+                <div class="ch2-flow-wrap" role="img" aria-label="GPT 계획 → 워커 병렬 → GPT 통합">
+                    <div class="ch2-flow-col">
+                        <div class="ch2-flow-step ch2-f-gpt"><span class="ch2-ft">1 · Planning (GPT)</span><span class="ch2-fs">워커 지시서 · Worker_Llama / Worker_Gemini</span></div>
+                        <div class="ch2-flow-arrow" aria-hidden="true">↓</div>
+                        <p class="ch2-flow-sub">Execution · FixedThreadPool(2)</p>
+                        <div class="ch2-flow-row">
+                            <div class="ch2-flow-step ch2-f-ll"><span class="ch2-ft">Worker · LLaMA</span><span class="ch2-fs">요약·기술 조사</span></div>
+                            <div class="ch2-flow-step ch2-f-gem"><span class="ch2-ft">Worker · Gemini</span><span class="ch2-fs">트렌드·글로벌</span></div>
+                        </div>
+                        <div class="ch2-flow-arrow" aria-hidden="true">↓ join</div>
+                        <div class="ch2-flow-step ch2-f-gpt"><span class="ch2-ft">3 · Aggregation (GPT)</span><span class="ch2-fs">최종 보고서</span></div>
+                    </div>
+                </div>
+                <div class="ch2-desc-gap">
+                    <b>Planning</b> — GPT가 작업 분해·전략 수립<br>
+                    <b>Execution</b> — LLaMA(구조·데이터 성격) + Gemini(확장·글로벌 성격) 병렬<br>
+                    <b>Aggregation</b> — GPT가 Worker 산출물을 하나의 보고서 톤으로 통합
+                </div>
+                <strong>REST</strong>: <code>POST /ch2/orchestrator-workers</code> · <code>prompt</code>
+            </td>
+        </tr>
+
+        <!-- 5. Evaluator-Optimizer -->
+        <tr>
+            <td><strong>5. Evaluator-Optimizer</strong></td>
+            <td class="ch2-desc-desc-cell">
+                <strong class="ch2-desc-h2">설명</strong>
+                <div class="ch2-desc-gap">
+                    <b>GPT</b>가 초안·수정(Optimizer), <b>Gemini</b>가 채점(Evaluator)을 맡아 글을 돌려 깎는 루프입니다.
+                    <code>EvaluationWorkflowService</code> 기준 최대 <b>3회</b>, 점수 <b>80점 이상</b>이면 종료합니다.
+                </div>
+                <strong class="ch2-desc-h2">동작 흐름</strong>
+                <div class="ch2-flow-wrap" role="img" aria-label="GPT 최적화와 Gemini 평가 루프 최대 3회">
+                    <div class="ch2-flow-col">
+                        <div class="ch2-flow-step ch2-f-gpt"><span class="ch2-ft">GPT · Optimizer</span><span class="ch2-fs">피드백 반영 초안/수정</span></div>
+                        <div class="ch2-flow-arrow" aria-hidden="true">↓</div>
+                        <div class="ch2-flow-step ch2-f-gem"><span class="ch2-ft">Gemini · Evaluator</span><span class="ch2-fs">점수 · 점수: N 파싱</span></div>
+                        <div class="ch2-flow-arrow" aria-hidden="true">↓</div>
+                        <div class="ch2-flow-step ch2-f-out"><span class="ch2-ft">판단</span><span class="ch2-fs">≥80 PASS · else 피드백 루프</span></div>
+                        <p class="ch2-flow-loop">↺ 최대 MAX_ITERATIONS(3) · PASS_SCORE 80</p>
+                    </div>
+                </div>
+                <div class="ch2-desc-gap">
+                    <b>1)</b> GPT Optimizer — 작성 또는 피드백 반영 수정<br>
+                    <b>2)</b> Gemini Evaluator — 완성도·논리 등 평가<br>
+                    <b>3)</b> 응답에서 점수 파싱(예: <code>점수: 85</code>)<br>
+                    <b>4)</b> 80점 미만이면 피드백과 함께 다시 <b>1)</b>으로(최대 3회)<br>
+                    <b>5)</b> 기준 충족 시 최종 텍스트 반환
+                </div>
+                <strong>REST</strong>: <code>POST /ch2/evaluator-optimizer</code> · <code>prompt</code>
+            </td>
+        </tr>
+
+        </tbody>
+    </table>
+
+
+</th:block>
+
+</html>

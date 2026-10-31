@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<th:block>
+
+    <style>
+        .course-main { max-width: 52rem; margin: 0 auto; padding: 0 0.25rem 2.5rem; font-size: 1rem; line-height: 1.65; color: #1e293b; }
+        .course-hero { margin-bottom: 1.25rem; padding-bottom: 1rem; border-bottom: 1px solid #e2e8f0; }
+        .course-hero h1 { font-size: clamp(1.25rem, 2.2vw, 1.65rem); font-weight: 700; letter-spacing: -0.02em; margin: 0; color: #0f172a; line-height: 1.3; }
+        .course-toc { background: linear-gradient(165deg, #f8fafc 0%, #f1f5f9 100%); border: 1px solid #e2e8f0; border-radius: 10px; padding: 1rem 1.25rem 1.1rem; margin-bottom: 1.25rem; }
+        .course-toc-title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b; margin: 0 0 0.6rem; }
+        .course-toc ol { margin: 0; padding-left: 1.2rem; }
+        .course-toc li { margin-bottom: 0.35rem; line-height: 1.45; }
+        .course-toc a { color: #1d4ed8; text-decoration: none; font-size: 0.9rem; }
+        .course-toc a:hover { text-decoration: underline; color: #1e40af; }
+        .course-overview { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 1.25rem 1.4rem 1.35rem; margin-bottom: 1.25rem; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06); }
+        .course-content h3 { font-size: 1.12rem; margin: 1.35rem 0 0.85rem; padding-bottom: 0.55rem; border-bottom: 2px solid #93c5fd; color: #0f172a; font-weight: 700; line-height: 1.4; }
+        .course-content > h3:first-of-type,
+        .course-content hr.course-divider + h3 { margin-top: 0; }
+        .course-content h4 { font-size: 1rem; margin: 1rem 0 0.5rem; color: #334155; font-weight: 600; }
+        .course-divider { border: none; height: 1px; background: linear-gradient(90deg, transparent, #cbd5e1, transparent); margin: 1.5rem 0; }
+        .course-footer-actions { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #e2e8f0; }
+        ul, ol { margin-left: 1.25rem; margin-bottom: 0.75rem; }
+        code { background: #f1f5f9; padding: 0.12em 0.38em; border-radius: 4px; font-size: 0.9em; color: #0f172a; }
+        p { margin-bottom: 0.85rem; }
+        .course-overview .meta { color: #475569; font-size: 0.95rem; margin-bottom: 0.75rem; }
+        .desc-overview-lead { margin-bottom: 0.9rem; }
+        .desc-overview-outro { margin-bottom: 0.5rem; }
+
+        .c4-flow-wrap {
+            margin: 1rem 0 1.25rem;
+            padding: 1.35rem 1.25rem 1.5rem;
+            border-radius: 14px;
+            background: linear-gradient(160deg, #f0f9ff 0%, #f8fafc 45%, #f1f5f9 100%);
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 24px rgba(15, 23, 42, 0.06);
+        }
+        .c4-flow-wrap .c4-flow-caption {
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #64748b;
+            margin: 0 0 1rem;
+            text-align: center;
+        }
+        .c4-flow-col { display: flex; flex-direction: column; align-items: center; gap: 0; }
+        .c4-flow-arrow {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0.35rem 0 0.45rem;
+            color: #94a3b8;
+            font-size: 1.1rem;
+            line-height: 1;
+        }
+        .c4-flow-arrow span { font-size: 0.65rem; font-weight: 600; letter-spacing: 0.06em; color: #94a3b8; margin-top: 0.2rem; }
+        .c4-card {
+            width: 100%;
+            max-width: 22rem;
+            border-radius: 12px;
+            padding: 0.85rem 1rem;
+            text-align: center;
+            border: 1px solid transparent;
+        }
+        .c4-card-main {
+            background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%);
+            color: #f8fafc;
+            border-color: #1e293b;
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.25);
+        }
+        .c4-card-main .c4-card-kicker { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.85; margin-bottom: 0.35rem; }
+        .c4-card-main .c4-card-title { font-size: 1.02rem; font-weight: 700; margin: 0; line-height: 1.35; }
+        .c4-card-main .c4-card-sub { font-size: 0.78rem; opacity: 0.88; margin: 0.4rem 0 0; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+        .c4-card-registry {
+            background: #fff;
+            border: 2px solid #38bdf8;
+            box-shadow: 0 4px 14px rgba(14, 165, 233, 0.12);
+        }
+        .c4-card-registry .c4-card-kicker { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #0369a1; margin-bottom: 0.3rem; }
+        .c4-card-registry .c4-card-title { font-size: 0.98rem; font-weight: 700; color: #0c4a6e; margin: 0; }
+        .c4-card-registry .c4-card-sub { font-size: 0.78rem; color: #64748b; margin: 0.35rem 0 0; }
+        .c4-agents-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.5rem 0.45rem;
+            margin-top: 0.75rem;
+            padding-top: 0.35rem;
+        }
+        .c4-agent-pill {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 0.45rem 0.65rem 0.5rem;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            line-height: 1.35;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            min-width: 7.5rem;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+        }
+        .c4-agent-pill code { font-size: 0.78rem; font-weight: 600; background: transparent; padding: 0; color: #0f172a; }
+        .c4-agent-pill .c4-model { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.04em; margin-top: 0.25rem; padding: 0.12rem 0.38rem; border-radius: 4px; background: #f1f5f9; color: #475569; }
+        .c4-agent-pill .c4-node-subagent {
+            display: block;
+            font-size: 0.72rem;
+            color: #475569;
+            margin-top: 0.35rem;
+            line-height: 1.4;
+        }
+        .c4-agent-pill .c4-node-subagent code { font-size: 0.85em; }
+        .c4-agent-pill .c4-node-muted { color: #94a3b8; font-weight: 400; }
+        .c4-flow-footnote {
+            text-align: center;
+            font-size: 0.82rem;
+            color: #64748b;
+            margin: 1rem 0 0;
+            padding-top: 0.75rem;
+            border-top: 1px dashed #cbd5e1;
+        }
+        @media (min-width: 640px) {
+            .c4-agents-grid { max-width: 36rem; margin-left: auto; margin-right: auto; }
+        }
+
+        .c4-pipeline-wrap {
+            margin: 1rem 0 1.25rem;
+            padding: 1.25rem 1.15rem 1.4rem;
+            border-radius: 14px;
+            background: linear-gradient(165deg, #f8fafc 0%, #eef2ff 40%, #f1f5f9 100%);
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
+        }
+        .c4-pipeline-wrap .c4-flow-caption {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #64748b;
+            margin: 0 0 0.9rem;
+            text-align: center;
+        }
+        .c4-pipeline-col { display: flex; flex-direction: column; align-items: center; max-width: 24rem; margin: 0 auto; }
+        .c4-pipeline-step {
+            width: 100%;
+            border-radius: 11px;
+            padding: 0.65rem 0.9rem;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+        }
+        .c4-pipeline-step .c4-ps-kicker { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #64748b; margin-bottom: 0.2rem; }
+        .c4-pipeline-step .c4-ps-title { font-size: 0.92rem; font-weight: 700; color: #0f172a; margin: 0; line-height: 1.35; }
+        .c4-pipeline-step .c4-ps-sub { font-size: 0.74rem; color: #64748b; margin: 0.28rem 0 0; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+        .c4-pipeline-step.c4-ps-user { background: linear-gradient(180deg, #f8fafc 0%, #fff 100%); border-color: #cbd5e1; }
+        .c4-pipeline-step.c4-ps-main {
+            background: linear-gradient(135deg, #1e3a5f 0%, #1e293b 100%);
+            border-color: #334155;
+            color: #f8fafc;
+        }
+        .c4-pipeline-step.c4-ps-main .c4-ps-kicker { color: rgba(248, 250, 252, 0.75); }
+        .c4-pipeline-step.c4-ps-main .c4-ps-title { color: #f8fafc; }
+        .c4-pipeline-step.c4-ps-main .c4-ps-sub { color: rgba(248, 250, 252, 0.88); }
+        .c4-pipeline-step.c4-ps-registry { border: 2px solid #38bdf8; background: #fff; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.1); }
+        .c4-pipeline-step.c4-ps-registry .c4-ps-kicker { color: #0369a1; }
+        .c4-pipeline-step.c4-ps-registry .c4-ps-title { color: #0c4a6e; }
+        .c4-pipeline-step.c4-ps-subs { border-style: dashed; border-color: #94a3b8; background: #fffefb; }
+        .c4-pipeline-step.c4-ps-subs .c4-ps-kicker { color: #a16207; }
+        .c4-pipeline-step.c4-ps-merge { background: linear-gradient(180deg, #fffbeb 0%, #fff 100%); border-color: #fcd34d; }
+        .c4-pipeline-step.c4-ps-merge .c4-ps-kicker { color: #b45309; }
+        .c4-pipeline-step.c4-ps-out {
+            background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%);
+            border: 2px solid #34d399;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.12);
+        }
+        .c4-pipeline-step.c4-ps-out .c4-ps-kicker { color: #047857; }
+        .c4-pipeline-step.c4-ps-out .c4-ps-title { color: #065f46; }
+        .c4-pipeline-arrow-sm { padding: 0.28rem 0 0.32rem; color: #94a3b8; font-size: 1rem; line-height: 1; }
+
+        .c4-lab-step {
+            margin: 0.85rem 0 1rem;
+            padding: 0.9rem 1rem;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+        }
+        .c4-lab-step .lab-n {
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 0.06em;
+            color: #0369a1;
+            margin-bottom: 0.35rem;
+        }
+        .c4-lab-step .lab-title { font-weight: 700; color: #0f172a; margin-bottom: 0.35rem; }
+        .c4-lab-step p:last-child { margin-bottom: 0; }
+        .c4-pipeline-wrap.c4-pipeline-stack-ch4 .c4-pipeline-col { max-width: 26rem; }
+    </style>
+
+    <div class="course-main">
+    <header class="course-hero">
+    <h1>Chapter 7 실습 가이드 — DAG-Orchestrated Multi-Agent (DAG 엔진 · 노드 실행)</h1>
+    </header>
+
+    <div class="course-overview">
+    <p class="desc-overview-lead">
+        Chapter 4~6에서는 <strong>오케스트레이터</strong>가 라우팅·병렬·평가 루프를 <strong>자바 코드로 직접 펼쳤습니다</strong>.<br>
+        Chapter 7 실습에서는 같은 흐름을 <strong>방향 그래프(DAG)</strong>와 <strong><code>DagWorkflowEngine</code></strong>으로 옮겨, 엔진이 노드 의존성에 따라 순차·병렬 실행을 구성합니다.
+    </p>
+    <p>
+        이제는 <code>DagWorkflowEngine</code>이 “어느 노드를 언제, 동시에/순차로 돌릴지”를 결정하고, 각 <code>WorkflowNode</code>는
+        <strong>실행 컨텍스트</strong>에 사용자 입력·라우팅 결과·병렬 분석 결과·평가/최적화 결과를 누적합니다.
+        노드 안에서는 필요할 때 <strong>SubAgent(역할별 LLM)</strong>이나 보고서 최적화 단계를 호출합니다.
+    </p>
+    <p>
+        이 실습의 초점은 <strong>DAG 조립과 노드 실행</strong>입니다.
+        각 노드는 <strong>SubAgent를 직접</strong> 호출하는 형태로 두었고, Ch5의 <code>ToolRegistry</code>·<code>StrategicTool</code> 계층은 이 경로에 포함하지 않습니다.
+        Ch4~6과의 관계·실무 확장은 본문 <a href="#d7-s5">§5</a>에서 다룹니다.
+    </p>
+
+    <p>
+        <a th:href="@{/go/ch7/1_strategic_analysis}" class="btn btn-primary font-weight-bold">실습 화면 열기</a>
+        &nbsp;
+        <a th:href="@{/go/ch7}" class="btn btn-outline-secondary">Chapter 7 본문 보기</a>
+    </p>
+    </div>
+
+    <nav class="course-toc" aria-label="목차">
+    <p class="course-toc-title">목차</p>
+    <ol>
+        <li><a href="#d7-s1">진행 흐름</a></li>
+        <li><a href="#d7-s2">노드 구조와 DAG 의존성</a></li>
+        <li><a href="#d7-s3">엔드투엔드 흐름과 패키지</a></li>
+        <li><a href="#d7-s4"><code>DagWorkflowEngine</code> 설계 방법</a></li>
+        <li><a href="#d7-s5">Chapter 4·5·6·8·9와의 관계</a></li>
+    </ol>
+    </nav>
+
+    <div class="course-content">
+    <hr class="course-divider">
+
+    <h3 id="d7-s1">1. 진행 흐름</h3>
+
+    <div class="c4-pipeline-wrap c4-pipeline-stack-ch4" role="img" aria-label="Ch7Controller부터 DagWorkflowEngine과 노드까지">
+        <p class="c4-flow-caption">서버 호출 스택 (실습 코드 기준)</p>
+        <div class="c4-pipeline-col">
+            <div class="c4-pipeline-step c4-ps-user">
+                <div class="c4-ps-kicker">실습 UI</div>
+                <p class="c4-ps-title">pages/ch7/1_strategic_analysis.html</p>
+                <p class="c4-ps-sub">폼 → POST /ch7/strategic-analysis</p>
+            </div>
+            <div class="c4-pipeline-arrow-sm" aria-hidden="true">↓</div>
+            <div class="c4-pipeline-step c4-ps-user">
+                <div class="c4-ps-kicker">REST</div>
+                <p class="c4-ps-title">Ch7Controller#strategicAnalysis</p>
+                <p class="c4-ps-sub">StrategicAnalysisDagWorkflowService 로 위임</p>
+            </div>
+            <div class="c4-pipeline-arrow-sm" aria-hidden="true">↓</div>
+            <div class="c4-pipeline-step c4-ps-main">
+                <div class="c4-ps-kicker">서비스</div>
+                <p class="c4-ps-title">StrategicAnalysisDagWorkflowService</p>
+                <p class="c4-ps-sub">executeWithMonitoring — WorkflowContext + statusPublisher → engine.run(ctx).join()</p>
+            </div>
+            <div class="c4-pipeline-arrow-sm" aria-hidden="true">↓</div>
+            <div class="c4-pipeline-step c4-ps-main">
+                <div class="c4-ps-kicker">엔진</div>
+                <p class="c4-ps-title">DagWorkflowEngine#run</p>
+                <p class="c4-ps-sub">CompletableFuture — 의존성 조립 · 병렬 스케줄</p>
+            </div>
+            <div class="c4-pipeline-arrow-sm" aria-hidden="true">↓</div>
+            <div class="c4-pipeline-step c4-ps-subs">
+                <div class="c4-ps-kicker">노드</div>
+                <p class="c4-ps-title">WorkflowNode 구현체</p>
+                <p class="c4-ps-sub">RouterNode, SimpleQueryNode, … → SubAgentRegistry 키</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="c4-lab-step">
+        <div class="lab-n">실습 STEP A</div>
+        <div class="lab-title">요청 · 응답 · 진행</div>
+        <p>
+            <code>POST /ch7/strategic-analysis</code>(<code>application/x-www-form-urlencoded</code>)에 <code>prompt</code>, <code>workflowId</code>(UUID).
+            응답 본문은 최종 문자열, 중간 단계는 <code>GET /api/workflow/stream/{workflowId}</code> SSE로 확인합니다.
+        </p>
+    </div>
+    <div class="c4-lab-step">
+        <div class="lab-n">실습 STEP B</div>
+        <div class="lab-title">SSE → POST 순서</div>
+        <p>
+            스크립트는 SSE를 <strong>먼저</strong> 연 뒤 POST를 보냅니다. 그래야 <code>STARTED</code>·<code>ROUTING</code> 같은 초반 이벤트가 로그에 남습니다.
+        </p>
+    </div>
+    <div class="c4-lab-step">
+        <div class="lab-n">실습 STEP C</div>
+        <div class="lab-title">이벤트 필드</div>
+        <p>
+            SSE JSON에 <code>step</code>·<code>message</code> 등이 붙습니다. 바깥 래핑은 <code>STARTED</code>·<code>AGENT</code>·<code>COMPLETED</code>·<code>ERROR</code>, 안쪽 본문은 대략 <code>ROUTING</code> → <code>SIMPLE</code> 또는 <code>STRATEGIC</code> 분기로 이어집니다(<a href="#d7-s2">§2</a> 노드·<a th:href="|@{/go/ch4/desc}#d4-s3|">Ch4 실습 가이드 §3</a> 단계 이름과 대조).
+        </p>
+    </div>
+
+    <hr class="course-divider">
+
+    <h3 id="d7-s2">2. 노드 구조와 DAG 의존성</h3>
+
+    <div class="c4-flow-wrap" role="img" aria-label="DAG 엔진과 WorkflowNode 구조">
+        <p class="c4-flow-caption">실행 흐름 (개념)</p>
+        <div class="c4-flow-col">
+            <div class="c4-card c4-card-main">
+                <div class="c4-card-kicker">Engine</div>
+                <p class="c4-card-title">DagWorkflowEngine</p>
+                <p class="c4-card-sub">의존성 조립 · 병렬 스케줄</p>
+            </div>
+            <div class="c4-flow-arrow" aria-hidden="true">↓<span>노드 실행</span></div>
+            <div class="c4-card c4-card-registry">
+                <div class="c4-card-kicker">Context</div>
+                <p class="c4-card-title">WorkflowContext</p>
+                <p class="c4-card-sub">입력 · 출력 · NodeResult</p>
+            </div>
+            <div class="c4-flow-arrow" aria-hidden="true">↓<span>노드 내부</span></div>
+            <div class="c4-agents-grid">
+                <div class="c4-agent-pill">
+                    <code>RouterNode</code>
+                    <span class="c4-node-subagent"><code>routing</code></span>
+                    <span class="c4-model">ROUTING</span>
+                </div>
+                <div class="c4-agent-pill">
+                    <code>SimpleQueryNode</code>
+                    <span class="c4-node-subagent"><code>simple-query</code></span>
+                    <span class="c4-model">SIMPLE</span>
+                </div>
+                <div class="c4-agent-pill">
+                    <code>TechnicalAnalysisNode</code>
+                    <span class="c4-node-subagent"><code>technical-analysis</code></span>
+                    <span class="c4-model">병렬</span>
+                </div>
+                <div class="c4-agent-pill">
+                    <code>MarketAnalysisNode</code>
+                    <span class="c4-node-subagent"><code>market-analysis</code></span>
+                    <span class="c4-model">병렬</span>
+                </div>
+                <div class="c4-agent-pill">
+                    <code>MergeReportNode</code>
+                    <span class="c4-node-subagent">없음 <span class="c4-node-muted">(문자열 병합만)</span></span>
+                    <span class="c4-model">DRAFT</span>
+                </div>
+                <div class="c4-agent-pill">
+                    <code>EvaluationNode</code>
+                    <span class="c4-node-subagent"><code>report-evaluator</code></span>
+                    <span class="c4-model">EVALUATOR</span>
+                </div>
+                <div class="c4-agent-pill">
+                    <code>OptimizationNode</code>
+                    <span class="c4-node-subagent"><code>ReportOptimizerSubagent</code> </span>
+                    <span class="c4-model">OPTIMIZER</span>
+                </div>
+            </div>
+        </div>
+        <p class="c4-flow-footnote">
+            <code>SubAgentRegistry#require</code> 키는 Chapter 4와 동일합니다. <code>MergeReportNode</code>는 LLM·SubAgent 호출 없이 컨텍스트 문자열만 합치고,
+            <code>OptimizationNode</code>는 Chapter 4와 같이 <code>ReportOptimizerSubagent</code>를 직접 주입해 <code>optimize(report, feedback)</code>만 호출합니다.
+        </p>
+    </div>
+
+    <hr class="course-divider">
+
+    <h3 id="d7-s3">3. 엔드투엔드 흐름과 패키지</h3>
+
+    <div class="c4-pipeline-wrap" role="img" aria-label="ch7 요청부터 응답까지의 전체 흐름">
+        <p class="c4-flow-caption">엔드투엔드 흐름</p>
+        <div class="c4-pipeline-col">
+            <div class="c4-pipeline-step c4-ps-user">
+                <div class="c4-ps-kicker">입력</div>
+                <p class="c4-ps-title">브라우저 폼 · prompt + workflowId</p>
+            </div>
+            <div class="c4-pipeline-arrow-sm" aria-hidden="true">↓</div>
+            <div class="c4-pipeline-step c4-ps-user">
+                <div class="c4-ps-kicker">REST</div>
+                <p class="c4-ps-title">Ch7Controller#strategicAnalysis</p>
+                <p class="c4-ps-sub">POST /ch7/strategic-analysis</p>
+            </div>
+            <div class="c4-pipeline-arrow-sm" aria-hidden="true">↓</div>
+            <div class="c4-pipeline-step c4-ps-main">
+                <div class="c4-ps-kicker">서비스</div>
+                <p class="c4-ps-title">StrategicAnalysisDagWorkflowService</p>
+                <p class="c4-ps-sub">WorkflowContext 조립 → DagWorkflowEngine#run</p>
+            </div>
+            <div class="c4-pipeline-arrow-sm" aria-hidden="true">↓</div>
+            <div class="c4-pipeline-step c4-ps-registry">
+                <div class="c4-ps-kicker">엔진</div>
+                <p class="c4-ps-title">DagWorkflowEngine</p>
+                <p class="c4-ps-sub">com.ai.chapter7.dagengine</p>
+            </div>
+            <div class="c4-pipeline-arrow-sm" aria-hidden="true">↓</div>
+            <div class="c4-pipeline-step c4-ps-subs">
+                <div class="c4-ps-kicker">노드</div>
+                <p class="c4-ps-title">WorkflowNode → SubAgentRegistry</p>
+                <p class="c4-ps-sub">nodes 패키지 — 병렬·루프는 그래프로 표현</p>
+            </div>
+            <div class="c4-pipeline-arrow-sm" aria-hidden="true">↓</div>
+            <div class="c4-pipeline-step c4-ps-merge">
+                <div class="c4-ps-kicker">집계</div>
+                <p class="c4-ps-title">STRATEGIC 시 병합 · 평가·최적화 루프</p>
+            </div>
+            <div class="c4-pipeline-arrow-sm" aria-hidden="true">↓</div>
+            <div class="c4-pipeline-step c4-ps-out">
+                <div class="c4-ps-kicker">출력</div>
+                <p class="c4-ps-title">HTTP String + Redis/SSE 이벤트</p>
+            </div>
+        </div>
+    </div>
+    <p>
+        패키지 위치: <code>com.ai.chapter7.dagengine</code> — <code>engine</code>(<code>DagWorkflowEngine</code>, <code>WorkflowContext</code>, <code>NodeResult</code>) · <code>nodes</code>(<code>RouterNode</code>, …).
+    </p>
+
+    <hr class="course-divider">
+
+    <h3 id="d7-s4">4. <code>DagWorkflowEngine</code> 설계 방법</h3>
+    <p>
+        이 장의 <code>DagWorkflowEngine</code>은 <strong>특정 비즈니스만을 위한 거대 엔진</strong>이 아니라,
+        <strong>노드·간선 DAG</strong>를 읽어 <strong>실행 순서·병렬·의존성</strong>만 맡는 <strong>얇은 실행기(runner)</strong>에 가깝게 두었습니다.
+    </p>
+    <p>
+        <strong>한 줄 설계 원칙</strong> — <strong>그래프 정의는 밖에서</strong>(Java 조립·이후 장의 YAML 등) 주고,
+        엔진은 <strong>“지금 의존이 풀려 돌릴 수 있는 노드”</strong>를 골라 <strong>비동기로 스케줄</strong>합니다.
+    </p>
+
+    <h4>엔진과 노드가 나누는 일</h4>
+    <ul>
+        <li><strong>엔진</strong> — 선행 노드 완료 여부에 따른 <strong>의존성 해소</strong>, 실행 상태, <code>ExecutorService</code> 등 <strong>스케줄 인프라</strong>.</li>
+        <li><strong><code>WorkflowNode</code></strong> — 라우팅·SubAgent 호출·병합·평가·최적화 등 <strong>단계별 실제 업무</strong>.</li>
+    </ul>
+
+    <h4>예제에서의 병렬과 합류</h4>
+    <p>
+        라우팅 이후 <code>TechnicalAnalysisNode</code>와 <code>MarketAnalysisNode</code>는 <code>CompletableFuture</code>와 전용 <code>ExecutorService</code>로 <strong>동시에</strong> 돌리고,
+        <strong>두 Future가 모두 끝난 뒤에만</strong> <code>MergeReportNode</code>로 넘어간 뒤 <code>EvaluationNode</code> ↔ <code>OptimizationNode</code> 루프가 이어지도록 맞춰 두었습니다.
+    </p>
+
+    <h4>상태·관측·확장</h4>
+    <ul>
+        <li><code>WorkflowContext</code> — 라우팅 결과, 병렬 분석 산출, 병합 초안, 평가·개선 이력 등 <strong>중간 결과</strong>를 노드가 차곡차곡 쌓습니다.</li>
+        <li><code>WorkflowStatusPublisher</code> — 노드 <strong>시작·완료·오류</strong>를 단계 이벤트로 보내 <strong>SSE 로그</strong>에서 그대로 추적할 수 있습니다.</li>
+        <li>노드를 추가하거나 그래프만 바꿔도 엔진은 여전히 <strong>“의존이 풀린 노드를 찾아 스케줄한다”</strong>는 역할만 유지하므로, <strong>비즈니스 변화와 실행기 책임을 분리</strong>하기 쉽습니다.</li>
+    </ul>
+
+    <h4>실무·생태계와 이어지는 점</h4>
+    <p>
+        도메인마다 노드 쪼개기는 제각각입니다. 예를 들어 <strong>업무 단계</strong>(결제 승인·재고 확인·알림)나
+        <strong>ML 파이프라인</strong>(적재·피처 추출·모델 추론)처럼 단위를 잡기도 합니다.
+    </p>
+    <p class="small text-muted mb-0">
+        <strong>Airflow</strong>·<strong>Prefect</strong>·<strong>Dagster</strong>, <strong>LangGraph</strong> 계열은 공통적으로 <strong>그래프 정의(코드·YAML)</strong>와 <strong>실행 엔진</strong>을 나누고,
+        노드에 <strong>재시도·백오프·타임아웃·알림</strong>을 얹는 패턴이 흔합니다.
+        본 장 엔진도 그 <strong>같은 발상의 교육용 축소본</strong>으로 보면 되고, 향후 같은 종류의 요구는 <strong>DAG·엔진 계층</strong>에서 확장할 여지가 큽니다.
+        그래프 정의만 YAML로 빼고 검증층을 더하는 이야기는 <a href="#d7-s5">§5</a>의 Chapter 8·9로 이어집니다.
+    </p>
+
+    <hr class="course-divider">
+
+    <h3 id="d7-s5">5. Chapter 4·5·6·8·9와의 관계</h3>
+    <p>마지막으로, 지금 배운 내용이 앞뒤 장에서 어떻게 확장되는지만 짚고 마무리합니다.</p>
+    <ul>
+        <li><strong>Chapter 4</strong> — <code>Ch4Controller</code> → <code>StrategicAnalysisAgentService#executeWithMonitoring</code> → <code>StrategicAnalysisAgentOrchestrator</code> → <code>SubAgentRegistry</code> (도구 레이어 없음).</li>
+        <li><strong>Chapter 5</strong> — <code>Ch5Controller</code> → <code>StrategicAnalysisAgentToolTaskService</code>(ch5) → <code>StrategicAnalysisAgentToolOrchestrator</code> → 동일 Tool·SubAgent 스택.</li>
+        <li><strong>Chapter 6</strong> — <code>Ch6Controller</code> → <code>StrategicAnalysisAgentToolTaskService</code>(ch6) → <code>StrategicAnalysisTaskToolOrchestrator</code> → ChatClient·TaskTool.</li>
+        <li><strong>Chapter 7 (지금 실습)</strong> — <code>Ch7Controller</code> → <code>StrategicAnalysisDagWorkflowService</code> → <code>DagWorkflowEngine</code> → <code>WorkflowNode</code> 내부 <code>SubAgentRegistry</code> — <strong>DAG-Orchestrated Multi-Agent</strong>.</li>
+        <li><strong>Chapter 8</strong> — 코드로 조립한 DAG와 같은 흐름을 <strong>YAML</strong>로 옮기고 <code>YamlDagWorkflowEngine</code>이 실행합니다.</li>
+        <li><strong>Chapter 9</strong> — <strong>엔진·DSL 어휘는 Ch8과 동일</strong>, 확장은 YAML만. <code>chapter9/dagworkflow/*.yml</code> 로딩 직후 검증 통과분만 캐시해 <strong>스케줄링 전</strong> 선언 오류를 차단하는 <strong>검증층</strong>. (<a th:href="@{/go/ch9}">본문</a> · <a th:href="@{/go/ch9/desc}">실습 가이드</a>)</li>
+    </ul>
+
+    <div class="course-footer-actions">
+    <p>
+        <a th:href="@{/go/ch7/1_strategic_analysis}" class="btn btn-primary font-weight-bold">실습 다시 하기 — Strategic Analysis (DAG)</a>
+        &nbsp;
+        <a th:href="@{/go/ch7}" class="btn btn-outline-primary">Chapter 7 본문으로 돌아가기</a>
+        &nbsp;
+        <a th:href="@{/go/ch8}" class="btn btn-outline-secondary">다음 — Chapter 8 (YAML 워크플로)</a>
+    </p>
+    </div>
+
+    </div>
+    </div>
+
+</th:block>
+</html>

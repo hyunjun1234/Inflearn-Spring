@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<th:block>
+
+    <style>
+        .course-main { max-width: 52rem; margin: 0 auto; padding: 0 0.25rem 2.5rem; font-size: 1rem; line-height: 1.65; color: #1e293b; }
+        .course-hero { margin-bottom: 1.25rem; padding-bottom: 1rem; border-bottom: 1px solid #e2e8f0; }
+        .course-hero h1 { font-size: clamp(1.25rem, 2.2vw, 1.65rem); font-weight: 700; letter-spacing: -0.02em; margin: 0; color: #0f172a; line-height: 1.3; }
+        .course-toc { background: linear-gradient(165deg, #f8fafc 0%, #f1f5f9 100%); border: 1px solid #e2e8f0; border-radius: 10px; padding: 1rem 1.25rem 1.1rem; margin-bottom: 1.25rem; }
+        .course-toc-title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b; margin: 0 0 0.6rem; }
+        .course-toc ol { margin: 0; padding-left: 1.2rem; }
+        .course-toc li { margin-bottom: 0.35rem; line-height: 1.45; }
+        .course-toc a { color: #1d4ed8; text-decoration: none; font-size: 0.9rem; }
+        .course-toc a:hover { text-decoration: underline; color: #1e40af; }
+        .course-overview { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 1.25rem 1.4rem 1.35rem; margin-bottom: 1.25rem; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06); }
+        .course-content h3 { font-size: 1.12rem; margin: 1.35rem 0 0.85rem; padding-bottom: 0.55rem; border-bottom: 2px solid #93c5fd; color: #0f172a; font-weight: 700; line-height: 1.4; }
+        .course-content > h3:first-of-type,
+        .course-content hr.course-divider + h3 { margin-top: 0; }
+        .course-content h4 { font-size: 1rem; margin: 1rem 0 0.5rem; color: #334155; font-weight: 600; }
+        .course-divider { border: none; height: 1px; background: linear-gradient(90deg, transparent, #cbd5e1, transparent); margin: 1.5rem 0; }
+        .course-footer-actions { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #e2e8f0; }
+        ul, ol { margin-left: 1.25rem; margin-bottom: 0.75rem; }
+        code { background: #f1f5f9; padding: 0.12em 0.38em; border-radius: 4px; font-size: 0.9em; color: #0f172a; }
+        p { margin-bottom: 0.85rem; }
+        .course-overview .meta { color: #475569; font-size: 0.95rem; margin-bottom: 0.75rem; }
+        .desc-overview-lead { margin-bottom: 0.9rem; }
+        .desc-overview-outro { margin-bottom: 0.5rem; }
+
+        /* ch4.html과 동일 계열 — 구조 다이어그램 */
+        .c4-flow-wrap {
+            margin: 1rem 0 1.25rem;
+            padding: 1.35rem 1.25rem 1.5rem;
+            border-radius: 14px;
+            background: linear-gradient(160deg, #f0f9ff 0%, #f8fafc 45%, #f1f5f9 100%);
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 24px rgba(15, 23, 42, 0.06);
+        }
+        .c4-flow-wrap .c4-flow-caption {
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #64748b;
+            margin: 0 0 1rem;
+            text-align: center;
+        }
+        .c4-flow-col { display: flex; flex-direction: column; align-items: center; gap: 0; }
+        .c4-flow-arrow {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0.35rem 0 0.45rem;
+            color: #94a3b8;
+            font-size: 1.1rem;
+            line-height: 1;
+        }
+        .c4-flow-arrow span { font-size: 0.65rem; font-weight: 600; letter-spacing: 0.06em; color: #94a3b8; margin-top: 0.2rem; }
+        .c4-card {
+            width: 100%;
+            max-width: 22rem;
+            border-radius: 12px;
+            padding: 0.85rem 1rem;
+            text-align: center;
+            border: 1px solid transparent;
+        }
+        .c4-card-main {
+            background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%);
+            color: #f8fafc;
+            border-color: #1e293b;
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.25);
+        }
+        .c4-card-main .c4-card-kicker { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.85; margin-bottom: 0.35rem; }
+        .c4-card-main .c4-card-title { font-size: 1.02rem; font-weight: 700; margin: 0; line-height: 1.35; }
+        .c4-card-main .c4-card-sub { font-size: 0.78rem; opacity: 0.88; margin: 0.4rem 0 0; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+        .c4-card-registry {
+            background: #fff;
+            border: 2px solid #38bdf8;
+            box-shadow: 0 4px 14px rgba(14, 165, 233, 0.12);
+        }
+        .c4-card-registry .c4-card-kicker { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #0369a1; margin-bottom: 0.3rem; }
+        .c4-card-registry .c4-card-title { font-size: 0.98rem; font-weight: 700; color: #0c4a6e; margin: 0; }
+        .c4-card-registry .c4-card-sub { font-size: 0.78rem; color: #64748b; margin: 0.35rem 0 0; }
+        .c4-agents-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.5rem 0.45rem;
+            margin-top: 0.75rem;
+            padding-top: 0.35rem;
+        }
+        .c4-agent-pill {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 0.45rem 0.65rem 0.5rem;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            line-height: 1.35;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            min-width: 7.5rem;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+        }
+        .c4-agent-pill code { font-size: 0.78rem; font-weight: 600; background: transparent; padding: 0; color: #0f172a; }
+        .c4-agent-pill .c4-model { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.04em; margin-top: 0.25rem; padding: 0.12rem 0.38rem; border-radius: 4px; }
+        .c4-model-llama { background: #ecfdf5; color: #047857; }
+        .c4-model-gpt { background: #eff6ff; color: #1d4ed8; }
+        .c4-model-gemini { background: #f5f3ff; color: #6d28d9; }
+        .c4-flow-footnote {
+            text-align: center;
+            font-size: 0.82rem;
+            color: #64748b;
+            margin: 1rem 0 0;
+            padding-top: 0.75rem;
+            border-top: 1px dashed #cbd5e1;
+        }
+        @media (min-width: 640px) {
+            .c4-agents-grid { max-width: 36rem; margin-left: auto; margin-right: auto; }
+        }
+
+        /* 엔드투엔드 파이프라인 */
+        .c4-pipeline-wrap {
+            margin: 1rem 0 1.25rem;
+            padding: 1.25rem 1.15rem 1.4rem;
+            border-radius: 14px;
+            background: linear-gradient(165deg, #f8fafc 0%, #eef2ff 40%, #f1f5f9 100%);
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
+        }
+        .c4-pipeline-wrap .c4-flow-caption {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #64748b;
+            margin: 0 0 0.9rem;
+            text-align: center;
+        }
+        .c4-pipeline-col { display: flex; flex-direction: column; align-items: center; max-width: 24rem; margin: 0 auto; }
+        .c4-pipeline-step {
+            width: 100%;
+            border-radius: 11px;
+            padding: 0.65rem 0.9rem;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+        }
+        .c4-pipeline-step .c4-ps-kicker { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #64748b; margin-bottom: 0.2rem; }
+        .c4-pipeline-step .c4-ps-title { font-size: 0.92rem; font-weight: 700; color: #0f172a; margin: 0; line-height: 1.35; }
+        .c4-pipeline-step .c4-ps-sub { font-size: 0.74rem; color: #64748b; margin: 0.28rem 0 0; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+        .c4-pipeline-step.c4-ps-user { background: linear-gradient(180deg, #f8fafc 0%, #fff 100%); border-color: #cbd5e1; }
+        .c4-pipeline-step.c4-ps-main {
+            background: linear-gradient(135deg, #1e3a5f 0%, #1e293b 100%);
+            border-color: #334155;
+            color: #f8fafc;
+        }
+        .c4-pipeline-step.c4-ps-main .c4-ps-kicker { color: rgba(248, 250, 252, 0.75); }
+        .c4-pipeline-step.c4-ps-main .c4-ps-title { color: #f8fafc; }
+        .c4-pipeline-step.c4-ps-main .c4-ps-sub { color: rgba(248, 250, 252, 0.88); }
+        .c4-pipeline-step.c4-ps-registry { border: 2px solid #38bdf8; background: #fff; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.1); }
+        .c4-pipeline-step.c4-ps-registry .c4-ps-kicker { color: #0369a1; }
+        .c4-pipeline-step.c4-ps-registry .c4-ps-title { color: #0c4a6e; }
+        .c4-pipeline-step.c4-ps-subs { border-style: dashed; border-color: #94a3b8; background: #fffefb; }
+        .c4-pipeline-step.c4-ps-subs .c4-ps-kicker { color: #a16207; }
+        .c4-pipeline-step.c4-ps-merge { background: linear-gradient(180deg, #fffbeb 0%, #fff 100%); border-color: #fcd34d; }
+        .c4-pipeline-step.c4-ps-merge .c4-ps-kicker { color: #b45309; }
+        .c4-pipeline-step.c4-ps-out {
+            background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%);
+            border: 2px solid #34d399;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.12);
+        }
+        .c4-pipeline-step.c4-ps-out .c4-ps-kicker { color: #047857; }
+        .c4-pipeline-step.c4-ps-out .c4-ps-title { color: #065f46; }
+        .c4-pipeline-arrow-sm { padding: 0.28rem 0 0.32rem; color: #94a3b8; font-size: 1rem; line-height: 1; }
+
+        .c4-lab-step {
+            margin: 0.85rem 0 1rem;
+            padding: 0.9rem 1rem;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+        }
+        .c4-lab-step .lab-n {
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 0.06em;
+            color: #0369a1;
+            margin-bottom: 0.35rem;
+        }
+        .c4-lab-step .lab-title { font-weight: 700; color: #0f172a; margin-bottom: 0.35rem; }
+        .c4-lab-step p:last-child { margin-bottom: 0; }
+        .c4-pipeline-wrap.c4-pipeline-stack-ch4 .c4-pipeline-col { max-width: 26rem; }
+    </style>
+
+    <div class="course-main">
+    <header class="course-hero">
+    <h1>Chapter 4 실습 가이드 — Multi-Agent (SubAgent·레지스트리)</h1>
+    </header>
+
+    <div class="course-overview">
+    <p class="desc-overview-lead">
+        이전 장까지는 주로 <strong>한 오케스트레이션 코드 안에서 모델을 직접 호출</strong>하는 패턴을 공부 했습니다.<br>
+        Chapter 4에서는 같은 비즈니스 흐름(라우팅 → 단순 응답 또는 전략 분석, 전략이면 기술·시장 병렬 분석 → 초안 평가·개선 루프)을
+        <strong>역할마다 나뉜 서브에이전트</strong>로 실행합니다. 각 단계는 고정된 이름(키)으로 레지스트리에서 꺼내 호출하고, 시스템 프롬프트는 구현체마다 갖습니다.
+        <strong>도구 전용 레이어</strong>(Spring AI <code>@Tool</code>에 대응하는 별도 추상화)는 두지 않고, 서버 안에서 이름 조회와 LLM 호출만으로 단계를 밟습니다.
+        관측은 <strong>HTTP 요청·응답 경계</strong>와, <strong>Redis에 단계 이벤트를 쌓고 SSE로 구독자에게 흘리는 구조</strong>로 묶입니다.
+        이후 장에서는 같은 단계 의미를 <strong>도구 레지스트리·전략 도구 인터페이스</strong>로 감싼 뒤, 더 나아가 Task/Markdown·DAG 등으로 확장합니다.
+    </p>
+
+    <p>
+        <a th:href="@{/go/ch4/1_strategic_analysis}" class="btn btn-primary font-weight-bold">실습 화면 열기</a>
+        &nbsp;
+        <a th:href="@{/go/ch4}" class="btn btn-outline-secondary">Chapter 4 본문 보기</a>
+    </p>
+    </div>
+
+    <nav class="course-toc" aria-label="목차">
+    <p class="course-toc-title">목차</p>
+    <ol>
+        <li><a href="#d4-s1">진행 흐름</a></li>
+        <li><a href="#d4-s2">구조</a></li>
+        <li><a href="#d4-s3">엔드투엔드 흐름과 실습 로그 매핑</a></li>
+        <li><a href="#d4-s4">STRATEGIC 경로 — 병렬·평가·개선 루프</a></li>
+        <li><a href="#d4-s5">레지스트리 키·모델·예외(Optimizer)</a></li>
+        <li><a href="#d4-s6">다른 Chapter와 이어지는 맥락</a></li>
+    </ol>
+    </nav>
+
+    <div class="course-content">
+    <hr class="course-divider">
+
+    <h3 id="d4-s1">1. 진행 흐름</h3>
+
+    <div class="c4-pipeline-wrap c4-pipeline-stack-ch4" role="img" aria-label="Ch4Controller부터 SubAgentRegistry까지">
+        <p class="c4-flow-caption">서버 호출 스택 (실습 코드 기준)</p>
+        <div class="c4-pipeline-col">
+            <div class="c4-pipeline-step c4-ps-user">
+                <div class="c4-ps-kicker">실습 UI</div>
+                <p class="c4-ps-title">pages/ch4/1_strategic_analysis.html</p>
+                <p class="c4-ps-sub">폼 → POST /ch4/strategic-analysis</p>
+            </div>
+            <div class="c4-pipeline-arrow-sm" aria-hidden="true">↓</div>
+            <div class="c4-pipeline-step c4-ps-user">
+                <div class="c4-ps-kicker">REST</div>
+                <p class="c4-ps-title">Ch4Controller#strategicAnalysis</p>
+                <p class="c4-ps-sub">StrategicAnalysisAgentService 로 위임</p>
+            </div>
+            <div class="c4-pipeline-arrow-sm" aria-hidden="true">↓</div>
+            <div class="c4-pipeline-step c4-ps-main">
+                <div class="c4-ps-kicker">래핑</div>
+                <p class="c4-ps-title">StrategicAnalysisAgentService</p>
+                <p class="c4-ps-sub">executeWithMonitoring — STARTED · AGENT · COMPLETED</p>
+            </div>
+            <div class="c4-pipeline-arrow-sm" aria-hidden="true">↓</div>
+            <div class="c4-pipeline-step c4-ps-main">
+                <div class="c4-ps-kicker">오케스트레이터</div>
+                <p class="c4-ps-title">StrategicAnalysisAgentOrchestrator</p>
+                <p class="c4-ps-sub">executeWithMonitoring — 라우팅 · 병렬 분석 · 평가·최적화 루프</p>
+            </div>
+            <div class="c4-pipeline-arrow-sm" aria-hidden="true">↓</div>
+            <div class="c4-pipeline-step c4-ps-subs">
+                <div class="c4-ps-kicker">조회·실행</div>
+                <p class="c4-ps-title">SubAgentRegistry → SubAgent</p>
+                <p class="c4-ps-sub">각 SubAgent 구현체 내장 system · routing · simple-query · …</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="c4-lab-step">
+        <div class="lab-n">실습 STEP A</div>
+        <div class="lab-title">요청 · 응답 · 진행</div>
+        <p>
+            <code>POST /ch4/strategic-analysis</code>(<code>application/x-www-form-urlencoded</code>)에 <code>prompt</code>, <code>workflowId</code>(UUID).
+            응답 본문은 최종 문자열, 중간 단계는 <code>GET /api/workflow/stream/{workflowId}</code> SSE로 확인합니다.
+        </p>
+    </div>
+    <div class="c4-lab-step">
+        <div class="lab-n">실습 STEP B</div>
+        <div class="lab-title">SSE → POST 순서</div>
+        <p>
+            스크립트는 SSE를 <strong>먼저</strong> 연 뒤 POST를 보냅니다. 그래야 <code>STARTED</code>·<code>ROUTING</code> 같은 초반 이벤트가 로그에 남습니다.
+        </p>
+    </div>
+    <div class="c4-lab-step">
+        <div class="lab-n">실습 STEP C</div>
+        <div class="lab-title">이벤트 필드</div>
+        <p>
+            SSE JSON에 <code>step</code>·<code>message</code> 등이 붙습니다. 바깥 래핑은 <code>STARTED</code>·<code>AGENT</code>·<code>COMPLETED</code>·<code>ERROR</code>, 안쪽 본문은 대략 <code>ROUTING</code> → <code>SIMPLE</code> 또는 <code>STRATEGIC</code> 분기로 이어집니다(<a href="#d4-s3">§3</a> 로그 목록과 대조).
+        </p>
+    </div>
+
+    <hr class="course-divider">
+
+    <h3 id="d4-s2">2. 구조</h3>
+
+    <div class="c4-flow-wrap" role="img" aria-label="Orchestrator에서 SubAgentRegistry로 분기하는 구조">
+        <p class="c4-flow-caption">실행 흐름 (오케스트레이터 내부)</p>
+        <div class="c4-flow-col">
+            <div class="c4-card c4-card-main">
+                <div class="c4-card-kicker">Orchestrator</div>
+                <p class="c4-card-title">StrategicAnalysisAgentOrchestrator</p>
+                <p class="c4-card-sub">단계 순서·병렬·루프 제어</p>
+            </div>
+            <div class="c4-flow-arrow" aria-hidden="true">↓<span>키로 조회</span></div>
+            <div class="c4-card c4-card-registry">
+                <div class="c4-card-kicker">Registry</div>
+                <p class="c4-card-title">SubAgentRegistry</p>
+                <p class="c4-card-sub">StrategicAgentKeys → SubAgent (프롬프트는 구현체 내부)</p>
+            </div>
+            <div class="c4-flow-arrow" aria-hidden="true">↓<span>역할별 실행</span></div>
+            <div class="c4-agents-grid">
+                <div class="c4-agent-pill">
+                    <code>routing</code>
+                    <span class="c4-model c4-model-llama">Llama</span>
+                </div>
+                <div class="c4-agent-pill">
+                    <code>simple-query</code>
+                    <span class="c4-model c4-model-llama">Llama</span>
+                </div>
+                <div class="c4-agent-pill">
+                    <code>technical-analysis</code>
+                    <span class="c4-model c4-model-gpt">GPT</span>
+                </div>
+                <div class="c4-agent-pill">
+                    <code>market-analysis</code>
+                    <span class="c4-model c4-model-gemini">Gemini</span>
+                </div>
+                <div class="c4-agent-pill">
+                    <code>report-evaluator</code>
+                    <span class="c4-model c4-model-gemini">Gemini</span>
+                </div>
+                <div class="c4-agent-pill">
+                    <code>report-optimizer</code>
+                    <span class="c4-model c4-model-gpt">GPT</span>
+                </div>
+            </div>
+        </div>
+        <p class="c4-flow-footnote">
+            <strong>Orchestrator → SubAgentRegistry → SubAgent</strong> — 오케스트레이터는 순서·분기·병렬만 담당하고, LLM 호출·system 프롬프트는 각 <code>SubAgent</code> 구현이 담당합니다.
+            보고서 <strong>수정(Optimizer)</strong>은 초안과 피드백을 합쳐 <code>report-optimizer</code> SubAgent를 호출합니다.
+        </p>
+    </div>
+
+    <hr class="course-divider">
+
+    <h3 id="d4-s3">3. 엔드투엔드 흐름과 실습 로그 매핑</h3>
+
+    <div class="c4-pipeline-wrap" role="img" aria-label="User 요청부터 최종 응답까지의 전체 흐름">
+        <p class="c4-flow-caption">엔드투엔드 흐름</p>
+        <div class="c4-pipeline-col">
+            <div class="c4-pipeline-step c4-ps-user">
+                <div class="c4-ps-kicker">입력</div>
+                <p class="c4-ps-title">브라우저 폼 · prompt + workflowId</p>
+            </div>
+            <div class="c4-pipeline-arrow-sm" aria-hidden="true">↓</div>
+            <div class="c4-pipeline-step c4-ps-main">
+                <div class="c4-ps-kicker">서비스·오케스트레이터</div>
+                <p class="c4-ps-title">StrategicAnalysisAgentService → Orchestrator</p>
+                <p class="c4-ps-sub">executeWithMonitoring 체인 · Ch4Controller</p>
+            </div>
+            <div class="c4-pipeline-arrow-sm" aria-hidden="true">↓</div>
+            <div class="c4-pipeline-step c4-ps-registry">
+                <div class="c4-ps-kicker">조회</div>
+                <p class="c4-ps-title">SubAgentRegistry</p>
+                <p class="c4-ps-sub">require(StrategicAgentKeys.…) — 오케스트레이터에서 호출</p>
+            </div>
+            <div class="c4-pipeline-arrow-sm" aria-hidden="true">↓</div>
+            <div class="c4-pipeline-step c4-ps-subs">
+                <div class="c4-ps-kicker">실행</div>
+                <p class="c4-ps-title">단계별 SubAgent</p>
+                <p class="c4-ps-sub">경로에 따라 1개 또는 여러 번 호출</p>
+            </div>
+            <div class="c4-pipeline-arrow-sm" aria-hidden="true">↓</div>
+            <div class="c4-pipeline-step c4-ps-merge">
+                <div class="c4-ps-kicker">집계</div>
+                <p class="c4-ps-title">STRATEGIC 시 초안 병합</p>
+                <p class="c4-ps-sub">기술·시장 병렬 결과 → 하나의 문자열</p>
+            </div>
+            <div class="c4-pipeline-arrow-sm" aria-hidden="true">↓</div>
+            <div class="c4-pipeline-step c4-ps-out">
+                <div class="c4-ps-kicker">출력</div>
+                <p class="c4-ps-title">HTTP 응답 + Redis/SSE 이벤트</p>
+            </div>
+        </div>
+    </div>
+
+    <h4>실습 로그에 자주 보이는 단계 이름</h4>
+    <ul>
+        <li><strong>ROUTING</strong> — <code>routing</code> SubAgent가 여기서 <code>SIMPLE</code>인지 <code>STRATEGIC</code>인지 갈라 줍니다.</li>
+        <li><strong>SIMPLE</strong> — <code>simple-query</code>만 타고, 긴 파이프라인 없이 마무리되는 경로입니다.</li>
+        <li><strong>ANALYZING</strong> — <code>STRATEGIC</code>이면 <code>technical-analysis</code>와 <code>market-analysis</code>를 병렬로 돌린 다음, 결과를 한 덩어리로 합칩니다.</li>
+        <li><strong>EVALUATING / OPTIMIZING</strong> — <code>report-evaluator</code>로 품질을 보고, 필요하면 Optimizer가 초안을 고치는 것을 반복합니다(최대 4회).</li>
+    </ul>
+    <p>
+        이 이벤트들은 <code>WorkflowStatusPublisher</code>가 Redis로 보내 주는 것이며, 브라우저는 같은 <code>workflowId</code>로 SSE를 열어서 받아 보는 구조입니다.
+    </p>
+
+    <hr class="course-divider">
+
+    <h3 id="d4-s4">4. STRATEGIC 경로 — 병렬·평가·개선 루프</h3>
+    <p>실습에서 로그가 길게 이어지는 것은 보통 이 <strong>STRATEGIC</strong> 경로 때문입니다. 아래 순서만 따라가 보시면 Chapter 본문에 있는 요약과 딱 맞아떨어집니다.</p>
+    <ol>
+        <li><strong>ROUTING</strong> — 먼저 라우팅 SubAgent가 돕니다.</li>
+        <li><strong>STRATEGIC으로 갈렸을 때</strong> — 기술(GPT) + 시장(Gemini)을 <code>CompletableFuture</code>로 병렬 돌리고, 나온 문자열 두 개를 하나의 초안으로 합칩니다.</li>
+        <li><strong>EVALUATING / OPTIMIZING</strong> — 평가 SubAgent가 통과인지 봅니다(<code>PASS</code> 같은 표시). 안 되면 Optimizer가 초안을 고치고, 다시 평가로 돌아갑니다.</li>
+    </ol>
+    <p>
+        그래서 화면에서는 대략 <strong>Routing → (병렬) Analysis → Merge → Evaluate ⇄ Optimize</strong> 같은 리듬이 SSE에 그대로 보이게 됩니다.
+        Chapter 3의 <code>StrategicAnalysisService</code>와 <strong>비즈니스로는 같은 이야기</strong>이며, Chapter 4에서는 그것을 <strong><code>SubAgentRegistry</code> 역할 키 단위로 쪼개 올린 것</strong>이라고 이해하시면 다음 장으로 넘어가기 편합니다.
+    </p>
+
+    <hr class="course-divider">
+
+    <h3 id="d4-s5">5. 레지스트리 키·모델</h3>
+    <p>코드는 <code>StrategicAgentKeys</code> 상수와 <code>com/ai/shared/agent/subagent</code> 구현을 맞춰 둔 요약표입니다. 실습 중에 “지금 로그에 나온 단계가 어떤 키와 연결되는가?” 하실 때 펼쳐 보시면 됩니다.</p>
+
+    <table class="table table-bordered table-sm">
+        <thead class="thead-light">
+        <tr>
+            <th>레지스트리 키 (<code>name()</code>)</th>
+            <th>실습에서 하는 일</th>
+            <th>모델 (대표)</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><code>routing</code></td>
+            <td>요청을 SIMPLE / STRATEGIC으로 분류</td>
+            <td>Llama</td>
+        </tr>
+        <tr>
+            <td><code>simple-query</code></td>
+            <td>SIMPLE 경로에서 짧은 답만 생성</td>
+            <td>Llama</td>
+        </tr>
+        <tr>
+            <td><code>technical-analysis</code></td>
+            <td>STRATEGIC 경로 — 기술 관점 분석(병렬 워커)</td>
+            <td>GPT</td>
+        </tr>
+        <tr>
+            <td><code>market-analysis</code></td>
+            <td>STRATEGIC 경로 — 시장·트렌드 분석(병렬 워커)</td>
+            <td>Gemini</td>
+        </tr>
+        <tr>
+            <td><code>report-evaluator</code></td>
+            <td>병합 초안 품질 평가, 통과 시 응답에 <code>PASS</code> 포함</td>
+            <td>Gemini</td>
+        </tr>
+        <tr>
+            <td><code>report-optimizer</code></td>
+            <td>평가 미통과 시 초안에 평가 피드백을 반영해 개선(EVALUATING/OPTIMIZING 루프)</td>
+            <td>GPT</td>
+        </tr>
+        </tbody>
+    </table>
+
+
+
+    <hr class="course-divider">
+
+    <h3 id="d4-s6">6. 다른 Chapter와 이어지는 맥락</h3>
+    <p>마지막으로, 지금 배운 내용이 앞뒤 장에서 어떻게 확장되는지만 짚고 마무리합니다.</p>
+    <ul>
+        <li><strong>Chapter 3</strong> — 한 서비스 클래스 안에서 <code>ChatClient</code>를 여러 번 직접 부르는 오케스트레이션.</li>
+        <li><strong>Chapter 4 (지금 실습)</strong> — <code>StrategicAnalysisAgentOrchestrator</code>가 <code>SubAgentRegistry</code>를 직접 사용(<code>ToolRegistry</code> 없음).</li>
+        <li><strong>Chapter 5</strong> — 동일 역할 키를 <code>ToolRegistry</code> + <code>StrategicTool</code>로 감싼 <code>StrategicAnalysisAgentToolOrchestrator</code>, HTTP 래핑은 <code>StrategicAnalysisAgentToolTaskService</code>.</li>
+        <li><strong>Chapter 6</strong> — Task tool, Markdown 서브에이전트 같은 런타임 쪽 이야기로 넓어집니다.</li>
+        <li><strong>Chapter 7</strong> — 같은 역할을 DAG 노드로 쪼개서 엔진이 돌리고, 레지스트리 아이디어는 그대로 재사용합니다.</li>
+        <li><strong>Chapter 8</strong> — 동일 DAG를 YAML(DSL)로 정의하고 <code>YamlDagWorkflowEngine</code>이 실행하는 선언적 워크플로.</li>
+        <li><strong>Chapter 9</strong> — <strong>엔진·DSL 어휘는 Ch8과 동일</strong>, 확장은 YAML만. <code>chapter9/dagworkflow/*.yml</code> 로딩 직후 <code>WorkflowDefinitionValidator</code>로 <strong>스케줄링 전</strong> 선언 오류를 걸러 내는 <strong>검증층</strong>이 본질인 Validated Agent Workflow DSL.</li>
+    </ul>
+
+    <div class="course-footer-actions">
+    <p>
+        <a th:href="@{/go/ch4/1_strategic_analysis}" class="btn btn-primary font-weight-bold">실습 다시 하기 — Strategic Analysis (Agent)</a>
+        &nbsp;
+        <a th:href="@{/go/ch4}" class="btn btn-outline-primary">Chapter 4 본문으로 돌아가기</a>
+    </p>
+    </div>
+
+    </div>
+    </div>
+
+</th:block>
+</html>

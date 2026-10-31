@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<th:block>
+
+    <style>
+        .course-main { max-width: 52rem; margin: 0 auto; padding: 0 0.25rem 2.5rem; font-size: 1rem; line-height: 1.65; color: #1e293b; }
+        .course-hero { margin-bottom: 1.25rem; padding-bottom: 1rem; border-bottom: 1px solid #e2e8f0; }
+        .course-hero h1 { font-size: clamp(1.25rem, 2.2vw, 1.65rem); font-weight: 700; letter-spacing: -0.02em; margin: 0; color: #0f172a; line-height: 1.3; }
+        .course-toc { background: linear-gradient(165deg, #f8fafc 0%, #f1f5f9 100%); border: 1px solid #e2e8f0; border-radius: 10px; padding: 1rem 1.25rem 1.1rem; margin-bottom: 1.25rem; }
+        .course-toc-title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b; margin: 0 0 0.6rem; }
+        .course-toc ol { margin: 0; padding-left: 1.2rem; }
+        .course-toc li { margin-bottom: 0.35rem; line-height: 1.45; }
+        .course-toc a { color: #1d4ed8; text-decoration: none; font-size: 0.9rem; font-weight: 700; }
+        .course-toc a:hover { text-decoration: underline; color: #1e40af; }
+        .course-overview { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 1.25rem 1.4rem 1.35rem; margin-bottom: 1.25rem; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06); }
+        .course-content h3 { font-size: 1.12rem; margin: 1.35rem 0 0.85rem; padding-bottom: 0.55rem; border-bottom: 2px solid #93c5fd; color: #0f172a; font-weight: 700; line-height: 1.4; }
+        .course-content hr.course-divider + h3 { margin-top: 0; }
+        .course-divider { border: none; height: 1px; background: linear-gradient(90deg, transparent, #cbd5e1, transparent); margin: 1.5rem 0; }
+        .course-footer-actions { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #e2e8f0; }
+        ul { margin-left: 1.25rem; margin-bottom: 0.75rem; }
+        code { background: #f1f5f9; padding: 0.12em 0.38em; border-radius: 4px; font-size: 0.9em; color: #0f172a; }
+        p { margin-bottom: 0.85rem; }
+        table { font-size: 0.95rem; }
+        .course-content h4 { font-size: 1rem; margin: 1rem 0 0.5rem; color: #334155; font-weight: 600; }
+        .course-overview .meta { color: #475569; font-size: 0.95rem; margin-bottom: 0.75rem; }
+        .course-overview .term-note { font-size: 0.88rem; color: #64748b; margin-bottom: 0.85rem; line-height: 1.55; }
+
+        /* Maven agent-utils 의존성 안내 — overview 본문(흰 배경)과 구분 */
+        .c6-agent-utils-deps {
+            font-size: 0.88rem;
+            line-height: 1.55;
+            margin-bottom: 0.85rem;
+            padding: 0.9rem 1.1rem;
+            border-radius: 10px;
+            border: 1px solid #c4b5fd;
+            background: linear-gradient(165deg, #f5f3ff 0%, #ede9fe 45%, #eef2ff 100%);
+            color: #4c1d95;
+            box-shadow: 0 2px 8px rgba(91, 33, 182, 0.08);
+        }
+        .c6-agent-utils-deps strong { color: #5b21b6; }
+        .c6-agent-utils-deps code {
+            background: rgba(255, 255, 255, 0.85);
+            color: #3730a3;
+        }
+        .c6-agent-utils-deps a {
+            color: #4f46e5;
+            font-weight: 600;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+        .c6-agent-utils-deps a:hover { color: #312e81; }
+        .c6-agent-utils-deps a code {
+            text-decoration: underline;
+            color: inherit;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        /* Flow diagrams — Chapter 4·5와 동일 계열 */
+        .course-flow-pipeline {
+            margin: 1rem 0 1.25rem;
+            padding: 1.25rem 1.15rem 1.4rem;
+            border-radius: 14px;
+            background: linear-gradient(165deg, #f8fafc 0%, #eef2ff 40%, #f1f5f9 100%);
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
+        }
+        .course-flow-pipeline .course-flow-caption {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #64748b;
+            margin: 0 0 0.9rem;
+            text-align: center;
+        }
+        .course-flow-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 24rem;
+            margin: 0 auto;
+        }
+        .course-flow-col-wide { max-width: 28rem; }
+        .course-flow-step {
+            width: 100%;
+            border-radius: 11px;
+            padding: 0.65rem 0.9rem;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+        }
+        .course-flow-step .course-flow-kicker {
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #64748b;
+            margin-bottom: 0.2rem;
+        }
+        .course-flow-step .course-flow-title {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0;
+            line-height: 1.35;
+        }
+        .course-flow-step .course-flow-sub {
+            font-size: 0.74rem;
+            color: #64748b;
+            margin: 0.28rem 0 0;
+        }
+        .course-flow-step.course-flow-user {
+            background: linear-gradient(180deg, #f8fafc 0%, #fff 100%);
+            border-color: #cbd5e1;
+        }
+        .course-flow-step.course-flow-llm {
+            background: linear-gradient(135deg, #1e3a5f 0%, #1e293b 100%);
+            border-color: #334155;
+            color: #f8fafc;
+        }
+        .course-flow-step.course-flow-llm .course-flow-kicker { color: rgba(248, 250, 252, 0.75); }
+        .course-flow-step.course-flow-llm .course-flow-title { color: #f8fafc; }
+        .course-flow-step.course-flow-runtime {
+            border: 2px solid #8b5cf6;
+            background: linear-gradient(180deg, #faf5ff 0%, #fff 100%);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.12);
+        }
+        .course-flow-step.course-flow-runtime .course-flow-kicker { color: #6d28d9; }
+        .course-flow-step.course-flow-runtime .course-flow-title { color: #4c1d95; }
+        .course-flow-step.course-flow-subagent {
+            border: 2px solid #6366f1;
+            background: linear-gradient(180deg, #eef2ff 0%, #fff 100%);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
+        }
+        .course-flow-step.course-flow-subagent .course-flow-kicker { color: #4338ca; }
+        .course-flow-step.course-flow-subagent .course-flow-title { color: #3730a3; }
+        .course-flow-step.course-flow-subagent .course-flow-sub { color: #64748b; }
+        .course-flow-step.course-flow-tool {
+            border: 2px solid #38bdf8;
+            background: #fff;
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.1);
+        }
+        .course-flow-step.course-flow-tool .course-flow-kicker { color: #0369a1; }
+        .course-flow-step.course-flow-tool .course-flow-title { color: #0c4a6e; }
+        .course-flow-step.course-flow-act {
+            border-style: dashed;
+            border-color: #94a3b8;
+            background: #fffefb;
+        }
+        .course-flow-step.course-flow-act .course-flow-kicker { color: #a16207; }
+        .course-flow-step.course-flow-loop {
+            border-style: dashed;
+            border-color: #c084fc;
+            background: #fefce8;
+        }
+        .course-flow-step.course-flow-loop .course-flow-kicker { color: #a16207; }
+        .course-flow-step.course-flow-merge {
+            background: linear-gradient(180deg, #fffbeb 0%, #fff 100%);
+            border-color: #fcd34d;
+        }
+        .course-flow-step.course-flow-merge .course-flow-kicker { color: #b45309; }
+        .course-flow-step.course-flow-out {
+            background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%);
+            border: 2px solid #34d399;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.12);
+        }
+        .course-flow-step.course-flow-out .course-flow-kicker { color: #047857; }
+        .course-flow-step.course-flow-out .course-flow-title { color: #065f46; }
+        .course-flow-step.course-flow-stack {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+            text-align: left;
+            padding-left: 1rem;
+        }
+        .course-flow-arrow {
+            padding: 0.28rem 0 0.32rem;
+            color: #94a3b8;
+            font-size: 1rem;
+            line-height: 1;
+        }
+
+        /* Chapter 5 개요와 동일 계열: course-overview 안 요약 카드 */
+        .c2-field-section { margin-top: 0; margin-bottom: 0; }
+        .c2-field-section .c2-field-kicker {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #64748b;
+            margin: 1rem 0 0.4rem;
+        }
+        .c2-field-section .c2-field-kicker--top { margin-top: 0.35rem; }
+        .c2-field-section ul.c2-field-list { margin: 0.25rem 0 0.7rem; padding-left: 1.15rem; }
+        .c2-field-section ul.c2-field-list > li { margin-bottom: 0.42rem; line-height: 1.5; }
+        .c2-field-section .c2-field-focus {
+            margin-top: 0.5rem;
+            margin-bottom: 0.85rem;
+            padding: 0.85rem 1rem;
+            background: linear-gradient(165deg, #f8fafc 0%, #eff6ff 100%);
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            color: #334155;
+        }
+        .c2-field-section .c2-field-focus p { margin-bottom: 0.5rem; }
+        .c2-field-section .c2-field-focus p:last-child { margin-bottom: 0; }
+        .c2-field-section .c2-field-focus ul:last-child { margin-bottom: 0; }
+        .c2-field-section .c2-field-lead {
+            font-size: 1.02rem;
+            color: #0f172a;
+            font-weight: 600;
+            line-height: 1.5;
+            margin-bottom: 0.65rem;
+        }
+    </style>
+
+    <div class="course-main">
+    <header class="course-hero">
+    <h1>Chapter 6. Task-Orchestrated Multi-Agent</h1>
+    <p style="margin:0.35rem 0 0; color:#475569; font-size:1.15rem; font-weight:700;">TaskTool 기반 Agent Runtime 설계</p>
+    </header>
+
+    <div class="course-overview c2-field-section">
+
+    <p class="c6-agent-utils-deps">
+        <strong>의존성</strong>: Maven <a href="https://springaicommunity.mintlify.app/projects/incubating/spring-ai-agent-utils" target="_blank" rel="noopener noreferrer"><code>org.springaicommunity:spring-ai-agent-utils</code></a>
+        (Artifact <code>spring-ai-agent-utils</code>, <a href="https://springaicommunity.mintlify.app/projects/incubating/spring-ai-agent-utils" target="_blank" rel="noopener noreferrer">Spring AI Community</a> 문서).
+        본 실습·문서는 버전 <strong>0.4.2</strong> 기준이며, 이하 <a href="https://springaicommunity.mintlify.app/projects/incubating/spring-ai-agent-utils" target="_blank" rel="noopener noreferrer">agent-utils</a>로 약칭합니다.
+        본 저장소에서는 Gradle 모듈 <code>edu/build.gradle</code>에 <code>implementation 'org.springaicommunity:spring-ai-agent-utils:0.4.2'</code> 를 선언해 이 의존성을 추가합니다.
+    </p>
+
+    <p class="c2-field-lead">
+        Chapter 5에서는 Java 오케스트레이터와 <code>ToolRegistry</code>로 <strong>단계마다 어떤 Tool을 쓸지</strong>를 코드에 직접 정하는 방식을 봤습니다.
+        본 장은 그 대신 <strong>agent-utils</strong>의 <strong>Agent Runtime</strong>이 <strong>생각 → 행동 → 관측</strong>을 반복하는 쪽으로 넘어갑니다.
+    </p>
+
+    <div class="c2-field-focus">
+        <p><strong>생각 → 행동 → 관측</strong>이 한데 묶인 루프입니다.</p>
+        <ul class="c2-field-list">
+            <li><strong>생각</strong> — 사용자 메시지·이전 결과를 보고, 모델이 다음에 무엇을 할지(어떤 Tool을 쓸지 등) 고름</li>
+            <li><strong>행동</strong> — <code>TaskTool</code> · <code>TodoWriteTool</code> 등이 실제로 호출됨</li>
+            <li><strong>관측</strong> — Tool이 돌려준 결과를 다시 모델에 넘겨, 다음 판단의 근거로 씀</li>
+        </ul>
+        <p>
+            Task마다 상태가 어떻게 바뀌는지까지 <strong>한 실행 엔진</strong> 안에서 처리합니다.
+            여러 Task와 서브에이전트를 Runtime이 조율하는 형태를 <strong>Task-Orchestrated Multi-Agent</strong>라고 부릅니다.
+        </p>
+    </div>
+
+    <p>
+        <code>TaskTool</code>은 Runtime에 붙는 Tool 하나로, <code>.md</code>에 적어 둔 <strong>서브에이전트 역할</strong>을 <strong>이름만으로</strong> 불러 씁니다.
+        <strong>Runtime</strong>은 루프와 Task 진행을 돌리고, <strong>TaskTool</strong>은 Markdown 역할 정의와 Runtime을 잇는 <strong>연결 고리</strong>입니다.
+    </p>
+
+    <p>
+        <code>StrategicTaskChatClientFactory</code>로 <code>ChatClient</code>를 조립하고, <code>StrategicAnalysisAgentConfig</code>에서 빈 <code>strategicAnalysisAgent</code>를 만듭니다.
+        이 <strong>전용 <code>ChatClient</code> + agent-utils Tool 등록</strong>이 곧 이 실습에서 <strong>Agent Runtime</strong>을 붙이는 방식이며,
+        생각·행동·관측 반복과 Task·서브에이전트·할 일(Todo) 변화는 <strong>agent-utils 런타임</strong>이 맡습니다.
+    </p>
+
+    <p>
+        같은 Chapter 6 안에서도, <strong>워크플로를 어디에 두느냐</strong>는 두 갈래로 나뉩니다.
+        <strong>Java</strong>가 단계·분기·병렬·평가 루프까지 직접 밀어 나가는 쪽은 <code>StrategicAnalysisTaskToolOrchestrator</code>이고,
+        <strong>system Markdown</strong>에 규칙을 모아 두고 <strong>생각 → 행동 → 관측</strong> 루프 안에서 Runtime이 다음 행동을 고르게 하는 쪽은 <code>StrategicAnalysisTaskToolMDOrchestrator</code>입니다.
+        실습·강의의 <strong>주 경로</strong>는 전자이며, 후자는 같은 TaskTool·서브에이전트 조립을 쓰되 흐름을 프롬프트에 더 맡긴 <strong>참고용</strong> 예제입니다. 자세한 대비는 아래 <a href="#c6-s8">§5</a>에서 정리합니다.
+    </p>
+
+    <p>
+        주 경로에서는 <strong>전략 분석을 몇 단계로 나누고 어떤 순서로 진행할지</strong>를 Java 오케스트레이터가 바깥에서 정합니다.
+        각 단계 안에서 문장을 만들고 서브 역할을 부르는 쪽은 <code>strategicAnalysisAgent</code>이고,
+        <code>TaskTool</code>이 <code>classpath:chapter6/agents/strategic/*.md</code>에 정의된 서브에이전트를 호출합니다.
+    </p>
+
+    <p>
+        <strong>한 줄 요약</strong> — 바깥(오케스트레이션)은 <strong>단계·순서</strong>(주로 Java, 선택적으로 system MD)를, 안쪽(Runtime + <code>strategicAnalysisAgent</code>)은 <strong>생각·행동·관측 루프와 Task 진행</strong>을 맡고, <code>TaskTool</code>이 <code>.md</code> 역할과 Runtime을 이어 줍니다.
+    </p>
+
+    <p class="mb-0">
+        실습 화면: <a th:href="@{/go/ch6/1_strategic_analysis}">Strategic Analysis (Task tool)</a>
+    </p>
+    </div>
+
+    <nav class="course-toc" aria-label="목차">
+    <p class="course-toc-title">목차</p>
+    <ol>
+        <li><a href="#c6-s2">개념 정리 — Ch5 Agent+Tool 복습</a></li>
+        <li><a href="#c6-s3">개념 정리 — agent-utils 구조</a></li>
+        <li><a href="#c6-s1">차이점 정리</a></li>
+        <li><a href="#c6-s4">가장 중요한 차이 (상세)</a></li>
+        <li><a href="#c6-s8">Java vs MD 오케스트레이터 및 본 과정의 선택</a></li>
+        <li><a href="#c6-s9">언제 agent-utils가 필요한가</a></li>
+        <li><a href="#c6-s10">핵심 결론</a></li>
+    </ol>
+    </nav>
+
+    <div class="course-content">
+    <hr class="course-divider">
+
+    <p>
+        겉으로 보면 Chapter 5(Agent + Tool)와 Chapter 6(agent-utils·TaskTool) 모두 “Tool을 사용하는 구조”처럼 보이지만,
+        실제로는 <strong>실행 모델과 런타임 레벨이 완전히 다릅니다.</strong>
+    </p>
+
+    <hr class="course-divider">
+
+    <h3 id="c6-s2">1. 개념 정리 (Ch5 Agent+Tool 패턴 복습)</h3>
+    <p class="small text-muted mb-1">
+        이 절에서는 <strong>Chapter 5에서 이미 다룬 “Agent + Tool 혼합 구조”</strong>를 간단히 복습합니다.
+        즉, <strong>Agent + Tool 패턴</strong>을 다시 한 번 짚고, 그 위에서 이 장의 주제인 <strong>Agent Runtime(TaskTool)</strong>이
+        어떻게 한 단계 더 올라가는지 대비해서 보게 됩니다.
+    </p>
+    <p><strong>구조 (Chapter 5 본편 ② Tool을 사용하는 구조 — 동일 도식)</strong></p>
+    <div class="course-flow-pipeline" role="img" aria-label="Tool 사용: 질문부터 최종 답변까지">
+        <p class="course-flow-caption">Agent + Tool 흐름</p>
+        <div class="course-flow-col">
+            <div class="course-flow-step course-flow-user">
+                <div class="course-flow-kicker">입력</div>
+                <p class="course-flow-title">User 질문</p>
+            </div>
+            <div class="course-flow-arrow" aria-hidden="true">↓</div>
+            <div class="course-flow-step course-flow-llm">
+                <div class="course-flow-kicker">추론</div>
+                <p class="course-flow-title">Agent (LLM)</p>
+            </div>
+            <div class="course-flow-arrow" aria-hidden="true">↓</div>
+            <div class="course-flow-step course-flow-tool">
+                <div class="course-flow-kicker">선택</div>
+                <p class="course-flow-title">Tool 선택</p>
+            </div>
+            <div class="course-flow-arrow" aria-hidden="true">↓</div>
+            <div class="course-flow-step course-flow-act">
+                <div class="course-flow-kicker">실행</div>
+                <p class="course-flow-title">Tool 실행</p>
+                <p class="course-flow-sub"><code>StrategicTool#execute</code></p>
+            </div>
+            <div class="course-flow-arrow" aria-hidden="true">↓</div>
+            <div class="course-flow-step course-flow-subagent">
+                <div class="course-flow-kicker">위임</div>
+                <p class="course-flow-title">SubAgentRegistry → SubAgent</p>
+                <p class="course-flow-sub"><code>require("routing")</code> 등 동일 키로 LLM 호출</p>
+            </div>
+            <div class="course-flow-arrow" aria-hidden="true">↓</div>
+            <div class="course-flow-step course-flow-merge">
+                <div class="course-flow-kicker">반환</div>
+                <p class="course-flow-title">결과 반환</p>
+            </div>
+            <div class="course-flow-arrow" aria-hidden="true">↓</div>
+            <div class="course-flow-step course-flow-out">
+                <div class="course-flow-kicker">출력</div>
+                <p class="course-flow-title">Agent가 최종 답변 생성</p>
+            </div>
+        </div>
+    </div>
+    <p class="small text-muted mb-1">
+        이 구조는 <strong>Chapter 5 전체의 주제</strong>입니다. <code>StrategicAnalysisAgentToolOrchestrator</code>가
+        <code>ToolRegistry</code>에 등록된 <code>RoutingTool</code>, <code>SimpleQueryTool</code>, <code>TechnicalAnalysisTool</code>,
+        <code>MarketAnalysisTool</code>, <code>ReportEvaluatorTool</code>, <code>ReportOptimizerTool</code> 을 <strong>이름으로 꺼내 순서대로 호출</strong>하고,
+        각 Tool 내부에서는 <code>SubAgentRegistry</code>를 통해 Chapter 4에서 정의한 서브 에이전트를 재사용해 LLM을 실행합니다.
+        RAG나 데이터베이스 연동이 필요하다면, 해당 Tool 안에서 외부 API·DB·Vector Store를 호출한 뒤 그 결과를 SubAgent에 넘기는 식으로
+        <strong>“Agent + Tool + SubAgent + 외부 데이터”</strong>를 한 층으로 묶을 수 있습니다.
+    </p>
+    <p class="text-muted small mb-0">
+        이 장(Ch6)은 이 <strong>② Tool 구조</strong>를 대체하는 것이 아니라,
+        같은 비즈니스 문제를 <strong>“Agent Runtime(TaskTool) + Markdown 서브에이전트 + TodoWrite”</strong>라는 <strong>다른 실행 모델</strong>로 구현해 보는 장입니다.
+        즉, Ch5의 ② 구조 위에 <strong>Agent Runtime(사고–행동–관측, Task, SubAgent)</strong>를 한 층 더 쌓는다고 이해하시면 됩니다.
+    </p>
+
+    <hr class="course-divider">
+
+    <h3 id="c6-s3">2. 개념 정리 (agent-utils 구조)</h3>
+    <p>이건 단순 Tool 사용이 아니라 <strong>Agent 실행 엔진(Runtime)</strong> 입니다. 개념도 위에서 설명했듯, <strong>TaskTool</strong>은 Runtime이 제공하는 실행 경로 위에 올라가는 <strong>구체적인 Tool</strong>이며, 본 실습에서는 그 TaskTool이 <code>strategicAnalysisAgent</code> <code>ChatClient</code>에 붙어 서브에이전트 호출을 담당합니다.</p>
+    <p class="small text-muted mb-1">
+        <strong>이 장에서 “Agent Runtime”은 코드 상 어디인가?</strong>
+    </p>
+    <ul class="small">
+        <li><strong>Agent Runtime에 해당하는 영역</strong>
+            <ul>
+                <li><code>StrategicAnalysisAgentConfig</code> / <code>StrategicAnalysisAgentMDConfig</code> — <code>strategicAnalysisAgent</code>·<code>strategicAnalysisAgentMd</code> 빈을 선언하고, 시스템 프롬프트·workflowId 공급·Redis 단계 태그만 팩토리에 다르게 넘깁니다.</li>
+                <li><code>StrategicTaskChatClientFactory</code> — <code>STRATEGIC_SUBAGENTS</code>·<code>TaskTool</code>·<code>TodoWriteTool</code>·<code>ChatClient</code> 조립을 <strong>단일 구현</strong>으로 제공합니다.</li>
+                <li>이 <code>ChatClient</code>에 붙는 <code>TaskTool</code> (Markdown 서브에이전트 + <code>DefaultTaskRepository</code>)</li>
+                <li><code>TodoWriteTool</code> — agent-utils Tool. 모델이 호출해 할 일 목록을 갱신하면, 팩토리 핸들러가 <code>workflowIdSupplier</code>·단계 태그(<code>AGENT_TODO</code> 등)로 <code>WorkflowStatusPublisher</code> → Redis/SSE에 스냅샷 전송</li>
+                <li>이 조합이 <strong>사고–행동–관측 루프, Task 저장소, 서브에이전트 실행, Todo 관리</strong> 등
+                    “Agent Runtime” 기능을 구현합니다.</li>
+            </ul>
+        </li>
+        <li><strong>오케스트레이션(Java) 쪽 역할</strong>
+            <ul>
+                <li><code>StrategicAnalysisTaskToolOrchestrator</code> / <code>StrategicAnalysisAgentToolTaskService</code>는
+                    <strong>워크플로 조립자(Controller/Client)</strong>입니다.</li>
+                <li><code>StrategicAnalysisTaskToolMDOrchestrator</code>는 같은 TaskTool·서브에이전트 조립을 쓰되, 단계·분기를 <strong>system Markdown</strong>에 더 맡기는 <strong>참고용</strong> 경로입니다. Java vs MD 대비는 <a href="#c6-s8">§5</a>입니다.</li>
+                <li>언제 <code>routing</code>/<code>technical-analysis</code>/<code>market-analysis</code>/<code>report-evaluator</code>/<code>report-optimizer</code>를 호출할지,</li>
+                <li>병렬/순차/루프 구조를 어떻게 가져갈지,</li>
+                <li>SSE 상태(예: 단계 이름, 평가 점수, Todo 스냅샷)를 어떻게 발행할지를 제어합니다.</li>
+            </ul>
+        </li>
+        <li><strong>요약</strong>: <code>Runtime = TaskTool + TodoWriteTool + TaskRepository + ChatClient</code> 조립은 <code>StrategicTaskChatClientFactory</code>에 모이고,
+            ch6의 오케스트레이터/서비스는 그 Runtime을 호출해 <strong>Chapter 6 전략 분석 시나리오</strong>를 만드는 층이라고 보면 됩니다.</li>
+    </ul>
+    <p><strong>구조</strong> (일반화한 흐름 — “Tool 실행”에는 TaskTool·기타 Tool이 포함되며, TaskTool 경로에서는 이어서 Markdown 서브에이전트가 이름(<code>routing</code> 등)으로 LLM을 호출합니다)</p>
+    <div class="course-flow-pipeline" role="img" aria-label="agent-utils: 런타임과 반복 루프">
+        <p class="course-flow-caption">Agent Runtime + 반복 (TaskTool은 ChatClient의 Tool 중 하나)</p>
+        <div class="course-flow-col course-flow-col-wide">
+            <div class="course-flow-step course-flow-user">
+                <div class="course-flow-kicker">입력</div>
+                <p class="course-flow-title">User 질문</p>
+            </div>
+            <div class="course-flow-arrow" aria-hidden="true">↓</div>
+            <div class="course-flow-step course-flow-runtime">
+                <div class="course-flow-kicker">엔진</div>
+                <p class="course-flow-title">Agent Runtime</p>
+            </div>
+            <div class="course-flow-arrow" aria-hidden="true">↓</div>
+            <div class="course-flow-step course-flow-tool">
+                <div class="course-flow-kicker">선택</div>
+                <p class="course-flow-title">Tool 선택</p>
+                <p class="course-flow-sub">예: TaskTool, TodoWriteTool</p>
+            </div>
+            <div class="course-flow-arrow" aria-hidden="true">↓</div>
+            <div class="course-flow-step course-flow-merge">
+                <div class="course-flow-kicker">실행</div>
+                <p class="course-flow-title">Tool 실행</p>
+                <p class="course-flow-sub">TaskTool·TodoWriteTool 등 (런타임이 제공하는 Tool)</p>
+            </div>
+            <div class="course-flow-arrow" aria-hidden="true">↓</div>
+            <div class="course-flow-step course-flow-subagent">
+                <div class="course-flow-kicker">위임</div>
+                <p class="course-flow-title">Markdown 서브에이전트 (이름 → LLM)</p>
+                <p class="course-flow-sub"><code>routing</code> · <code>simple-query</code> · <code>technical-analysis</code> · … / <code>classpath:…/strategic-*.md</code></p>
+            </div>
+            <div class="course-flow-arrow" aria-hidden="true">↓</div>
+            <div class="course-flow-step course-flow-loop">
+                <div class="course-flow-kicker">관찰</div>
+                <p class="course-flow-title">결과 분석</p>
+                <p class="course-flow-sub">사고 → 행동 → 관측</p>
+            </div>
+            <div class="course-flow-arrow" aria-hidden="true">↓</div>
+            <div class="course-flow-step course-flow-tool">
+                <div class="course-flow-kicker">반복</div>
+                <p class="course-flow-title">다음 Tool 선택 → 다시 실행</p>
+                <p class="course-flow-sub">필요 시 TaskTool 재호출</p>
+            </div>
+            <div class="course-flow-arrow" aria-hidden="true">↓</div>
+            <div class="course-flow-step course-flow-out">
+                <div class="course-flow-kicker">출력</div>
+                <p class="course-flow-title">최종 답변 생성</p>
+            </div>
+        </div>
+    </div>
+
+
+    <hr class="course-divider">
+
+    <h3 id="c6-s1">3. 차이점 정리</h3>
+    <ul class="list-unstyled">
+        <li><strong>Agent + Tool 패턴 (Ch5)</strong> = Tool 기반 애플리케이션 — LLM이 Tool을 선택하고 실행하는 구조</li>
+        <li><strong>agent-utils 사용 (Ch6)</strong> = Agent Runtime 기반 시스템 — 본 장에서는 <code>ChatClient</code>(<code>strategicAnalysisAgent</code>)에 <strong>TaskTool</strong>을 올려 서브에이전트(.md)를 부르는 형태로 구체화됩니다.</li>
+    </ul>
+    <p>
+        <strong>Markdown(<code>.md</code>) 파일</strong>을 쓰느냐만이 핵심은 아니지만, 본 장 실습에서는 agent-utils의 <strong><code>TaskTool</code></strong>이
+        <code>classpath:chapter6/agents/strategic/*.md</code> 같은 <strong>서브에이전트 정의</strong>를 읽어, 역할·지시문을 <strong>자바 코드가 아닌 문서</strong>로 두고 이름 기반으로 호출할 수 있게 합니다.
+        즉 프롬프트·역할 분리를 <strong>재컴파일 없이 md로 조정</strong>하기 쉬운 쪽이 agent-utils 경로에 가깝습니다.
+    </p>
+    <p class="small mb-1"><strong>예시: Markdown 서브에이전트 정의</strong></p>
+    <pre class="bg-light p-3 border rounded small"><code>---
+name: strategic-router
+model: llama
+description: &gt;
+  사용자의 요청을 SIMPLE / STRATEGIC 으로 분류합니다.
+---
+
+## 역할
+- 입력 요청을 읽고, 복잡도와 요구 작업을 판단합니다.
+- 단순 Q&amp;A / 요약 수준이면 SIMPLE 로 분류합니다.
+- 기술/시장 분석이 필요하면 STRATEGIC 으로 분류합니다.
+
+## 출력 형식
+- 반드시 &quot;SIMPLE&quot; 또는 &quot;STRATEGIC&quot; 만 대문자로 출력합니다.</code></pre>
+    <p class="text-muted small">
+        같은 방식으로, RAG나 데이터베이스 연동을 위한 서브에이전트를 정의할 수도 있습니다.
+    </p>
+    <pre class="bg-light p-3 border rounded small"><code>---
+name: strategic-rag-search
+model: gpt
+description: &gt;
+  벡터 스토어에서 관련 문서를 검색하고, 검색 결과를 요약합니다.
+---
+
+## 역할
+- 사용자의 질문을 기반으로 벡터 스토어를 조회합니다.
+- 상위 N개의 관련 문서를 가져와 핵심 내용을 요약합니다.
+
+## 출력 형식
+- 검색된 근거 문서의 요약과, 질문에 대한 간단한 답변을 함께 제공합니다.</code></pre>
+    <pre class="bg-light p-3 border rounded small mt-2"><code>---
+name: strategic-db-price
+model: gpt
+description: &gt;
+  PostgreSQL에서 여행 상품 가격 정보를 조회합니다.
+---
+
+## 역할
+- 입력된 상품 ID 또는 여행 조건을 바탕으로 DB를 조회합니다.
+- 관련된 가격 정보와 기간, 재고 상태를 정리합니다.
+
+## 출력 형식
+- 조회된 가격 목록과, 사용자가 이해하기 쉬운 가격 비교 요약을 제공합니다.</code></pre>
+    <p class="text-muted small mb-0">
+        본 저장소에서는 전략용 .md 목록이 <code>StrategicTaskChatClientFactory#STRATEGIC_SUBAGENTS</code>에 한곳 정의되어 TaskTool에 연결됩니다. (예시로 아래처럼) 추가 서브에이전트를 TaskTool에 등록해 두면, 에이전트가 필요할 때 해당 서브에이전트를 호출해 문서/DB에서 <strong>실제 근거</strong>를 가져온 뒤,
+        그 결과를 다른 서브에이전트(분석·보고서 작성 등)와 결합해 보다 신뢰도 높은 답변을 만들 수 있습니다.
+    </p>
+    <p>
+        한편 <strong>Agent 실행 엔진(Runtime)</strong>은 <code>ChatClient</code>에 Tool을 몇 개 붙인 수준을 넘어,
+        <strong>사고 → 행동 → 관측</strong> 반복·<strong>Task</strong> 생명주기·서브에이전트 위임을 <strong>런타임이 구조적으로 담당</strong>한다는 뜻에 가깝습니다.
+        일반 Tool 방식에서도 모델이 여러 번 Tool을 부를 수는 있지만, 그 실행을 <strong>에이전트 전용 루프·Task 단위</strong>로 묶어 주는 층이 바로 이 Runtime입니다.
+    </p>
+
+    <hr class="course-divider">
+
+    <h3 id="c6-s4">4. 가장 중요한 차이 (상세)</h3>
+    <p class="small text-muted mb-2">여러 개의 Tool을 쓰는 경우에도, 비교 축은 <strong>Tool 개수</strong>가 아니라 <strong>“다단계 실행을 어디에 두느냐”</strong>입니다. Ch5는 <strong>Agent + Tool 패턴</strong>, Ch6는 <strong>Agent Runtime(TaskTool)</strong>이 그 실행을 어떻게 묶느냐가 핵심입니다.</p>
+    <table class="table table-bordered table-sm">
+        <thead class="thead-light">
+        <tr>
+            <th>방식</th>
+            <th>실행 모델 (차이의 본질)</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Agent + Tool 패턴 (Ch5)</td>
+            <td>
+                <code>ChatClient</code> + 여러 <code>StrategicTool</code> 또는 <code>@Tool</code> 을 등록해 두면,
+                <strong>Java 오케스트레이터</strong>가 <code>ToolRegistry.require(키).execute(...)</code> 형태로
+                단계별로 적절한 Tool을 선택·실행합니다. LLM은 주로 “질문 이해 + 결과 해석”에 집중하고,
+                다단계 실행 흐름은 <strong>오케스트레이터 코드</strong>에 녹아 있습니다.
+                Agent Runtime·Task 생명주기·명시적 사고–행동–관측 루프는 별도로 제공되지 않습니다.
+            </td>
+        </tr>
+        <tr>
+            <td>agent-utils 방식 (Ch6)</td>
+            <td>
+                <strong>Agent Runtime</strong>이 <code>사고 → 행동 → 관측</code> 같은 <strong>반복 실행</strong>과
+                <strong>Task</strong>·상태·서브에이전트 위임을 전제로 다단계 실행을 <strong>구조적으로</strong> 다룹니다.
+                이 장에서는 <strong><code>TaskTool</code></strong>이 <code>StrategicTaskChatClientFactory</code>를 통해 <code>ChatClient</code>에 등록되어
+                Markdown 서브에이전트(<code>classpath:chapter6/agents/strategic/*.md</code>)를 이름으로 호출하는 <strong>실행 입구</strong> 역할을 하고,
+                <code>TodoWriteTool</code>과 <code>TaskRepository</code>가 Task 상태와 진행 상황을 관리합니다.
+                Tool이 여러 개인 점은 Ch5와 같을 수 있지만, <strong>다단계 실행 루프와 Task 관리가 “Agent Runtime” 레벨로 올라간다</strong>는 것이 가장 큰 차이입니다.
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <hr class="course-divider">
+
+    <h3 id="c6-s8">5. Java 오케스트레이터와 MD(system) 오케스트레이터 — <code>StrategicAnalysisTaskToolOrchestrator</code> vs <code>StrategicAnalysisTaskToolMDOrchestrator</code></h3>
+
+    <p class="small text-muted mb-2">
+        앞 절들은 <strong>Chapter 5 vs Chapter 6</strong>(실행 모델이 Agent+Tool인지, Agent Runtime+TaskTool인지)를 기준으로 했습니다.
+        이 절만큼은 축을 바꿔, <strong>같은 Ch6 구성요소를 쓰면서도</strong> “워크플로를 코드에 쓸지, system 프롬프트에 쓸지”를 나눕니다.
+    </p>
+
+    <p>
+        비교의 핵심은 한 가지입니다.
+        <strong>Java</strong>가 라우팅·병렬·평가 루프 같은 <strong>단계 제어</strong>를 직접 수행하는지,
+        아니면 <strong>system Markdown</strong>(예: <code>prompts/strategic-analysis-agent-system.md</code>)에 routing·분석·평가·개선·TodoWrite 규칙을 모아 두고
+        <strong>생각 → 행동 → 관측</strong> 루프 속에서 Runtime이 다음 Tool 호출을 고르게 할지입니다.
+        아래 두 클래스가 각각 이 두 방식에 대응합니다.
+    </p>
+
+    <p>
+        <strong><code>StrategicAnalysisTaskToolOrchestrator</code></strong> — 전형적인 <strong>Java 오케스트레이터</strong>입니다.
+        라우팅, 간단 응답, 기술·시장 <strong>병렬</strong> 분석, 평가, 개선까지 <strong>어느 단계를 언제 돌릴지</strong>가 메서드·분기·스레드 풀·루프로 소스에 드러납니다.
+        각 단계 <em>안</em>에서만 <code>strategicAnalysisAgent</code>와 <code>TaskTool</code>로 Markdown 서브에이전트를 부릅니다.
+        Redis 발행, 예외 처리, 재시도 정책도 <strong>타입이 있는 코드</strong>를 따라가면 되므로 운영·디버깅·회귀 테스트에 유리합니다.
+    </p>
+
+    <p>
+        <strong><code>StrategicAnalysisTaskToolMDOrchestrator</code></strong> — 흐름을 <strong>MD(system)</strong>에 더 맡기는 <strong>최소 예제</strong>입니다.
+        <code>@Qualifier("strategicAnalysisAgentMd")</code> <code>ChatClient</code>는 <code>StrategicAnalysisAgentMDConfig</code>가 <code>StrategicTaskChatClientFactory</code>로 만든 빈입니다.
+        <strong>TaskTool과 서브에이전트 목록은 주 경로와 동일</strong>하고, 달라지는 것은 <strong>system 프롬프트</strong>와 <strong>Todo용 Redis 태그</strong> 정도입니다.
+        사용자 입력을 한 번 넘기면, 위 규칙들을 system Markdown에 묶어 둔 채 Runtime이 순서를 풀어 갑니다.
+        Java 쪽은 <code>executeWithMonitoring</code>에서 호출을 걸고 시작·완료·오류 같은 <strong>상태만</strong> 남기는 얇은 층에 가깝습니다.
+        소스 주석대로 <strong>참고용</strong>이며, HTTP·컨트롤러 연동은 수업 범위 밖에서 선택할 수 있게 둔 형태입니다.
+    </p>
+
+    <table class="table table-bordered table-sm">
+        <thead class="thead-light">
+        <tr>
+            <th style="width:22%">구분</th>
+            <th>Java 오케스트레이터<br><code>StrategicAnalysisTaskToolOrchestrator</code></th>
+            <th>MD(system) 오케스트레이터<br><code>StrategicAnalysisTaskToolMDOrchestrator</code></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>워크플로 정의 위치</td>
+            <td>Java 메서드·분기·스레드 풀·루프</td>
+            <td>system 프롬프트(Markdown) + 런타임의 생각 → 행동 → 관측</td>
+        </tr>
+        <tr>
+            <td>단계 가시성</td>
+            <td>IDE 디버깅, 스택, 로그에 단계가 직접 매핑</td>
+            <td>주로 LLM 추론·도구 호출 로그로 간접 추적</td>
+        </tr>
+        <tr>
+            <td>변경·배포</td>
+            <td>컴파일·리뷰·테스트 후 배포</td>
+            <td>프롬프트·MD 수정만으로 행동 변화 가능(품질 편차 관리 필요)</td>
+        </tr>
+        <tr>
+            <td>적합한 경우</td>
+            <td>규제·SLA(서비스 수준 협약)·감사가 요구하는 <strong>명시적 제어</strong>, 장기 유지보수</td>
+            <td>빠른 실험, 프롬프트 엔지니어 중심 반복, 단순 진입점</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <p>
+        위 표의 두 열을 기준으로 보면, <strong>본 과정의 강의·실습은 왼쪽 열, 즉 워크플로 제어 로직을 JVM(Java) 계층에 두는 구성</strong>을 채택합니다.
+        단계·분기·병렬·루프를 <strong>명령형(imperative) 오케스트레이션</strong>으로 코드에 고정하는 쪽을 전제로 합니다.
+        Spring AI·Spring Boot 기반 <strong>엔터프라이즈 백엔드</strong>에서는 <strong>요청 단위 제어 흐름(control flow)</strong>과 순서, <strong>병렬 실행(동시성) 경계</strong>, <strong>예외·재시도·실패 처리 경계</strong>, <strong>Redis·SSE를 통한 진행 상태·이벤트 발행(observability)</strong>까지
+        <strong>정적 타입·테스트 스위트로 명세하고 회귀 검증</strong>하기 쉬울수록 <strong>운영 가시성</strong>과 <strong>교육 목표(재현 가능한 실행 모델 습득)</strong>에 직결되기 때문입니다.
+    </p>
+    <p>
+        반면 <strong>오른쪽 열</strong>처럼 라우팅·분석·평가·TodoWrite까지 <strong>system Markdown·프롬프트</strong>에 맡기고 Java는 얇은 진입점만 두면,
+        앞 문단에서 말한 <strong>제어 흐름·동시성·실패 경계·상태 발행</strong>이 <strong>LLM 추론·Tool 호출 로그</strong>에 흩어져 보이기 쉽습니다.
+        빠른 스파이크·프롬프트 실험에는 부담이 적지만, 팀 단위로 서비스화할 때는 <strong>컴파일·리뷰·테스트로 워크플로를 고정</strong>하기 어렵고,
+        표에서 오른쪽 열이 약한 것처럼 <strong>단계별 SLA</strong>(서비스 수준 협약: 지연·가용성 등 단계마다 지켜야 할 목표)·<strong>보상 트랜잭션·감사 추적</strong>처럼 <strong>경계가 명시적이어야 하는 요구</strong>를 맞추기도 훨씬 까다롭습니다.
+    </p>
+    <p>
+        그래서 본 과정에서는 <strong>주 경로</strong>를 <code>StrategicAnalysisTaskToolOrchestrator</code>로 두고,
+        <code>StrategicAnalysisTaskToolMDOrchestrator</code>는 같은 Runtime 위에서 “프롬프트 쪽에 흐름을 더 맡기는 설계”를 보여 주는 <strong>참고용 예제</strong>로만 둡니다.
+        두 구현을 나란히 읽어 보면, 수업에서 Java 오케스트레이션을 먼저 익히는 이유가 한 번에 정리됩니다.
+    </p>
+
+    <h3 id="c6-s9">6. 언제 agent-utils가 필요한가</h3>
+    <ul>
+        <li>Multi Agent 시스템</li>
+        <li>자동 업무 처리 Agent</li>
+        <li>여행 예약 Agent</li>
+        <li>쇼핑 추천 Agent</li>
+        <li>코드 생성 Agent</li>
+        <li>파일 자동 처리 Agent</li>
+        <li>복잡한 Workflow Agent</li>
+    </ul>
+
+    <hr class="course-divider">
+
+    <h3 id="c6-s10">7. 핵심 결론</h3>
+    <p class="small text-muted mb-2">이 장 전체를 한 번에 짚는 요약입니다. 앞의 Ch5 대비·오케스트레이션 논의와 이어집니다.</p>
+    <ul>
+        <li><strong>Agent + Tool (Chapter 5)</strong> — LLM에 도구를 붙여 <strong>기능을 확장</strong>하는 패턴입니다. Tool을 여러 개 두거나 여러 번 호출할 수 있지만, 그것만으로 Ch6와 구분되지는 않습니다.</li>
+        <li><strong>agent-utils (Chapter 6)</strong> — 그 위에 <strong>Agent Runtime·Task</strong>를 얹어, <strong>생각 → 행동 → 관측</strong>과 Task 진행을 <strong>런타임이 구조적으로</strong> 맡기 쉬운 층입니다.</li>
+        <li><strong>본 장 실습에서의 TaskTool</strong> — <code>ChatClient</code>(예: <code>strategicAnalysisAgent</code>)에 붙는 Tool 가운데 하나로, Markdown 서브에이전트를 부르는 <strong>실행 입구(관문)</strong>입니다. 이 조립은 본 저장소에서 <code>StrategicTaskChatClientFactory</code>에 <strong>한곳</strong>에 모아 둡니다.</li>
+    </ul>
+    <p class="small text-muted mb-0">
+        <strong>비교할 때</strong> 둘을 “Tool 한 개 vs 여러 개”로만 나누면 오해가 생깁니다.
+        <strong>실행을 어떤 층에서 묶느냐</strong>—한 번의 대화, Java 오케스트레이터 코드, Agent Runtime, Task 단위 등—를 기준으로 보는 편이 안전합니다.
+        <strong>TaskTool</strong>은 그중 “<code>ChatClient</code>에 등록된 Tool”로서 서브에이전트 호출로 이어지는 <strong>구체적인 입구</strong>입니다.
+    </p>
+
+    <hr class="course-divider">
+
+    <div class="course-footer-actions">
+    <p>
+        <a th:href="@{/go/ch6/desc}" class="btn btn-warning font-weight-bold">Chapter6. 상세 가이드 (Screen Description)</a>
+    </p>
+    <p>
+        이전 장: <a th:href="@{/go/ch5}">Chapter 5 — Tool-Orchestrated Multi-Agent</a>
+    </p>
+    <p>
+        다음 장: <a th:href="@{/go/ch7}">Chapter 7 — DAG-Orchestrated Multi-Agent</a>
+    </p>
+    </div>
+
+    </div>
+    </div>
+
+</th:block>
+</html>
+
+
+

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+
+
+<th:block>
+    <script>
+        /*
+         * ==========================================================
+         *  Orchestrator - Workers 패턴 예제
+         * ----------------------------------------------------------
+         *  ✔ Orchestrator(지휘자)가 전체 작업을 분해
+         *  ✔ 여러 Worker(전문 LLM/서비스)가 부분 작업 수행
+         *  ✔ Orchestrator가 결과를 취합하여 최종 응답 생성
+         *
+         *  → 복잡한 문제 해결에 적합한 멀티 에이전트 구조
+         * ==========================================================
+         */
+
+        orchestrator_workers = {
+
+            // Spring Boot 서버의 Orchestrator 엔드포인트
+            // 내부적으로 여러 Worker 서비스 또는 LLM을 호출
+            url:'/ch2/orchestrator-workers',
+
+            /*
+             * 초기화 함수
+             * - Send 버튼 클릭 이벤트 등록
+             * - 페이지 로딩 시 스피너 숨김 처리
+             */
+            init:function(){
+                document.querySelector("#send_btn").addEventListener("click", ()=>{
+                    this.send();
+                })
+                document.querySelector("#spinner").style.cssText = "visibility:hidden;";
+            },
+
+            /*
+             * 사용자 질문을 채팅 UI에 출력
+             * - 시간 정보 포함
+             * - prepend()로 최신 메시지를 위로 배치
+             */
+            makeQuestionHtml:function(question){
+
+            },
+
+            /*
+             * 챗봇 응답 영역 생성
+             * - 각 응답마다 고유 ID 생성
+             * - Streaming 데이터가 이 영역에 append 됨
+             */
+            makeResponseHtml: async function(){
+
+            },
+
+            /*
+             * 서버 호출 핵심 로직
+             *
+             * [Orchestrator 흐름]
+             * 1️⃣ 사용자의 복잡한 질문 수신
+             * 2️⃣ 서버의 Orchestrator가 작업을 세분화
+             * 3️⃣ Worker들이 병렬 또는 순차적으로 작업 수행
+             * 4️⃣ 결과를 통합 후 Streaming으로 반환
+             */
+            send:async function(){
+
+            },
+
+            /*
+             * Streaming 응답 처리
+             * - 서버에서 Orchestrator가 취합한 결과를
+             *   chunk 단위로 전송
+             * - ReadableStream을 사용하여 실시간 표시
+             */
+            responseDisplay:async function(targetId, response) {
+
+            }
+        }
+
+        // 페이지 로드 완료 후 초기화
+        window.onload = function(){
+            orchestrator_workers.init();
+        }
+    </script>
+
+
+    <div class="col-sm-10">
+        <h2 class="text-center">4. Orchestrator-Workers</h2>
+        <div class="container py-2">
+            <div class="alert alert-light border small shadow-sm mb-3" role="note">
+                <p class="mb-2 font-weight-bold">입력 예시 (기본값·추가 예시 문장)</p>
+                <ul class="mb-0 pl-3">
+                    <li class="mb-2">
+                        <span class="badge badge-secondary mr-1">예시 1 · 기본값</span>
+                        <strong>K-푸드 유럽 진출</strong> —
+                        <code class="small text-dark" style="color: #212529 !important;">한국의 K-푸드 스타트업이 유럽 시장에 진출하기 위한 종합 전략을 짜줘.</code>
+                    </li>
+                    <li class="mb-0">
+                        <span class="badge badge-secondary mr-1">예시 2</span>
+                        <strong>전고체 배터리 분석</strong> —
+                        <code class="small text-dark" style="color: #212529 !important;">차세대 전고체 배터리 기술의 현재 단계와 향후 5년 내 상용화 가능성을 분석해줘.</code>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="container py-5">
+
+            <div class="row d-flex justify-content-center">
+                <div class="col-sm-10">
+                    <button class="btn btn-primary" disabled id="spinner">
+                        <span class="spinner-border spinner-border-sm" ></span>
+                        Loading..
+                    </button>
+                    <div class="card">
+                        <div class="card-header text-muted d-flex justify-content-start align-items-center p-3">
+                            <div class="input-group mb-0">
+                                <input  id="question" type="text" class="form-control" placeholder="Type message" value="한국의 K-푸드 스타트업이 유럽 시장에 진출하기 위한 종합 전략을 짜줘."
+                                        aria-label="Recipient's username" aria-describedby="button-addon2" />
+                                <button type="button" class="btn btn-primary" id="send_btn">Send</button>
+                            </div>
+                        </div>
+                        <div id="result" class="card-body" data-mdb-perfect-scrollbar-init >
+
+
+                        </div> <!-- end result -->
+                    </div> <!-- end card -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+</th:block>
+
+</html>

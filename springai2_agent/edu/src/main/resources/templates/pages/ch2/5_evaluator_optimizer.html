@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+
+
+<th:block>
+    <script>
+        /*
+         * ==========================================================
+         *  Evaluator - Optimizer 패턴 예제
+         * ----------------------------------------------------------
+         *  ✔ Optimizer(생성기)가 초안 생성
+         *  ✔ Evaluator(평가기)가 결과 품질 평가
+         *  ✔ 피드백을 기반으로 재생성 (반복 개선)
+         *
+         *  → 품질이 중요한 작업에 적합한 반복 최적화 구조
+         * ==========================================================
+         */
+
+        evaluator_optimizer = {
+
+            // Spring Boot 서버의 Evaluator-Optimizer 엔드포인트
+            // 내부적으로 "생성 → 평가 → 개선" 루프가 동작
+            url:'/ch2/evaluator-optimizer',
+
+            /*
+             * 초기화 함수
+             * - Send 버튼 클릭 이벤트 등록
+             * - 페이지 로딩 시 스피너 숨김
+             */
+            init:function(){
+                document.querySelector("#send_btn").addEventListener("click", ()=>{
+                    this.send();
+                })
+                document.querySelector("#spinner").style.cssText = "visibility:hidden;";
+            },
+
+            /*
+             * 사용자 질문을 채팅 화면에 출력
+             * - 시간 정보 포함
+             * - prepend()로 최신 메시지를 위로 표시
+             */
+            makeQuestionHtml:function(question){
+
+            },
+
+            /*
+             * 챗봇 응답 출력 영역 생성
+             * - 각 응답마다 고유 ID 생성
+             * - Streaming 데이터를 이 영역에 append
+             */
+            makeResponseHtml: async function(){
+
+            },
+
+            /*
+             * 서버 호출 핵심 로직
+             *
+             * [Evaluator-Optimizer 내부 흐름 예시]
+             *
+             * 1️⃣ Optimizer가 초안 생성
+             * 2️⃣ Evaluator가 품질 평가 (명확성, 논리성, 설득력 등)
+             * 3️⃣ 피드백 생성
+             * 4️⃣ Optimizer가 개선 버전 생성
+             * 5️⃣ 기준 충족 시 종료 (또는 최대 반복 횟수 도달)
+             */
+            send:async function(){
+
+            },
+
+            /*
+             * Streaming 응답 처리
+             * - 생성/평가/개선 단계가 실시간으로 전달될 수 있음
+             * - LLM 개선 과정을 그대로 보여줄 수 있음
+             */
+            responseDisplay:async function(targetId, response) {
+
+            }
+        }
+
+        // 페이지 로드 완료 후 초기화 실행
+        window.onload = function(){
+            evaluator_optimizer.init();
+        }
+    </script>
+
+
+    <div class="col-sm-10">
+        <h2 class="text-center">5. Evaluator-Optimizer</h2>
+        <div class="container py-2">
+            <div class="alert alert-light border small shadow-sm mb-3" role="note">
+                <p class="mb-2 font-weight-bold">입력 예시 (기본값·추가 예시 문장)</p>
+                <ul class="mb-0 pl-3">
+                    <li class="mb-2">
+                        <span class="badge badge-secondary mr-1">예시 1 · 기본값</span>
+                        <strong>엘리베이터 피치</strong> —
+                        <code class="small text-dark" style="color: #212529 !important;">스타트업 투자 유치를 위한 1분 엘리베이터 피치 문구를 작성해줘.</code>
+                    </li>
+                    <li class="mb-0">
+                        <span class="badge badge-secondary mr-1">예시 2</span>
+                        <strong>SQL 튜닝 가이드</strong> —
+                        <code class="small text-dark" style="color: #212529 !important;">복잡한 SQL 쿼리 성능을 최적화하는 튜닝 가이드를 작성해줘.</code>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="container py-5">
+
+            <div class="row d-flex justify-content-center">
+                <div class="col-sm-10">
+                    <button class="btn btn-primary" disabled id="spinner">
+                        <span class="spinner-border spinner-border-sm" ></span>
+                        Loading..
+                    </button>
+                    <div class="card">
+                        <div class="card-header text-muted d-flex justify-content-start align-items-center p-3">
+                            <div class="input-group mb-0">
+                                <input  id="question" type="text" class="form-control" placeholder="Type message" value="스타트업 투자 유치를 위한 1분 엘리베이터 피치 문구를 작성해줘."
+                                        aria-label="Recipient's username" aria-describedby="button-addon2" />
+                                <button type="button" class="btn btn-primary" id="send_btn">Send</button>
+                            </div>
+                        </div>
+                        <div id="result" class="card-body" data-mdb-perfect-scrollbar-init >
+
+
+                        </div> <!-- end result -->
+                    </div> <!-- end card -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</th:block>
+
+</html>

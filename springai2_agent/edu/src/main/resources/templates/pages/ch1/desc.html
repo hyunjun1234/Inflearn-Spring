@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<th:block>
+
+    <h4>Chapter 1. Multi-LLM Architecture (다중 모델 설계·운영 관점)</h4>
+    <br>
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>File Name</th>
+            <th>Description</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>1. Multi LLM</td>
+            <td>
+                현재 시스템은 GPT, GEMINI, LLAMA 3개의 LLM을 사용합니다.
+                요청 유형 및 전략에 따라 적절한 모델을 선택하여 호출하는
+                Multi LLM 기반 AI 서비스 구조입니다.
+            </td>
+        </tr>
+        <tr>
+            <td>2. Multi LLM Stream</td>
+            <td>
+                선택된 LLM(GPT, GEMINI, LLAMA)의 응답을
+                Reactive Streams(Project Reactor) 기반으로 스트리밍 처리합니다.
+                응답을 토큰 단위로 실시간 전송하여 사용자 경험을 향상시킵니다.
+            </td>
+        </tr>
+        <tr>
+            <td>3. Fallback</td>
+            <td>
+                <b>▶ 역할</b><br>
+                - Llama(Ollama)와 GPT 두 개의 AI 모델을 호출하는 서비스<br>
+                - Ollama 서버 장애 발생 시 자동으로 GPT로 fallback 처리<br>
+                - Resilience4j CircuitBreaker 적용<br><br>
+
+                <b>▶ 동작 흐름</b><br>
+                1. llama 호출 시 서킷 브레이커 감시<br>
+                2. 실패율 초과 → OPEN 상태 전환<br>
+                3. OPEN 상태에서는 fallback 메서드 자동 호출<br>
+                4. GPT가 대신 응답 반환
+            </td>
+        </tr>
+        <tr>
+            <td>4. Router</td>
+            <td>
+                <b>분류 단계</b>: 키워드 규칙이 아니라 <strong>Llama</strong>에 분류용 프롬프트를 보내 응답을
+                CREATIVE / TECHNICAL / GENERAL 중 하나로 받습니다. Llama 분류가 실패하면 <strong>GPT</strong>로 동일 분류를 재시도하고,
+                그래도 실패하면 UNKNOWN으로 둡니다(<code>RouterService#classifyTaskWithFallback</code>).<br><br>
+                <b>응답 라우팅</b>: 분류 결과에 따라 아래 모델로 최종 답변을 생성합니다. 주 라우팅 실패 시 GPT로 한 번 더 시도합니다.<br><br>
+                CREATIVE &nbsp;&nbsp;// 창의적 글쓰기, 복잡한 추론, 코딩 → GPT<br>
+                TECHNICAL // 기술 문서·명세 등 → Gemini<br>
+                GENERAL &nbsp;&nbsp;// 단순 질의응답, 일반 대화 → Llama<br>
+                UNKNOWN &nbsp;&nbsp;// 분류 실패 시 GENERAL과 동일하게 Llama로 응답 시도
+            </td>
+        </tr>
+        <tr>
+            <td>5. Security</td>
+            <td>
+                사용자 입력을 받아 민감 정보 여부를 판별한 후,
+                적절한 LLM(Local or External)으로 라우팅하는 보안 기반 AI 서비스 클래스입니다.<br><br>
+
+                - 민감 정보 포함 → Local LLM (Llama)<br>
+                - 일반 정보 → 외부 GPT 모델<br><br>
+
+                전달된 텍스트에 대해 아래 항목을 검사합니다:
+                <ul>
+                    <li>전화번호 존재 여부</li>
+                    <li>이메일 존재 여부</li>
+                    <li>주민등록번호 존재 여부</li>
+                    <li>기밀 키워드 포함 여부</li>
+                </ul>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <p class="border rounded p-3 small mb-3"
+       style="border-color:#c4b5fd !important;background:linear-gradient(165deg,#f5f3ff 0%,#ede9fe 45%,#eef2ff 100%);color:#4c1d95;line-height:1.55;">
+        <strong>의존성</strong>: Maven <a href="https://github.com/resilience4j/resilience4j" target="_blank" rel="noopener noreferrer"><code>io.github.resilience4j:resilience4j-spring-boot3</code></a>
+        (Artifact <code>resilience4j-spring-boot3</code>, <a href="https://resilience4j.readme.io/" target="_blank" rel="noopener noreferrer">Resilience4j</a> 문서).
+        본 실습·문서는 버전 <strong>2.1.0</strong> 기준이며, 이하 <strong>Resilience4j</strong>로 약칭합니다.
+        본 저장소에서는 Gradle 모듈 <code>edu/build.gradle</code>에 <code>implementation 'io.github.resilience4j:resilience4j-spring-boot3:2.1.0'</code> 를 선언해 이 의존성을 추가합니다.
+        <code>@CircuitBreaker</code> 등 어노테이션 연동에는 <code>org.springframework.boot:spring-boot-starter-aop</code>가 함께 필요하며, 본 저장소에도 동일하게 선언되어 있습니다.
+    </p>
+
+    <h5 class="mt-4">장애 대응 두 가지 관점: Resilience4j(CircuitBreaker) vs 코드 예외 처리(try/catch)</h5>
+    <p class="small text-muted mb-2">
+        Chapter 1에서는 둘 다 “에러가 났을 때 어떻게 살릴까”와 연결되지만, <strong>맡는 역할이 다릅니다</strong>.
+        한 줄로만 구분하면, CircuitBreaker는 <strong>“망가진 쪽을 당분간 부르지 않는다”</strong>, Router 스타일 try/catch는 <strong>“이 모델이 실패하면 저 모델을 부른다”</strong>에 가깝습니다.
+    </p>
+    <table class="table table-bordered table-sm small mb-3">
+        <thead class="table-light">
+        <tr>
+            <th style="width:18%">구분</th>
+            <th style="width:41%">Resilience4j <code>@CircuitBreaker</code><br><span class="fw-normal text-muted">(예: <code>MultiLLMService</code>, <code>FallbackService</code>)</span></th>
+            <th style="width:41%">예외 처리·라우팅<br><span class="fw-normal text-muted">(예: <code>RouterService#routeAndAsk</code>의 <code>try</code> / <code>catch</code>)</span></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>주된 목적</td>
+            <td>특정 호출 경로의 <strong>연속 실패</strong>를 감지해, 일정 시간 <strong>호출 자체를 막고</strong> fallback으로 빠지게 함(OPEN). 업스트림·스레드·타임아웃 낭비를 줄임.</td>
+            <td>한 요청 처리 흐름 안에서 <strong>실패를 잡아</strong> 다른 모델이나 단계로 <strong>대체 실행</strong>할 경로를 코드로 명시함.</td>
+        </tr>
+        <tr>
+            <td>동작 단위</td>
+            <td>보호 대상 메서드 호출마다 통계가 쌓이고, <strong>CLOSED → OPEN → HALF_OPEN</strong> 같은 상태 전환이 있음(<code>application-dev.yml</code>과 연동).</td>
+            <td>상태 머신 없이, <strong>이번 실행</strong>에서 예외가 나면 catch 블록의 순서대로 분기(예: 주 라우팅 실패 후 GPT 재시도).</td>
+        </tr>
+        <tr>
+            <td>설정·표현</td>
+            <td>선언적: 어노테이션 + YAML(윈도, 실패율, OPEN 유지 시간, HALF_OPEN 시험 횟수 등).</td>
+            <td>절차적: <code>switch</code>·<code>catch</code> 안에 대체 호출 순서를 직접 작성.</td>
+        </tr>
+        <tr>
+            <td>실습에서의 위치</td>
+            <td>실습 1(Multi LLM), 3(Fallback) 등에서 체감.</td>
+            <td>실습 4(Router)에서 분류·응답 라우팅과 함께 체감.</td>
+        </tr>
+        </tbody>
+    </table>
+    <div class="row small mb-4 g-3">
+        <div class="col-md-6">
+            <div class="border rounded p-3 h-100" style="border-color:#cbd5e1;background:#f8fafc;">
+                <strong class="d-block mb-2 text-primary">CircuitBreaker 쪽</strong>
+                <p class="mb-1"><strong>장점</strong></p>
+                <ul class="mb-2 ps-3">
+                    <li>동일 장애에 대한 <strong>반복 호출을 자동으로 줄여</strong> 시스템·외부 API를 보호하기 쉬움.</li>
+                    <li>임계치·쿨다운·복구 시험을 <strong>코드 밖(YAML)</strong>에서 조정 가능.</li>
+                </ul>
+                <p class="mb-1"><strong>단점·주의</strong></p>
+                <ul class="mb-0 ps-3">
+                    <li>AOP·프록시·상태 전환 이해가 없으면 동작이 추상적으로 느껴질 수 있음.</li>
+                    <li>“어떤 예외를 실패로 할지” 등은 설정·코드와 맞춰야 함.</li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="border rounded p-3 h-100" style="border-color:#cbd5e1;background:#f8fafc;">
+                <strong class="d-block mb-2 text-primary">try/catch·라우팅 쪽</strong>
+                <p class="mb-1"><strong>장점</strong></p>
+                <ul class="mb-2 ps-3">
+                    <li>비즈니스마다 <strong>“실패 시 무엇을 할지”</strong>를 읽기 쉬운 순서로 적을 수 있음.</li>
+                    <li>추가 라이브러리 없이도 동작 이해가 직관적임.</li>
+                    <li>모델별·단계별 <strong>세밀한 대체 전략</strong>을 한 메서드 안에 모을 수 있음.</li>
+                </ul>
+                <p class="mb-1"><strong>단점·주의</strong></p>
+                <ul class="mb-0 ps-3">
+                    <li>호출을 <strong>자동으로 쉬게 하지는 않음</strong>—매 요청마다 실패한 API를 계속 두드릴 수 있음(별도 제한·CB·재시도 정책이 필요할 수 있음).</li>
+                    <li>분기가 길어지면 중복·복잡도가 커지기 쉬움.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <h5>Resilience4j CircuitBreaker 설정 예시 — TIME_BASED (Ollama)</h5>
+    <pre class="bg-light p-3 border rounded small mb-4 overflow-auto"><code># ===============================
+# 4️⃣ Resilience4j CircuitBreaker 설정 예시 TIME_BASED
+# ===============================
+      # --------------------------------
+      # 4-2️⃣ Ollama 전용 CircuitBreaker
+      # --------------------------------
+      ollamaService:
+        # ✅ 실패율 계산 방식
+        # COUNT_BASED: 최근 N번 호출 기준
+        # TIME_BASED : 최근 N초 동안의 호출 기준
+        # Ollama는 호출 간격이 들쭉날쭉할 수 있으므로,
+        # "최근 1분 동안의 상태"를 보는 TIME_BASED가 직관적이다.
+        sliding-window-type: TIME_BASED
+        # 최근 60초(1분) 동안의 호출만 평가 대상으로 사용
+        # 예: 60초 안에 들어온 성공/실패/느린 호출들을 모아서 비율 계산
+        sliding-window-size: 60
+        # 실패율 계산을 시작하기 위한 최소 호출 수
+        # application-dev.yml 실습값: 1 → Llama 1회(재시도 끝까지) 실패 후 다음 요청부터 OPEN·GPT fallback 체감 용이
+        # 운영 권장: 5~10 → 최근 60초 안에 충분한 호출이 쌓인 뒤에만 OPEN 판단(일시 오류에 덜 민감)
+        minimum-number-of-calls: 1
+        # 실패율 임계치(%)
+        failure-rate-threshold: 50
+
+        # ✅ 느린 호출 기준
+        # 로컬 Ollama 모델이 응답은 하더라도 과도하게 느려지면
+        # 서킷브레이커가 장애 징후로 인식해 보호 동작 가능
+        slow-call-duration-threshold: 3s
+        # 의미: 최근 윈도우(여기서는 '최근 60초')에서 느린 호출 비율이 50%를 넘으면 OPEN 전환
+        # 예: 최근 60초 동안 10회 호출 중 6회가 3초 초과 = 60% > 50 → 실패율과 무관하게 OPEN
+        #      (오류가 없더라도 지연이 심하면 사용자 체감 품질 저하를 막기 위해 차단)
+        slow-call-rate-threshold: 50
+
+        # ✅ OPEN/HALF_OPEN/CLOSED 복구 사이클
+        wait-duration-in-open-state: 30s
+        # OPEN 유지 시간이 끝난 뒤 전환 동작
+        # - true  : 30초 후 자동으로 HALF_OPEN 전환 (자동 복구 테스트 수행)
+        # - false : 30초 후에도 OPEN 유지 (자동 복구 시도 없음, 계속 fallback/차단)
+        automatic-transition-from-open-to-half-open-enabled: true
+        # HALF_OPEN 상태에서 실제 호출을 몇 번까지 시험해볼지 설정
+        # - 시험 호출 수: 2회
+        # - failure-rate-threshold: 50
+        #   · 실패 0회(0%), 1회(50%)  → CLOSED 복귀
+        #   · 실패 2회(100%)          → OPEN 전환
+        # - slow-call-rate-threshold 도 함께 적용
+        #   · 느린 호출 비율이 임계치 초과 시 OPEN 전환
+        # - 최종적으로 실패율/느린호출율 둘 다 임계치 이내일 때만 CLOSED
+        permitted-number-of-calls-in-half-open-state: 2
+
+        # ✅ 장애성 예외만 실패로 집계(선택)
+        record-exceptions:
+          - java.io.IOException
+          - java.util.concurrent.TimeoutException</code></pre>
+
+    <h5>Resilience4j CircuitBreaker 설정 예시 — COUNT_BASED (multiLLM)</h5>
+    <pre class="bg-light p-3 border rounded small mb-4 overflow-auto"><code># ===============================
+# 4️⃣ Resilience4j CircuitBreaker 설정 예시 COUNT_BASED
+# ===============================
+      # --------------------------------
+      # 4-1️⃣ 다중 LLM CircuitBreaker
+      # --------------------------------
+      multiLLM:
+        # ✅ 실패율 계산 방식
+        # COUNT_BASED: "최근 N번 호출" 기준으로 통계 계산
+        # TIME_BASED : "최근 N초" 기준으로 통계 계산
+        sliding-window-type: COUNT_BASED
+        # 최근 5회 호출 결과를 기준으로 성공/실패율 계산
+        sliding-window-size: 5
+        # application-dev.yml 실습값: 1 → 첫 완전 실패 직후 실패율 100%로 OPEN 가능(Spring AI retry는 chat() 1건으로 집계)
+        # 운영 권장: 5 이상 → 우연한 소수 실패만으로 OPEN 나기 어렵게
+        minimum-number-of-calls: 1
+        # 실패율(%) 임계치: 윈도우 내 실패 비율이 이 값을 초과하면 OPEN 전환
+        # 예: 최근 5회 중 3회 실패 = 60% > 50 → OPEN
+        failure-rate-threshold: 50
+
+        # ✅ 느린 호출 감지(성공했더라도 너무 느리면 장애 징후로 판단)
+        # 아래 예시는 2초를 초과한 호출을 "느린 호출"로 분류
+        slow-call-duration-threshold: 2s
+        # 느린 호출 비율(%) 임계치
+        # 예: 최근 5회 중 3회가 2초 초과 = 60% > 50 → OPEN
+        # 의미: 최근 윈도우(여기서는 5회)에서 느린 호출 비율이 50%를 넘으면 OPEN 전환
+        # 참고: 이 조건은 "실패율"과 별개로 적용되므로,
+        #       실패가 없어도 지연이 심하면 보호를 위해 OPEN 될 수 있음
+        slow-call-rate-threshold: 50
+
+        # ✅ OPEN 상태 유지 시간(쿨다운 구간)
+        # OPEN 동안에는 실제 대상 호출을 차단하고 fallback으로 빠짐
+        wait-duration-in-open-state: 30s
+        # OPEN 유지 시간이 끝난 뒤 전환 동작
+        # - true  : 30초 후 자동으로 HALF_OPEN 전환 (자동 복구 테스트 수행)
+        # - false : 30초 후에도 OPEN 유지 (자동 복구 시도 없음, 계속 fallback/차단)
+        automatic-transition-from-open-to-half-open-enabled: true
+        # HALF_OPEN에서 시험 통과시킬 실제 호출 수
+        # ─────────────────────────────────────────────────────────
+        # [HALF_OPEN 판정 상세 규칙]
+        # 1) permitted-number-of-calls-in-half-open-state: 2 라면,
+        #    HALF_OPEN 상태에서 실제 대상 서비스(LLM)로 "정확히 2번" 시험 호출을 보냄
+        #
+        # 2) 실패율 계산식
+        #    failureRate(%) = (실패 호출 수 / 시험 호출 수) * 100
+        #
+        # 3) failure-rate-threshold: 50 기준 예시
+        #    - 실패 0회: (0/2)*100 = 0%    → 50% 이내  → CLOSED 복귀
+        #    - 실패 1회: (1/2)*100 = 50%   → 50% 이내  → CLOSED 복귀
+        #    - 실패 2회: (2/2)*100 = 100%  → 50% 초과  → 다시 OPEN 전환
+        #
+        # 4) 느린 호출(slow call)도 별도로 판정
+        #    - slow-call-duration-threshold 를 초과한 호출은 "느린 호출"로 집계
+        #    - slowCallRate(%) = (느린 호출 수 / 시험 호출 수) * 100
+        #    - slow-call-rate-threshold 를 초과하면 실패율이 정상이더라도 OPEN 전환
+        #
+        # 5) 정리
+        #    - 실패율/느린호출율이 모두 임계치 이내면 CLOSED
+        #    - 둘 중 하나라도 임계치 초과면 OPEN
+        permitted-number-of-calls-in-half-open-state: 2
+
+        # ✅ 어떤 예외를 실패로 기록할지 지정(선택)
+        # 미지정 시 대부분 예외가 실패로 집계될 수 있으므로,
+        # 강의/실무에서는 장애성 예외 위주로 명시하는 것이 명확함
+        record-exceptions:
+          - java.io.IOException
+          - java.util.concurrent.TimeoutException</code></pre>
+
+</th:block>
+
+</html>

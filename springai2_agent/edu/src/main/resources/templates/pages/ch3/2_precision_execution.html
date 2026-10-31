@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+
+
+<th:block>
+    <script>
+        /*
+         * precision_execution 객체
+         *
+         * ✔ 목적
+         * - 전략 분석 이후, 실행 중심의 워크플로우를 수행
+         * - SSE를 통해 실행 단계 로그를 실시간 수신
+         * - NDJSON 스트리밍으로 결과를 점진적으로 출력
+         *
+         * ✔ 강의 핵심 포인트
+         * 1. 실행 중심 Workflow 구조 이해
+         * 2. SSE(Server-Sent Events) 기반 상태 모니터링
+         * 3. fetch + ReadableStream 기반 스트리밍 응답 처리
+         * 4. workflowId를 통한 요청-상태 동기화 구조
+         */
+
+        precision_execution = {
+
+            // 실행 요청을 처리하는 서버 엔드포인트
+            url:'/ch3/precision-execution',
+
+            // 워크플로우 상태를 실시간으로 전송하는 SSE 엔드포인트
+            sseUrl: '/api/workflow/stream/',
+
+            /*
+             * 초기화 함수
+             * - 페이지 로드시 실행
+             * - 버튼 클릭 이벤트 등록
+             * - 로딩 스피너 숨김 처리
+             */
+            init:function(){
+                document.querySelector("#send_btn").addEventListener("click", ()=>{
+                    this.send();
+                })
+                document.querySelector("#spinner").style.cssText = "visibility:hidden;";
+            },
+
+            /*
+             * 사용자 질문을 채팅 UI에 출력
+             */
+            makeQuestionHtml:function(question){
+
+            },
+
+            /*
+             * 챗봇 응답 출력 영역 생성
+             * - 고유 ID를 생성하여 스트리밍 출력 위치 지정
+             */
+            makeResponseHtml: async function(){
+
+            },
+
+            /*
+             * 메인 실행 함수
+             *
+             * 실행 흐름:
+             * 1. 로딩 시작
+             * 2. 질문 출력
+             * 3. workflowId 생성
+             * 4. SSE 연결 (실행 로그 수신 준비)
+             * 5. fetch 요청으로 실제 실행 시작
+             * 6. 스트리밍 응답 출력
+             */
+            send:async function(){
+
+            },
+
+            /*
+             * 실행 상태 UI 생성
+             * - 워크플로우 진행 상황 표시
+             */
+            makeStatusArea: function(workflowId) {
+
+            },
+
+            /*
+             * SSE 연결
+             *
+             * ✔ 서버 → 클라이언트 단방향 이벤트 스트림
+             * ✔ 실행 단계별 상태 수신
+             */
+            connectSSE: async function(workflowId) {
+
+            },
+
+            /*
+             * NDJSON 스트리밍 응답 출력
+             *
+             * ✔ reader.read() 반복 호출
+             * ✔ chunk 단위로 디코딩 후 append
+             * ✔ 실행 결과가 점진적으로 화면에 출력됨
+             */
+            responseDisplay:async function(targetId, response) {
+
+            }
+        }
+
+        // 페이지 로드시 초기화
+        window.onload = function(){
+            precision_execution.init();
+        }
+    </script>
+
+
+
+    <div class="col-sm-10">
+        <h2 class="text-center">2. Precision Execution</h2>
+        <div class="container py-5">
+
+            <div class="row d-flex justify-content-center">
+                <div class="col-sm-10">
+                    <button class="btn btn-primary" disabled id="spinner">
+                        <span class="spinner-border spinner-border-sm" ></span>
+                        Loading..
+                    </button>
+                    <div class="card">
+                        <div class="card-header text-muted d-flex justify-content-start align-items-center p-3">
+                            <div class="input-group mb-0">
+                                <input  id="question" type="text" class="form-control" placeholder="Type message" value="우리 카페 전용 포인트 적립 시스템 앱을 만들고 싶어."
+                                        aria-label="Recipient's username" aria-describedby="button-addon2" />
+                                <button type="button" class="btn btn-primary" id="send_btn">Send</button>
+                            </div>
+                        </div>
+                        <div id="result" class="card-body" data-mdb-perfect-scrollbar-init >
+
+
+                        </div> <!-- end result -->
+                    </div> <!-- end card -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+</th:block>
+
+</html>

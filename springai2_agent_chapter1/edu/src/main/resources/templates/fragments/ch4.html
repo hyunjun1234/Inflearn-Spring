@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<th:block>
+
+    <style>
+        .course-main { max-width: 52rem; margin: 0 auto; padding: 0 0.25rem 2.5rem; font-size: 1rem; line-height: 1.65; color: #1e293b; }
+        .course-hero { margin-bottom: 1.25rem; padding-bottom: 1rem; border-bottom: 1px solid #e2e8f0; }
+        .course-hero h1 { font-size: clamp(1.25rem, 2.2vw, 1.65rem); font-weight: 700; letter-spacing: -0.02em; margin: 0; color: #0f172a; line-height: 1.3; }
+        .course-toc { background: linear-gradient(165deg, #f8fafc 0%, #f1f5f9 100%); border: 1px solid #e2e8f0; border-radius: 10px; padding: 1rem 1.25rem 1.1rem; margin-bottom: 1.25rem; }
+        .course-toc-title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b; margin: 0 0 0.6rem; }
+        .course-toc ol { margin: 0; padding-left: 1.2rem; }
+        .course-toc li { margin-bottom: 0.35rem; line-height: 1.45; }
+        .course-toc a { color: #1d4ed8; text-decoration: none; font-size: 0.9rem; font-weight: 700; }
+        .course-toc a:hover { text-decoration: underline; color: #1e40af; }
+        .course-overview { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 1.25rem 1.4rem 1.35rem; margin-bottom: 1.25rem; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06); }
+        .course-content h3 { font-size: 1.12rem; margin: 1.35rem 0 0.85rem; padding-bottom: 0.55rem; border-bottom: 2px solid #93c5fd; color: #0f172a; font-weight: 700; line-height: 1.4; }
+        .course-content > h3:first-of-type,
+        .course-content hr.course-divider + h3 { margin-top: 0; }
+        .course-content h4 { font-size: 1rem; margin: 1rem 0 0.5rem; color: #334155; font-weight: 600; }
+        .course-divider { border: none; height: 1px; background: linear-gradient(90deg, transparent, #cbd5e1, transparent); margin: 1.5rem 0; }
+        .course-footer-actions { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #e2e8f0; }
+        ul { margin-left: 1.25rem; margin-bottom: 0.75rem; }
+        code { background: #f1f5f9; padding: 0.12em 0.38em; border-radius: 4px; font-size: 0.9em; color: #0f172a; }
+        p { margin-bottom: 0.85rem; }
+        .course-overview .meta { color: #475569; font-size: 0.95rem; margin-bottom: 0.75rem; }
+        .c3-s2-pattern-block {
+            margin-left: 1.25rem;
+            padding-left: 1.1rem;
+            border-left: 3px solid #cbd5e1;
+        }
+
+        /* Chapter 4 — 한눈에 보는 구조 다이어그램 */
+        .c4-flow-wrap {
+            margin: 1rem 0 1.25rem;
+            padding: 1.35rem 1.25rem 1.5rem;
+            border-radius: 14px;
+            background: linear-gradient(160deg, #f0f9ff 0%, #f8fafc 45%, #f1f5f9 100%);
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 24px rgba(15, 23, 42, 0.06);
+        }
+        .c4-flow-wrap .c4-flow-caption {
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #64748b;
+            margin: 0 0 1rem;
+            text-align: center;
+        }
+        .c4-flow-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0;
+        }
+        .c4-flow-arrow {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0.35rem 0 0.45rem;
+            color: #94a3b8;
+            font-size: 1.1rem;
+            line-height: 1;
+        }
+        .c4-flow-arrow span {
+            font-size: 0.65rem;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            color: #94a3b8;
+            margin-top: 0.2rem;
+        }
+        .c4-card {
+            width: 100%;
+            max-width: 22rem;
+            border-radius: 12px;
+            padding: 0.85rem 1rem;
+            text-align: center;
+            border: 1px solid transparent;
+            transition: box-shadow 0.2s ease;
+        }
+        .c4-card-main {
+            background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%);
+            color: #f8fafc;
+            border-color: #1e293b;
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.25);
+        }
+        .c4-card-main .c4-card-kicker {
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            opacity: 0.85;
+            margin-bottom: 0.35rem;
+        }
+        .c4-card-main .c4-card-title {
+            font-size: 1.02rem;
+            font-weight: 700;
+            margin: 0;
+            line-height: 1.35;
+        }
+        .c4-card-main .c4-card-sub {
+            font-size: 0.78rem;
+            opacity: 0.88;
+            margin: 0.4rem 0 0;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        }
+        .c4-card-registry {
+            background: #fff;
+            border: 2px solid #38bdf8;
+            box-shadow: 0 4px 14px rgba(14, 165, 233, 0.12);
+        }
+        .c4-card-registry .c4-card-kicker {
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #0369a1;
+            margin-bottom: 0.3rem;
+        }
+        .c4-card-registry .c4-card-title {
+            font-size: 0.98rem;
+            font-weight: 700;
+            color: #0c4a6e;
+            margin: 0;
+        }
+        .c4-card-registry .c4-card-sub {
+            font-size: 0.78rem;
+            color: #64748b;
+            margin: 0.35rem 0 0;
+        }
+        .c4-agents-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.5rem 0.45rem;
+            margin-top: 0.75rem;
+            padding-top: 0.35rem;
+        }
+        .c4-agent-pill {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 0.45rem 0.65rem 0.5rem;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            line-height: 1.35;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            min-width: 7.5rem;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+        }
+        .c4-agent-pill code {
+            font-size: 0.78rem;
+            font-weight: 600;
+            background: transparent;
+            padding: 0;
+            color: #0f172a;
+        }
+        .c4-agent-pill .c4-model {
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            margin-top: 0.25rem;
+            padding: 0.12rem 0.38rem;
+            border-radius: 4px;
+        }
+        .c4-model-llama { background: #ecfdf5; color: #047857; }
+        .c4-model-gpt { background: #eff6ff; color: #1d4ed8; }
+        .c4-model-gemini { background: #f5f3ff; color: #6d28d9; }
+        .c4-flow-footnote {
+            text-align: center;
+            font-size: 0.82rem;
+            color: #64748b;
+            margin: 1rem 0 0;
+            padding-top: 0.75rem;
+            border-top: 1px dashed #cbd5e1;
+        }
+        @media (min-width: 640px) {
+            .c4-agents-grid { max-width: 36rem; margin-left: auto; margin-right: auto; }
+        }
+
+        /* Chapter 4 — 전체 아키텍처 파이프라인 */
+        .c4-pipeline-wrap {
+            margin: 1rem 0 1.25rem;
+            padding: 1.25rem 1.15rem 1.4rem;
+            border-radius: 14px;
+            background: linear-gradient(165deg, #f8fafc 0%, #eef2ff 40%, #f1f5f9 100%);
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
+        }
+        .c4-pipeline-wrap .c4-flow-caption {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #64748b;
+            margin: 0 0 0.9rem;
+            text-align: center;
+        }
+        .c4-pipeline-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 24rem;
+            margin: 0 auto;
+        }
+        .c4-pipeline-step {
+            width: 100%;
+            border-radius: 11px;
+            padding: 0.65rem 0.9rem;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+        }
+        .c4-pipeline-step .c4-ps-kicker {
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #64748b;
+            margin-bottom: 0.2rem;
+        }
+        .c4-pipeline-step .c4-ps-title {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0;
+            line-height: 1.35;
+        }
+        .c4-pipeline-step .c4-ps-sub {
+            font-size: 0.74rem;
+            color: #64748b;
+            margin: 0.28rem 0 0;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        }
+        .c4-pipeline-step.c4-ps-user {
+            background: linear-gradient(180deg, #f8fafc 0%, #fff 100%);
+            border-color: #cbd5e1;
+        }
+        .c4-pipeline-step.c4-ps-main {
+            background: linear-gradient(135deg, #1e3a5f 0%, #1e293b 100%);
+            border-color: #334155;
+            color: #f8fafc;
+        }
+        .c4-pipeline-step.c4-ps-main .c4-ps-kicker { color: rgba(248, 250, 252, 0.75); }
+        .c4-pipeline-step.c4-ps-main .c4-ps-title { color: #f8fafc; }
+        .c4-pipeline-step.c4-ps-main .c4-ps-sub { color: rgba(248, 250, 252, 0.88); }
+        .c4-pipeline-step.c4-ps-registry {
+            border: 2px solid #38bdf8;
+            background: #fff;
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.1);
+        }
+        .c4-pipeline-step.c4-ps-registry .c4-ps-kicker { color: #0369a1; }
+        .c4-pipeline-step.c4-ps-registry .c4-ps-title { color: #0c4a6e; }
+        .c4-pipeline-step.c4-ps-subs {
+            border-style: dashed;
+            border-color: #94a3b8;
+            background: #fffefb;
+        }
+        .c4-pipeline-step.c4-ps-subs .c4-ps-kicker { color: #a16207; }
+        .c4-pipeline-step.c4-ps-merge {
+            background: linear-gradient(180deg, #fffbeb 0%, #fff 100%);
+            border-color: #fcd34d;
+        }
+        .c4-pipeline-step.c4-ps-merge .c4-ps-kicker { color: #b45309; }
+        .c4-pipeline-step.c4-ps-out {
+            background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%);
+            border: 2px solid #34d399;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.12);
+        }
+        .c4-pipeline-step.c4-ps-out .c4-ps-kicker { color: #047857; }
+        .c4-pipeline-step.c4-ps-out .c4-ps-title { color: #065f46; }
+        .c4-pipeline-arrow-sm {
+            padding: 0.28rem 0 0.32rem;
+            color: #94a3b8;
+            font-size: 1rem;
+            line-height: 1;
+        }
+
+        /* Chapter 3과 동일 계열: 개요·요약 카드 (course-overview 안) */
+        .c2-field-section { margin-top: 0; margin-bottom: 0; }
+        .c2-field-section .c2-field-kicker {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #64748b;
+            margin: 1rem 0 0.4rem;
+        }
+        .c2-field-section .c2-field-kicker--top { margin-top: 0.35rem; }
+        .c2-field-section ul.c2-field-list { margin: 0.25rem 0 0.7rem; padding-left: 1.15rem; }
+        .c2-field-section ul.c2-field-list > li { margin-bottom: 0.42rem; line-height: 1.5; }
+        .c2-field-section .c2-field-focus {
+            margin-top: 0.5rem;
+            margin-bottom: 0.85rem;
+            padding: 0.85rem 1rem;
+            background: linear-gradient(165deg, #f8fafc 0%, #eff6ff 100%);
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            color: #334155;
+        }
+        .c2-field-section .c2-field-focus p { margin-bottom: 0.5rem; }
+        .c2-field-section .c2-field-focus p:last-child { margin-bottom: 0; }
+        .c2-field-section .c2-field-lead {
+            font-size: 1.02rem;
+            color: #0f172a;
+            font-weight: 600;
+            line-height: 1.5;
+            margin-bottom: 0.65rem;
+        }
+
+        /* Chapter 4 — Agent 개념 한눈에 (ch6 의존성 박스와 동일 계열) */
+        .c4-agent-concept-callout {
+            font-size: 0.88rem;
+            line-height: 1.55;
+            margin: 0 0 1.25rem;
+            padding: 0.9rem 1.1rem 1rem;
+            border-radius: 10px;
+            border: 1px solid #c4b5fd;
+            background: linear-gradient(165deg, #f5f3ff 0%, #ede9fe 45%, #eef2ff 100%);
+            color: #4c1d95;
+            box-shadow: 0 2px 8px rgba(91, 33, 182, 0.08);
+        }
+        .c4-agent-concept-callout strong { color: #5b21b6; }
+        .c4-agent-concept-callout code {
+            background: rgba(255, 255, 255, 0.85);
+            color: #3730a3;
+        }
+        .c4-agent-concept-callout .c4-acc-kicker {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #6d28d9;
+            margin: 0 0 0.55rem;
+        }
+        .c4-agent-concept-callout > p { margin: 0 0 0.45rem; }
+        .c4-agent-concept-callout > p:last-child { margin-bottom: 0; }
+        .c4-agent-concept-callout .c4-acc-lead {
+            font-size: 0.95rem;
+            margin: 0.7rem 0 0.35rem;
+            color: #3730a3;
+            font-weight: 600;
+        }
+        .c4-agent-concept-callout ul { margin: 0.35rem 0 0.5rem; padding-left: 1.15rem; }
+        .c4-agent-concept-callout ul li { margin-bottom: 0.3rem; }
+        .c4-agent-concept-callout .c4-acc-compare {
+            display: grid;
+            gap: 0.45rem;
+            margin-top: 0.35rem;
+        }
+        @media (min-width: 640px) {
+            .c4-agent-concept-callout .c4-acc-compare { grid-template-columns: 1fr 1fr; }
+        }
+        .c4-agent-concept-callout .c4-acc-compare > div {
+            padding: 0.5rem 0.65rem;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.72);
+            border: 1px solid rgba(109, 40, 217, 0.2);
+            font-size: 0.84rem;
+        }
+        .c4-agent-concept-callout .c4-acc-compare .c4-acc-bad { border-color: rgba(185, 28, 28, 0.25); }
+        .c4-agent-concept-callout .c4-acc-compare .c4-acc-good { border-color: rgba(22, 163, 74, 0.28); }
+        .c4-agent-concept-callout .c4-acc-example {
+            margin-top: 0.6rem;
+            padding: 0.65rem 0.9rem 0.75rem;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.78);
+            border: 1px solid rgba(109, 40, 217, 0.22);
+            font-size: 0.86rem;
+        }
+        .c4-agent-concept-callout .c4-acc-example > p { margin: 0 0 0.4rem; }
+        .c4-agent-concept-callout .c4-acc-example > p:last-child { margin-bottom: 0; }
+        .c4-agent-concept-callout .c4-acc-example .c4-acc-example-kicker {
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            color: #6d28d9;
+            margin: 0 0 0.45rem;
+        }
+        .c4-agent-concept-callout .c4-acc-example ol.c4-acc-example-steps {
+            margin: 0.35rem 0 0;
+            padding-left: 1.25rem;
+        }
+        .c4-agent-concept-callout .c4-acc-example ol.c4-acc-example-steps li { margin-bottom: 0.25rem; }
+    </style>
+
+    <div class="course-main">
+    <header class="course-hero">
+    <h1>Chapter 4. Multi-Agent Architecture</h1>
+    <p style="margin:0.35rem 0 0; color:#475569; font-size:1.15rem; font-weight:700;">SubAgent 분리 전략과 Agent Registry 내부 구조</p>
+    </header>
+
+    <div class="c4-agent-concept-callout" role="region" aria-label="Agent 개념 요약">
+        <p class="c4-acc-kicker">Agent 개념 요약</p>
+
+        <p><strong>Agent 한 줄 정의</strong> — “스스로 판단하고 행동하는 AI 단위”</p>
+        <p><strong>조금 더 정확한 정의</strong> — “목표를 가지고, 계획하고, 도구를 사용해 결과를 만들어내는 실행 주체”</p>
+
+        <p class="c4-acc-lead"><strong>LLM과 Agent의 차이</strong></p>
+        <div class="c4-acc-compare">
+            <div class="c4-acc-bad">
+                <strong>기존 LLM</strong><br>
+                입력 → 응답. 단순 질문·응답에 가깝다.
+            </div>
+            <div class="c4-acc-good">
+                <strong>Agent</strong><br>
+                <strong>Goal</strong>(무엇을 할지) → <strong>Reasoning</strong>(어떻게 할지) → <strong>Action</strong>(실행) → <strong>Tool</strong>(외부 API·DB·검색)이 <strong>끊기지 않은 한 줄의 흐름</strong>으로 순서대로 이어지고, <strong>Action·Tool에서 나온 관측(observation)</strong>을 그다음 <strong>Reasoning</strong>의 입력으로 넣어 <strong>같은 순서의 처리를 이어 갈 수 있다</strong>.
+            </div>
+        </div>
+
+        <p class="c4-acc-lead"><strong>Agent 내부 구조 (핵심 네 가지)</strong></p>
+        <ul>
+            <li><strong>Goal (목표)</strong> — 무엇을 해야 하는가</li>
+            <li><strong>Reasoning (판단)</strong> — 어떻게 할지 결정</li>
+            <li><strong>Action (행동)</strong> — 실제 실행</li>
+            <li><strong>Tool (도구)</strong> — 외부 API, DB, 검색 등</li>
+        </ul>
+
+        <p class="c4-acc-lead"><strong>Agent와 단순 코드의 차이</strong></p>
+        <div class="c4-acc-compare">
+            <div class="c4-acc-bad">
+                <strong>일반 코드</strong> (<code>weatherApi.call();</code> 등)<br>
+                호출 순서와 분기가 코드에 고정된다.
+            </div>
+            <div class="c4-acc-good">
+                <strong>Agent</strong><br>
+                상황을 판단한 뒤 필요한 Tool을 고르고 실행한다. 행동이 유연하다.
+            </div>
+        </div>
+
+        <div class="c4-acc-example" aria-label="Agent 동작 예시">
+            <p class="c4-acc-example-kicker">예시 (직관적)</p>
+            <p><strong>사용자 요청</strong> — “서울 날씨 알려줘”</p>
+            <p><strong>Agent 동작</strong></p>
+            <ol class="c4-acc-example-steps">
+                <li>질문 분석</li>
+                <li>날씨 API 선택</li>
+                <li>API 호출</li>
+                <li>결과 정리</li>
+                <li>응답 생성</li>
+            </ol>
+        </div>
+
+        <p class="c4-acc-lead"><strong>Agent의 핵심 특징</strong></p>
+        <ul>
+            <li><strong>자율성 (Autonomy)</strong> — 스스로 다음 행동을 결정한다.</li>
+            <li><strong>Tool 사용</strong> — 외부 시스템과 연결한다.</li>
+            <li><strong>반복 실행</strong> — 실패나 부족한 결과에 맞춰 다시 시도할 수 있다.</li>
+            <li><strong>상태 기반</strong> — Memory 등 누적 맥락을 활용한다.</li>
+        </ul>
+
+        <p class="c4-acc-lead"><strong>Agent 종류</strong></p>
+        <ul>
+            <li><strong>단일 Agent</strong> — 하나의 주체가 전체 작업을 수행한다.</li>
+            <li><strong>Multi-Agent (다중 에이전트)</strong> — Planner, Executor, Refiner, Validator 등으로 <strong>역할을 나눈다</strong>. 본 장의 Main·Sub 구조도 이 계열에 해당한다.</li>
+        </ul>
+
+        <p class="c4-acc-lead"><strong>Agentic Workflow와의 관계</strong></p>
+        <p>
+            본 과정에서 <strong>Agentic Workflow</strong>(Chapter 2)는 “한 번의 프롬프트 응답”이 아니라
+            <strong>상태·분기·병렬·재시도·관측</strong>까지 포함한 <strong>엔드투엔드 실행 흐름</strong>을 뜻합니다.
+            그 흐름 안에서 <strong>어느 단계를 언제·어떤 조건으로 이어 갈지</strong>를 정리하는 제어를 <strong>오케스트레이션(Orchestration)</strong>이라고 보면,
+            Agent 내부의 판단과는 별도로 <strong>호출 순서·분기·병렬</strong>을 코드나 엔진이 맡는 층입니다.
+        </p>
+        <p>
+            <strong>단일 Agent</strong>는 그 흐름을 한 실행 주체가 Goal→Reasoning→Action→Tool로 밀고 가는 형태에 가깝고,
+            <strong>Multi-Agent</strong>는 같은 목표를 <strong>역할이 다른 Agent</strong>(본 장의 Main·Sub, 이후 장의 노드·Tool 담당 주체 등)로 나누어 맡기는 형태입니다.
+            Multi-Agent일수록 오케스트레이션은 <strong>누구를 언제 부를지</strong>를 잡는 <strong>바깥 조율층</strong>(본 장의 Main 오케스트레이터, 이후 <code>DagWorkflowEngine</code>·YAML 엔진 등)으로 더 분명해집니다.
+        </p>
+        <p>
+            이 흐름을 본 과정 축으로 보면, <strong>Chapter 2·3을 단일 Agent 관점</strong>으로 이해할 수 있고, 이후 장은 같은 문제를 <strong>Multi-Agent 관점으로 확장</strong>해 가는 구성입니다.
+            Chapter 4~6은 주로 <strong>코드·런타임</strong>이 오케스트레이션을 맡아 단계 순서와 Tool 호출을 잡고, Chapter 7~9는 <strong>DAG·YAML DSL</strong>로 그 워크플로를 그래프·선언적으로 옮겨 같은 전략 분석 시나리오를 확장합니다.
+            정리하면 <strong>Agentic Workflow</strong>는 Agent가 일을 나눠 실행하고(누가 할지), <strong>Orchestration</strong>이 그 실행 순서를 조율해(언제·어떻게 이어갈지), 사용자 요청 하나가 최종 응답으로 끝날 때까지 전 과정을 연결해 주는 실행 흐름입니다.
+        </p>
+
+        <p class="c4-acc-lead"><strong>한 줄로 정리</strong></p>
+        <ul>
+            <li><strong>Agent</strong> — 목표를 기준으로 판단·실행하며 결과를 만들어 내는 실행 주체</li>
+            <li><strong>Multi-Agent</strong> — 하나의 목표를 역할별 Agent로 분담해 협업하는 구조</li>
+            <li><strong>Orchestration</strong> — 각 Agent/Tool을 언제 어떤 순서·조건으로 호출할지 조율하는 제어층</li>
+            <li><strong>Agentic Workflow</strong> — 역할 분담과 실행 순서 조율을 묶어, 요청부터 최종 응답까지 연결한 전체 흐름</li>
+        </ul>
+        <p class="c4-acc-lead"><strong>가장 중요한 차이</strong></p>
+        <p>LLM은 “말하는 AI”에 가깝고, Agent는 “일하는 AI”에 가깝다.</p>
+    </div>
+
+    <div class="course-overview c2-field-section">
+
+    <p class="c2-field-lead">
+        Chapter 1~3에서는 <strong>여러 LLM을 쓰는 법</strong>과 <strong>한 서비스 안에서 파이프라인을 도는 법</strong>을 배웠습니다.
+        Chapter 3의 <code>StrategicAnalysisService</code>는 <strong>한 클래스가 Llama·GPT·Gemini를 직접 호출</strong>하는 구조였습니다.
+    </p>
+
+    <div class="c2-field-focus">
+        <p>
+            본 장은 그 한계를 넘어, <strong>Main</strong> (Main agent, Orchestrator agent)이 맡는 <strong>제어 계층</strong>과
+            <strong>Sub</strong> (Sub agent, Tool agent 등)가 맡는 <strong>역할 전용 실행 계층</strong> (<code>SubAgent</code>)를 <strong>나눈</strong> Multi-Agent 구조를 다룹니다.
+        </p>
+    </div>
+
+    <p>
+        전략 분석 파이프라인(라우팅·간단 응답·기술·시장 병렬 분석·평가·개선 루프 등)에서
+        <strong>단계를 정하고, 분기·병렬·반복을 짜는 일</strong>은 Main 쪽 <code>StrategicAnalysisAgentOrchestrator</code>가 맡습니다.
+        <strong>각 단계의 LLM 호출과 세부 프롬프트</strong>는 역할마다 쪼갠 <strong>SubAgent</strong>에 넘깁니다.
+    </p>
+
+    <p>
+        그 결과 오케스트레이션 코드는 <strong>“무엇을 언제 실행할지”</strong>에 집중하고, Sub 쪽은 <strong>“한 역할의 입·출력 계약”</strong>만 지키면 됩니다.
+    </p>
+
+    <p>
+        Sub는 <code>SubAgent</code>를 구현한 <strong>작고 단일 책임의 Spring 빈</strong>으로 두고, 기동 시 <code>SubAgentRegistry</code>가 <code>name()</code>으로 모읍니다.
+        Main은 <code>require("routing")</code>처럼 <strong>이름만으로 조회</strong>해 <code>execute</code>만 호출하면 되고, 역할마다 <code>@Qualifier</code>로 다른 <code>ChatClient</code>를 주입하면 Chapter 1의 <strong>Multi-LLM 전략</strong>을 <strong>에이전트 단계</strong>마다 그대로 이어 쓸 수 있습니다.
+    </p>
+
+    <p>
+        <strong>한 줄 요약</strong> — Chapter 1~3의 Multi-LLM·오케스트레이션을 <strong>에이전트 조각</strong>으로 쌓아 가는 장입니다.
+    </p>
+
+    <p class="mb-0">
+        실습 화면: <a th:href="@{/go/ch4/1_strategic_analysis}">Strategic Analysis (Agent)</a>
+    </p>
+    </div>
+
+    <nav class="course-toc" aria-label="목차">
+    <p class="course-toc-title">목차</p>
+    <ol>
+        <li><a href="#c4-s1">Main Agent와 Sub Agent 구조</a></li>
+        <li><a href="#c4-s2">SubAgent 레지스트리 기반 구조</a></li>
+        <li><a href="#c4-s3">등록된 서브 에이전트 목록</a></li>
+        <li><a href="#c4-s4">실행 파이프라인 (STRATEGIC 경로 요약)</a></li>
+        <li><a href="#c4-s5">Chapter 3 (<code>StrategicAnalysisService</code>)와의 차이</a></li>
+    </ol>
+    </nav>
+
+    <div class="course-content">
+    <hr class="course-divider">
+
+    <h3 id="c4-s1">1. Main Agent와 Sub Agent 구조</h3>
+    <br>
+
+    <p><strong>🔹 Main(Main agent, Orchestrator agent) (메인 오케스트레이터)</strong></p>
+    <p>
+        Main(Main agent, Orchestrator agent)는 단일 LLM 호출로 모든 작업을 처리하는 구조가 아니라, Java 기반 오케스트레이션 계층에서 단계·분기·병렬·반복 흐름을 제어합니다. <code>Ch4Controller</code>는 POST <code>/ch4/strategic-analysis</code> 요청 시 클라이언트가 SSE 구독과 맞추기 위해 넘긴 <code>workflowId</code>(UUID)와 <code>prompt</code>를 받아 <code>StrategicAnalysisAgentService#executeWithMonitoring()</code>에 전달합니다. 실제 라우팅·병렬 분석·평가·개선 루프의 실행 순서는 <code>StrategicAnalysisAgentOrchestrator</code>가 담당합니다. 단계별 진행은 Redis의 <code>WorkflowStatusPublisher</code>로 전송되며, 실습 화면은 동일 <code>workflowId</code>로 SSE(Server-Sent Events)를 구독해 상태를 확인합니다.
+    </p>
+
+    <p><strong>🔹 Sub(Sub agent, Tool agent 등) (서브 에이전트)</strong></p>
+    <p>
+        Sub(Sub agent, Tool agent 등)는 <code>SubAgent</code> 인터페이스(name(), description(), execute(String))를 구현한 작은 단위의 Spring 컴포넌트이며, 하나의 역할만 수행하도록 설계됩니다. 입력은 단일 문자열이고 출력도 한 번의 LLM 호출로 문자열을 반환하는 구조이기 때문에, 라우팅·요약·기술 분석·시장 분석·보고서 평가처럼 “한 단계에서 하나의 작업만 수행하는” 역할에 매우 적합합니다.         Main(Main agent, Orchestrator agent)는 subAgentRegistry.require("routing")처럼 이름으로 서브 에이전트를 조회한 뒤 execute()만 호출하여 각 단계를 순차적으로 실행합니다.
+    </p>
+    <p>
+        과정에서는 날씨·외부 API처럼 <strong>Tool·함수 호출</strong>이 중심인 Sub를 <strong>Tool agent</strong>로 짚어 설명합니다. <strong>Sub(Sub agent, Tool agent 등)</strong>의 <strong>등</strong>에는 라우팅·요약처럼 <strong>LLM 호출만</strong>으로 역할을 나눈 Sub도 포함됩니다.
+    </p>
+
+    <p><strong>🔹 SubAgentRegistry (서브 에이전트 관리 구조)</strong></p>
+    <p>
+        SubAgentRegistry는 Spring이 자동으로 주입한 모든 Sub(Sub agent, Tool agent 등) 빈을 name() 기준으로 Map 형태로 수집하고 관리하는 역할을 합니다. 동일한 이름의 Sub(Sub agent, Tool agent 등)가 두 개 이상 존재하면 애플리케이션 기동 시 즉시 예외가 발생하므로, 오케스트레이션에서 쓰는 키(예: <code>StrategicAgentKeys.ROUTING</code>, 실제 문자열 <code>"routing"</code>)와 각 SubAgent 구현의 <code>name()</code>이 정확히 일치하도록 맞춥니다. 이 구조 덕분에 Main(Main agent, Orchestrator agent)는 특정 구현 클래스에 의존하지 않고, 이름 기반으로 유연하게 서브 에이전트를 교체하거나 확장할 수 있습니다.
+    </p>
+    <p>
+        ✔ Chapter 7 DAG 엔진에서도 동일 레지스트리를 재사용합니다.
+    </p>
+
+    <hr class="course-divider">
+
+    <h3 id="c4-s2">2. SubAgent 레지스트리 기반 구조</h3>
+    <br>
+
+    <p>
+        이 장의 <strong>핵심은 하나</strong>입니다.
+    </p>
+    <p><strong>Main(Main agent, Orchestrator agent) 하나 + 여러 개의 역할 전용 SubAgent 구조</strong></p>
+    <p>즉</p>
+    <p><strong>1개의 큰 LLM → 여러 개의 작은 역할 LLM 구조로 변경</strong></p>
+
+    <h4><strong>1-1.</strong> 전체 아키텍처 구조</h4>
+    <div class="c3-s2-pattern-block">
+    <p>Chapter 4의 구조는 다음과 같이 구성됩니다.</p>
+
+    <div class="c4-pipeline-wrap" role="img" aria-label="User 요청부터 최종 응답까지의 전체 흐름">
+        <p class="c4-flow-caption">엔드투엔드 흐름</p>
+        <div class="c4-pipeline-col">
+            <div class="c4-pipeline-step c4-ps-user">
+                <div class="c4-ps-kicker">입력</div>
+                <p class="c4-ps-title">User 요청</p>
+            </div>
+            <div class="c4-pipeline-arrow-sm" aria-hidden="true">↓</div>
+            <div class="c4-pipeline-step c4-ps-main">
+                <div class="c4-ps-kicker">Main(Main agent, Orchestrator agent)</div>
+                <p class="c4-ps-title">오케스트레이터</p>
+                <p class="c4-ps-sub">StrategicAnalysisAgentService</p>
+            </div>
+            <div class="c4-pipeline-arrow-sm" aria-hidden="true">↓</div>
+            <div class="c4-pipeline-step c4-ps-registry">
+                <div class="c4-ps-kicker">조회</div>
+                <p class="c4-ps-title">SubAgentRegistry</p>
+                <p class="c4-ps-sub">이름 → SubAgent 빈</p>
+            </div>
+            <div class="c4-pipeline-arrow-sm" aria-hidden="true">↓</div>
+            <div class="c4-pipeline-step c4-ps-subs">
+                <div class="c4-ps-kicker">실행</div>
+                <p class="c4-ps-title">여러 개의 SubAgent 실행</p>
+                <p class="c4-ps-sub">routing · 분석 · 평가 등 단계별 호출</p>
+            </div>
+            <div class="c4-pipeline-arrow-sm" aria-hidden="true">↓</div>
+            <div class="c4-pipeline-step c4-ps-merge">
+                <div class="c4-ps-kicker">집계</div>
+                <p class="c4-ps-title">결과 병합</p>
+                <p class="c4-ps-sub">병렬 분석 후 초안 통합 등</p>
+            </div>
+            <div class="c4-pipeline-arrow-sm" aria-hidden="true">↓</div>
+            <div class="c4-pipeline-step c4-ps-out">
+                <div class="c4-ps-kicker">출력</div>
+                <p class="c4-ps-title">최종 응답</p>
+            </div>
+        </div>
+    </div>
+    <p><strong>핵심 포인트</strong></p>
+    <p>
+        Main(Main agent, Orchestrator agent)는 직접 LLM을 거의 호출하지 않습니다.<br>
+        대신 SubAgent만 실행하는 <strong>오케스트레이터</strong> 역할을 합니다.
+    </p>
+    </div>
+
+    <h4><strong>1-2.</strong> Agent와 SubAgent 역할 분리</h4>
+    <div class="c3-s2-pattern-block">
+    <p><strong>① Main(Main agent, Orchestrator agent) (메인 오케스트레이터)</strong></p>
+    <p>역할은 단 하나입니다.</p>
+    <p><strong>“어떤 SubAgent를 언제 실행할 것인지 결정”</strong></p>
+    <p>즉</p>
+    <ul>
+        <li>단계 제어</li>
+        <li>실행 순서 제어</li>
+        <li>병렬 실행 제어</li>
+        <li>반복 실행 제어</li>
+    </ul>
+    <p>구조적으로 보면</p>
+    <p><strong>AI가 직접 일하는 구조 → AI를 관리하는 구조</strong></p>
+
+    <p><strong>② SubAgent (실제 일을 하는 AI)</strong></p>
+    <p>SubAgent는 <strong>하나의 역할만</strong> 수행합니다.</p>
+    <p><strong>예시</strong></p>
+    <ul>
+        <li>라우팅 전용 SubAgent</li>
+        <li>기술 분석 전용 SubAgent</li>
+        <li>시장 분석 전용 SubAgent</li>
+        <li>평가 전용 SubAgent</li>
+        <li>간단 질문 전용 SubAgent</li>
+    </ul>
+    <p>즉 <strong>하나의 SubAgent = 하나의 역할</strong></p>
+    </div>
+
+    <h4><strong>1-3.</strong> 구조를 한 번에 이해하는 그림</h4>
+    <div class="c3-s2-pattern-block">
+    <p>Chapter 4 구조를 가장 쉽게 보면 이렇게 이해하면 됩니다.</p>
+
+    <div class="c4-flow-wrap" role="img" aria-label="Main(Main agent, Orchestrator agent)에서 SubAgentRegistry를 거쳐 여러 SubAgent로 분기하는 구조">
+        <p class="c4-flow-caption">실행 흐름 한 장면</p>
+        <div class="c4-flow-col">
+            <div class="c4-card c4-card-main">
+                <div class="c4-card-kicker">Main(Main agent, Orchestrator agent)</div>
+                <p class="c4-card-title">오케스트레이터</p>
+                <p class="c4-card-sub">StrategicAnalysisAgentService</p>
+            </div>
+            <div class="c4-flow-arrow" aria-hidden="true">↓<span>이름으로 조회</span></div>
+            <div class="c4-card c4-card-registry">
+                <div class="c4-card-kicker">Registry</div>
+                <p class="c4-card-title">SubAgentRegistry</p>
+                <p class="c4-card-sub">name() → SubAgent 빈 매핑</p>
+            </div>
+            <div class="c4-flow-arrow" aria-hidden="true">↓<span>역할별 실행</span></div>
+            <div class="c4-agents-grid">
+                <div class="c4-agent-pill">
+                    <code>routing</code>
+                    <span class="c4-model c4-model-llama">Llama (실패 시 GPT)</span>
+                </div>
+                <div class="c4-agent-pill">
+                    <code>simple-query</code>
+                    <span class="c4-model c4-model-llama">Llama</span>
+                </div>
+                <div class="c4-agent-pill">
+                    <code>technical-analysis</code>
+                    <span class="c4-model c4-model-gpt">GPT (실패 시 Gemini)</span>
+                </div>
+                <div class="c4-agent-pill">
+                    <code>market-analysis</code>
+                    <span class="c4-model c4-model-gemini">Gemini</span>
+                </div>
+                <div class="c4-agent-pill">
+                    <code>report-evaluator</code>
+                    <span class="c4-model c4-model-gemini">Gemini</span>
+                </div>
+                <div class="c4-agent-pill">
+                    <code>report-optimizer</code>
+                    <span class="c4-model c4-model-gpt">GPT</span>
+                </div>
+            </div>
+        </div>
+        <p class="c4-flow-footnote">
+            <strong>Main(Main agent, Orchestrator agent) → Registry → SubAgent</strong> — Main은 순서만, 실제 LLM 호출은 각 SubAgent에서 수행합니다.
+            보고서 <strong>수정(Optimizer)</strong>은 초안과 피드백을 합쳐 <code>report-optimizer</code> SubAgent를 호출합니다.
+        </p>
+    </div>
+    <p>즉 <strong>Main(Main agent, Orchestrator agent) → Registry → SubAgent 실행 구조</strong></p>
+    </div>
+
+    <h4><strong>1-4.</strong> 실행 흐름 구조</h4>
+    <div class="c3-s2-pattern-block">
+    <p><code>STRATEGIC</code> 요청이 들어오면 실행 흐름은 이렇게 됩니다.</p>
+    <ol>
+        <li><strong>Step 1.</strong> Routing SubAgent 실행</li>
+        <li><strong>Step 2.</strong> (STRATEGIC인 경우) 기술 분석 SubAgent 실행 · 시장 분석 SubAgent 실행</li>
+        <li><strong>Step 3.</strong> 결과 병합</li>
+        <li><strong>Step 4.</strong> 평가 SubAgent 실행</li>
+        <li><strong>Step 5.</strong> 필요하면 다시 수정 후 반복</li>
+    </ol>
+    <p>즉 <strong>Routing → Analysis → Merge → Evaluate → Optimize</strong></p>
+    </div>
+
+    <h4><strong>1-5.</strong> 가장 중요한 설계 포인트</h4>
+    <div class="c3-s2-pattern-block">
+    <p>이 구조의 핵심은 이것입니다.</p>
+    <p>
+        <strong>Main(Main agent, Orchestrator agent)는 “누가 실행될지”만 알고<br>
+        SubAgent는 “무엇을 실행할지”만 알고 있습니다.</strong>
+    </p>
+    <p>즉</p>
+    <table class="table table-bordered table-sm">
+        <thead class="thead-light">
+        <tr>
+            <th>역할</th>
+            <th>책임</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Main(Main agent, Orchestrator agent)</td>
+            <td>실행 순서 제어</td>
+        </tr>
+        <tr>
+            <td>Sub(Sub agent, Tool agent 등) · <code>SubAgent</code></td>
+            <td>실제 LLM 작업 수행</td>
+        </tr>
+        <tr>
+            <td>Registry</td>
+            <td>SubAgent 관리</td>
+        </tr>
+        </tbody>
+    </table>
+    </div>
+
+    <h4><strong>1-6.</strong> 왜 SubAgent 구조를 사용하는가</h4>
+    <div class="c3-s2-pattern-block">
+    <p><strong>기존 구조</strong>는 이런 문제를 가지고 있습니다.</p>
+    <ul>
+        <li>하나의 Service 안에서 Llama 호출, GPT 호출, Gemini 호출</li>
+        <li>프롬프트 10개 이상</li>
+    </ul>
+    <p><strong>결과</strong></p>
+    <ul>
+        <li>코드가 계속 커짐</li>
+        <li>유지보수 어려움</li>
+        <li>기능 추가 어려움</li>
+    </ul>
+    <p><strong>하지만 SubAgent 구조</strong>는 이렇게 바뀝니다.</p>
+    <p><strong>기능 추가 = SubAgent 하나 추가</strong></p>
+    <p>즉 <strong>확장 가능한 Agent 구조</strong></p>
+    </div>
+
+    <h4><strong>1-7.</strong> Chapter 4 구조 핵심 요약</h4>
+    <div class="c3-s2-pattern-block">
+    <p>이 장의 핵심은 아래 한 줄입니다.</p>
+    <p><strong>하나의 큰 Agent → 여러 개의 역할 기반 SubAgent 구조</strong></p>
+    <p>그리고 구조는 이렇게 정리됩니다.</p>
+    <ul>
+        <li><strong>Main(Main agent, Orchestrator agent)</strong> = 오케스트레이터</li>
+        <li><strong>Sub(Sub agent, Tool agent 등)</strong> · <code>SubAgent</code> = 역할 전용 AI</li>
+        <li><strong>Registry</strong> = SubAgent 관리 시스템</li>
+    </ul>
+    </div>
+
+    <hr class="course-divider">
+
+    <h3 id="c4-s3">3. 등록된 서브 에이전트 목록</h3>
+    <br>
+
+    <p>
+        아래는 <code>com/ai/shared/agent/subagent</code> 패키지에 구현된 내용입니다.
+    </p>
+
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>레지스트리 키 (<code>name()</code>)</th>
+            <th>역할</th>
+            <th>모델 (대표 <code>@Qualifier</code> / 폴백)</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><code>routing</code></td>
+            <td>사용자 요청을 <code>SIMPLE</code> / <code>STRATEGIC</code>으로 분류</td>
+            <td>Llama (실패 시 GPT)</td>
+        </tr>
+        <tr>
+            <td><code>simple-query</code></td>
+            <td><code>SIMPLE</code> 분기에서 심층 파이프라인 없이 짧은 답변 생성</td>
+            <td>Llama</td>
+        </tr>
+        <tr>
+            <td><code>technical-analysis</code></td>
+            <td>기술 관점 분석 (STRATEGIC 경로, 병렬 워커 중 하나)</td>
+            <td>GPT (실패 시 Gemini)</td>
+        </tr>
+        <tr>
+            <td><code>market-analysis</code></td>
+            <td>시장·트렌드 관점 분석 (기술 분석과 동시 실행 가능)</td>
+            <td>Gemini</td>
+        </tr>
+        <tr>
+            <td><code>report-evaluator</code></td>
+            <td>병합된 초안에 대해 품질 평가; 통과 시 응답에 <code>PASS</code> 포함</td>
+            <td>GPT</td>
+        </tr>
+        <tr>
+            <td><code>report-optimizer</code></td>
+            <td>평가 미통과 시 초안에 평가 피드백을 반영해 개선(EVALUATING/OPTIMIZING 루프)</td>
+            <td>GPT</td>
+        </tr>
+        </tbody>
+    </table>
+
+
+
+    <hr class="course-divider">
+
+    <h3 id="c4-s4">4. 실행 파이프라인 (STRATEGIC 경로 요약)</h3>
+    <br>
+
+    <ol>
+        <li><strong>ROUTING</strong> — <code>routing</code> 서브 에이전트가 분류</li>
+        <li><strong>SIMPLE</strong> — <code>simple-query</code>만 호출 후 종료</li>
+        <li><strong>ANALYZING</strong> — <code>technical-analysis</code>와 <code>market-analysis</code>를 <code>CompletableFuture</code>로 병렬 실행 후, 결과를 하나의 초안 문자열로 병합</li>
+        <li><strong>EVALUATING / OPTIMIZING</strong> — 최대 4회: <code>report-evaluator</code>로 평가 → <code>PASS</code>면 완료, 아니면 <code>ReportOptimizerSubagent#optimize</code>로 초안 갱신 후 반복</li>
+    </ol>
+
+    <p>
+        각 단계는 <code>WorkflowStatusPublisher</code>로 Redis에 발행되며, 브라우저는 동일 <code>workflowId</code>로 SSE 스트림을 구독해 진행 상황을 표시합니다.
+    </p>
+
+    <hr class="course-divider">
+
+    <h3 id="c4-s5">5. Chapter 3 (<code>StrategicAnalysisService</code>)와의 차이</h3>
+    <br>
+
+    <p><strong>🔹 동일한 점</strong></p>
+    <p>
+        큰 그림은 같습니다. 라우팅(Llama) → (STRATEGIC이면) 기술(GPT)·시장(Gemini) 병렬 → Gemini 평가 + GPT 개선 루프,
+        Redis/SSE로 단계 알림, 스레드 풀로 병렬 I/O 제어까지 워크플로 의미는 Chapter 3과 대응됩니다.
+    </p>
+
+    <p><strong>🔹 바뀐 점 (Chapter 4 설계 의도)</strong></p>
+    <ul>
+        <li><strong>역할 분리</strong> — Chapter 3은 한 서비스 클래스 안에서 <code>llamaClient</code>, <code>gptClient</code>, <code>geminiClient</code>를 직접 호출합니다.
+            Chapter 4는 각 역할을 <code>SubAgent</code> (또는 Optimizer 전용 빈)로 나누고, 오케스트레이터는 “누구를 부를지”만 결정합니다.</li>
+        <li><strong>확장·재사용</strong> — 새 단계를 추가할 때 서비스 본문을 비대하게 늘리기보다, <code>SubAgent</code> 구현 클래스를 추가하고 레지스트리에 자동 등록되는 방식으로 맞춥니다.
+            (Chapter 7 DAG 노드에서 같은 <code>SubAgentRegistry</code>를 쓰는 이유와 연결됩니다.)</li>
+        <li><strong>계약의 명시</strong> — <code>SubAgent</code>는 “단일 문자열 in / 문자열 out”으로 통일됩니다. Optimizer처럼 의미상 입력이 두 개이면,
+            <code>ReportOptimizerSubagent</code>가 합친 한 문자열을 받아 내부에서 나눕니다.</li>
+        <li><strong>엔드포인트</strong> — Chapter 3은 컨트롤러 경로가 <code>/ch3/...</code> 계열이고, Chapter 4 실습은 <code>/ch4/strategic-analysis</code>와
+            <code>StrategicAnalysisAgentService</code>를 사용합니다.</li>
+    </ul>
+
+    <hr class="course-divider">
+
+    <p>
+        Chapter 5에서는 같은 비즈니스를 <strong>도구 빈</strong>으로 쪼갠 뒤 <code>StrategicAnalysisOrchestrator</code>가
+        Chapter 4와 같은 순서로 <strong>Java 코드 워크플로</strong>를 실행하는 형태로 이어지고,
+        Chapter 6에서는 커뮤니티 <strong>Task tool</strong>과 Markdown 서브에이전트 실습이 이어집니다.
+        본 Chapter 4 문서는 <strong>순수 Java 오케스트레이션 + SubAgent 레지스트리</strong> 패턴에 맞춰 정리되었습니다.
+    </p>
+
+    <hr class="course-divider">
+
+    <div class="course-footer-actions">
+    <p>
+        <a th:href="@{/go/ch4/desc}" class="btn btn-warning font-weight-bold">Chapter4. 상세 가이드 (Screen Description)</a>
+    </p>
+    <p>
+        이전 장: <a th:href="@{/go/ch3}">Chapter 3 — Orchestrated Multi-Agent Pattern</a>
+    </p>
+    <p>
+        다음 장: <a th:href="@{/go/ch5}">Chapter 5 — Tool-Orchestrated Multi-Agent</a>
+    </p>
+    </div>
+
+    </div>
+    </div>
+
+</th:block>
+
+</html>
+
+
+

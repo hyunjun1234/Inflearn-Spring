@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<th:block>
+
+    <style>
+        .course-main { max-width: 52rem; margin: 0 auto; padding: 0 0.25rem 2.5rem; font-size: 1rem; line-height: 1.65; color: #1e293b; }
+        .course-hero { margin-bottom: 1.25rem; padding-bottom: 1rem; border-bottom: 1px solid #e2e8f0; }
+        .course-hero h1 { font-size: clamp(1.25rem, 2.2vw, 1.65rem); font-weight: 700; letter-spacing: -0.02em; margin: 0; color: #0f172a; line-height: 1.3; }
+        .course-toc { background: linear-gradient(165deg, #f8fafc 0%, #f1f5f9 100%); border: 1px solid #e2e8f0; border-radius: 10px; padding: 1rem 1.25rem 1.1rem; margin-bottom: 1.25rem; }
+        .course-toc-title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b; margin: 0 0 0.6rem; }
+        .course-toc ol { margin: 0; padding-left: 1.2rem; }
+        .course-toc li { margin-bottom: 0.35rem; line-height: 1.45; }
+        .course-toc a { color: #1d4ed8; text-decoration: none; font-size: 0.9rem; font-weight: 700; }
+        .course-toc a:hover { text-decoration: underline; color: #1e40af; }
+        .course-overview { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 1.25rem 1.4rem 1.35rem; margin-bottom: 1.25rem; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06); }
+        .course-content h3 { font-size: 1.12rem; margin: 1.35rem 0 0.85rem; padding-bottom: 0.55rem; border-bottom: 2px solid #93c5fd; color: #0f172a; font-weight: 700; line-height: 1.4; }
+        .course-content hr.course-divider + h3 { margin-top: 0; }
+        .course-content h4 { font-size: 1rem; margin: 1rem 0 0.5rem; color: #334155; font-weight: 600; }
+        .course-divider { border: none; height: 1px; background: linear-gradient(90deg, transparent, #cbd5e1, transparent); margin: 1.5rem 0; }
+        .course-footer-actions { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #e2e8f0; }
+        ul { margin-left: 1.25rem; margin-bottom: 0.75rem; }
+        code { background: #f1f5f9; padding: 0.12em 0.38em; border-radius: 4px; font-size: 0.9em; color: #0f172a; }
+        p { margin-bottom: 0.85rem; }
+        table { font-size: 0.95rem; }
+        .course-overview .meta { color: #475569; font-size: 0.95rem; margin-bottom: 0.75rem; }
+        .course-overview .note { font-size: 0.88rem; color: #64748b; margin-bottom: 0.65rem; line-height: 1.55; }
+        .course-overview .note:last-of-type { margin-bottom: 0; }
+
+        /* Flow diagrams — Chapter 4~7과 동일 계열 */
+        .course-flow-pipeline {
+            margin: 1rem 0 1.25rem;
+            padding: 1.25rem 1.15rem 1.4rem;
+            border-radius: 14px;
+            background: linear-gradient(165deg, #f8fafc 0%, #eef2ff 40%, #f1f5f9 100%);
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
+        }
+        .course-flow-pipeline .course-flow-caption {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #64748b;
+            margin: 0 0 0.9rem;
+            text-align: center;
+        }
+        .course-flow-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 24rem;
+            margin: 0 auto;
+        }
+        .course-flow-col-wide { max-width: 28rem; }
+        .course-flow-step {
+            width: 100%;
+            border-radius: 11px;
+            padding: 0.65rem 0.9rem;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+        }
+        .course-flow-step .course-flow-kicker {
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #64748b;
+            margin-bottom: 0.2rem;
+        }
+        .course-flow-step .course-flow-title {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0;
+            line-height: 1.35;
+        }
+        .course-flow-step .course-flow-sub {
+            font-size: 0.74rem;
+            color: #64748b;
+            margin: 0.28rem 0 0;
+        }
+        .course-flow-step.course-flow-user {
+            background: linear-gradient(180deg, #f8fafc 0%, #fff 100%);
+            border-color: #cbd5e1;
+        }
+        .course-flow-step.course-flow-llm {
+            background: linear-gradient(135deg, #1e3a5f 0%, #1e293b 100%);
+            border-color: #334155;
+            color: #f8fafc;
+        }
+        .course-flow-step.course-flow-llm .course-flow-kicker { color: rgba(248, 250, 252, 0.75); }
+        .course-flow-step.course-flow-llm .course-flow-title { color: #f8fafc; }
+        .course-flow-step.course-flow-runtime {
+            border: 2px solid #8b5cf6;
+            background: linear-gradient(180deg, #faf5ff 0%, #fff 100%);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.12);
+        }
+        .course-flow-step.course-flow-runtime .course-flow-kicker { color: #6d28d9; }
+        .course-flow-step.course-flow-runtime .course-flow-title { color: #4c1d95; }
+        .course-flow-step.course-flow-tool {
+            border: 2px solid #38bdf8;
+            background: #fff;
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.1);
+        }
+        .course-flow-step.course-flow-tool .course-flow-kicker { color: #0369a1; }
+        .course-flow-step.course-flow-tool .course-flow-title { color: #0c4a6e; }
+        .course-flow-step.course-flow-planner {
+            background: linear-gradient(135deg, #5b21b6 0%, #7c3aed 100%);
+            border-color: #6d28d9;
+            color: #faf5ff;
+            box-shadow: 0 6px 16px rgba(124, 58, 237, 0.25);
+        }
+        .course-flow-step.course-flow-planner .course-flow-kicker { color: rgba(250, 245, 255, 0.85); }
+        .course-flow-step.course-flow-planner .course-flow-title { color: #fff; }
+        .course-flow-step.course-flow-engine {
+            background: linear-gradient(180deg, #fff7ed 0%, #fff 100%);
+            border: 2px solid #fb923c;
+            box-shadow: 0 4px 12px rgba(251, 146, 60, 0.15);
+        }
+        .course-flow-step.course-flow-engine .course-flow-kicker { color: #c2410c; }
+        .course-flow-step.course-flow-engine .course-flow-title { color: #9a3412; }
+        .course-flow-step.course-flow-dag {
+            border-style: dashed;
+            border-color: #818cf8;
+            background: #eef2ff;
+        }
+        .course-flow-step.course-flow-dag .course-flow-kicker { color: #4338ca; }
+        .course-flow-step.course-flow-merge {
+            background: linear-gradient(180deg, #fffbeb 0%, #fff 100%);
+            border-color: #fcd34d;
+        }
+        .course-flow-step.course-flow-merge .course-flow-kicker { color: #b45309; }
+        .course-flow-step.course-flow-out {
+            background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%);
+            border: 2px solid #34d399;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.12);
+        }
+        .course-flow-step.course-flow-out .course-flow-kicker { color: #047857; }
+        .course-flow-step.course-flow-out .course-flow-title { color: #065f46; }
+        .course-flow-arrow {
+            padding: 0.28rem 0 0.32rem;
+            color: #94a3b8;
+            font-size: 1rem;
+            line-height: 1;
+        }
+        .course-flow-h {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem 0.35rem;
+            margin: 0.75rem 0 1rem;
+            padding: 0.9rem 1rem;
+            border-radius: 12px;
+            background: linear-gradient(165deg, #f8fafc 0%, #f1f5f9 100%);
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.05);
+        }
+        .course-flow-h .course-flow-chip {
+            padding: 0.38rem 0.7rem;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            color: #0f172a;
+        }
+        .course-flow-h .course-flow-h-arrow { color: #94a3b8; font-size: 0.95rem; font-weight: 600; }
+        .course-flow-branch-box {
+            margin: 0.75rem 0 1rem;
+            padding: 0.85rem 1rem 0.95rem;
+            border-radius: 12px;
+            background: linear-gradient(165deg, #f8fafc 0%, #f1f5f9 100%);
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.05);
+            text-align: center;
+        }
+        .course-flow-branch-box .course-flow-h-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem 0.35rem;
+        }
+        .course-flow-branch-box .course-flow-chip {
+            padding: 0.38rem 0.7rem;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            color: #0f172a;
+        }
+        .course-flow-branch-box .course-flow-h-arrow { color: #94a3b8; font-size: 0.95rem; font-weight: 600; }
+        .course-flow-branch-box .course-flow-branch-keys {
+            margin: 0.6rem 0 0;
+            padding-top: 0.55rem;
+            border-top: 1px dashed #cbd5e1;
+            font-size: 0.875rem;
+            color: #64748b;
+            line-height: 1.45;
+        }
+        .course-flow-compare { margin: 0.75rem 0 1rem; }
+        .course-flow-compare .small-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #64748b;
+            margin-bottom: 0.35rem;
+        }
+    </style>
+
+    <div class="course-main">
+    <header class="course-hero">
+    <h1>Chapter 8. Declarative Agent Workflow with YAML</h1>
+    <p style="margin:0.35rem 0 0; color:#475569; font-size:1.15rem; font-weight:700;">
+        YAML 기반 DAG 정의와 실행 엔진 분리
+    </p>
+    </header>
+
+    <div class="course-overview">
+    <p>
+        본 장은 Chapter 7에서 코드로 직접 구성하던 <strong>DAG(Directed Acyclic Graph)</strong>를
+        <strong>선언적으로 옮겨 적는 방식</strong>으로 다룹니다. 그래프를 서술할 때 쓰는 어휘는
+        <code>nodes</code>·<code>dependsOn</code>·<code>handler</code>·<code>when</code>·<code>config</code>처럼
+        <strong>워크플로에만 의미가 정해진 키</strong>로 모아 두었고, 그 <strong>구체적인 표기(문법적 표면)는 YAML 파일</strong>입니다.
+        이런 “작은 전용 언어”를 흔히 <strong>DSL(Domain-Specific Language)</strong>이라 부릅니다.
+        (이 장에서는 용어와 분리 구조 위주로 짚고, <strong>DSL을 무엇으로 볼지·문서를 어떤 규칙으로 검증할지</strong>는 <strong>Chapter 9에서 훨씬 구체적으로</strong> 이어집니다.)
+        별도의 실행 엔진은 이 <strong>DSL 문서</strong>를 읽어 노드를 스케줄링하며, 더 이상 “어떤 노드를 언제 실행할지”를 자바 코드로 고정하지 않고
+        <strong>파일에 적힌 노드·간선·조건·루프 설정을 해석</strong>해 실행 가능한 노드를 찾아냅니다.
+    </p>
+    <p>
+        즉 <strong>DAG 정의(= DSL로 적힌 YAML)</strong>와 <strong>DAG 실행 엔진(Java)</strong>을 분리해,
+        <strong>워크플로 변경은 DSL 문서(YAML) 수정으로, 실행 스케줄링과 <code>eval-opt-loop</code> 등 루프 처리는 엔진에서 공통화</strong>하는
+        <strong>선언적 Agent Workflow</strong> 패턴을 구현하는 것이 목표입니다.
+    </p>
+    <ul class="mb-2">
+        <li><strong>정의(Definition)</strong> — 노드 이름, 타입, 입력/출력 키, 의존 노드, 루프 조건 등을
+            <code>classpath:chapter8/dagworkflow/strategic-analysis.yml</code> 같은 <strong>YAML 파일(워크플로 DSL 문서)</strong>에 선언합니다.
+            팀은 범용 자바로 그래프를 조립하는 대신, 약속된 필드만으로 그래프를 “씁니다”.</li>
+        <li><strong>실행(Execution)</strong> — <code>YamlDagWorkflowEngine</code>(예시)는 DSL 문서를 파싱해
+            <code>WorkflowNode</code>(Chapter 7 노드 핸들러)를 조회하고, <strong>위상 순서로 노드를 순차 실행</strong>하며
+            <code>when</code> 분기와 <code>eval-opt-loop</code> 설정을 해석합니다. (Chapter 7 <code>DagWorkflowEngine</code>의 기술·시장 <strong>병렬</strong> 실행과 달리, 본 예제 엔진은 동시에 여러 노드를 스케줄하지 않습니다.)</li>
+        <li><strong>확장(Extension)</strong> — 새 노드 추가나 분기 조건 변경은
+            <strong>DSL(YAML) 편집</strong>으로 가능하며, 엔진은 바뀐 그래프를 같은 규칙으로 그대로 실행합니다.</li>
+    </ul>
+    <p>
+        이 구조를 통해 Chapter 7의 <strong>코드 중심 DAG-Orchestrated Multi-Agent</strong>를
+        <strong>DSL·YAML 선언 중심의 Declarative Agent Workflow</strong>로 한 단계 더 추상화합니다.
+        Chapter 9에서는 <strong>엔진·DSL 어휘는 동일</strong>하게 두고, <strong>로딩 파이프라인의 검증층</strong>(<code>WorkflowDefinitionValidator</code>)으로 잘못된 문서가 <strong>스케줄링에 넣기 전에</strong> 걸러지는 예시를 이어서 다룹니다.
+        <strong>DSL에 대한 개념 정리·검증 규칙 예시·Validator와 필드의 대응</strong> 등은 Chapter 9 본문에서 이 장보다 <strong>한층 구체적으로</strong> 설명합니다.
+    </p>
+    <p class="note">
+        <strong>실무 관점</strong>: Airflow, Prefect, Dagster, LangGraph 등 최신 워크플로/에이전트 프레임워크도
+        공통적으로 “<strong>그래프를 서술하는 층</strong>(파이썬 DSL, YAML, 전용 API 등)과 <strong>실행 엔진</strong>”을 나눕니다.
+        이 장의 예제는 Spring AI 위에서 <strong>YAML 표면의 워크플로 DSL</strong>과 엔진을 분리해, 그 아이디어를 구현하는 <strong>최소 단위</strong>에 가깝다고 볼 수 있습니다.
+    </p>
+    </div>
+
+    <nav class="course-toc" aria-label="목차">
+    <p class="course-toc-title">목차</p>
+    <ol>
+        <li><a href="#c8-s1">개념 정리 (YAML 기반 DAG 정의)</a></li>
+        <li><a href="#c8-s2">코드 기반 DAG vs YAML 기반 DAG</a></li>
+        <li><a href="#c8-s3">YAML DSL 구조 (핵심 개념 정리)</a></li>
+        <li><a href="#c8-s4">YAML 스키마 설계 예시</a></li>
+        <li><a href="#c8-s5">요청 시점의 워크플로 정의 바인딩</a></li>
+        <li><a href="#c8-s6">언제 YAML DSL이 유리한가</a></li>
+        <li><a href="#c8-s7">YAML이 유리한 경우와 실무 적용</a></li>
+        <li><a href="#c8-s8">핵심 정리</a></li>
+    </ol>
+    </nav>
+
+    <div class="course-content">
+    <hr class="course-divider">
+
+    <h3 id="c8-s1">1. 개념 정리 (YAML 기반 DAG 정의)</h3>
+    <p>
+        Chapter 7에서는 <code>DagWorkflowEngine</code>이 내부에서 <code>RouterNode</code>, <code>TechnicalAnalysisNode</code>,
+        <code>MarketAnalysisNode</code> 등을 직접 조합해 <strong>DAG를 코드로 표현</strong>했습니다.
+        Chapter 8에서는 이 그래프를 <strong>YAML로 적힌 워크플로 DSL 정의</strong>로 바꿔 적는 것을 목표로 합니다.
+    </p>
+    <p>
+        YAML은 DSL의 <strong>저장 형식</strong>이고, 의미 있는 키 집합이 곧 이 과정에서 말하는 DSL입니다.
+        전략 분석 그래프에 대응하는 <strong>전체 YAML 예시</strong>(주석 포함)는 <strong>이 장 §3</strong>와 <code>chapter8/dagworkflow/</code>·<code>chapter9/dagworkflow/</code> 리소스를 보면 되고, 문서 규칙·<strong>검증</strong> 관점은 Chapter 9 본문이 담당합니다.
+    </p>
+    <p class="small text-muted">
+        실제 구현에서는 이러한 DSL 구조를 <strong>Spring YAML 프로퍼티 또는 별도 YAML 파일</strong>로 두고,
+        <code>YamlDagWorkflowEngine</code>이 이를 파싱해 <code>WorkflowNode</code> 실행 계획으로 변환합니다.
+        이때 <code>handler</code> 값은 Chapter 4·7과 마찬가지로 <code>SubAgentRegistry</code> 키나 Node 핸들러 Bean 이름에 매핑할 수 있습니다.
+    </p>
+    <p><strong>실행 엔진 분리 패턴</strong></p>
+    <p>
+        Chapter 7의 <code>DagWorkflowEngine</code>는 “정의 + 실행”을 한 클래스 안에서 담당했습니다.
+        Chapter 8에서는 다음과 같이 <strong>세 계층</strong>으로 나눠볼 수 있습니다.
+    </p>
+    <ul>
+        <li><strong>Definition Loader</strong> — YAML을 읽어 <code>WorkflowDefinition</code> 객체로 변환 (<code>YamlWorkflowDefinitionLoader</code>)</li>
+        <li><strong>Execution Engine</strong> — 의존성 그래프를 분석해 <code>WorkflowNode</code> 실행 순서를 스케줄 (<code>YamlDagWorkflowEngine</code>)</li>
+        <li><strong>Node Handler</strong> — 각 노드 id/type에 해당하는 실제 비즈니스 로직 (<code>RouterNode</code>, <code>TechnicalAnalysisNode</code> 등)</li>
+    </ul>
+    <div class="course-flow-pipeline" role="img" aria-label="YAML 정의와 실행 엔진 분리 구조">
+        <div class="course-flow-col course-flow-col-wide">
+            <div class="course-flow-step course-flow-dag">
+                <div class="course-flow-kicker">정의</div>
+                <p class="course-flow-title">YAML Workflow Definition</p>
+                <p class="course-flow-sub">chapter8/dagworkflow/strategic-analysis.yml</p>
+            </div>
+            <div class="course-flow-arrow" aria-hidden="true">↓</div>
+            <div class="course-flow-step course-flow-engine">
+                <div class="course-flow-kicker">엔진</div>
+                <p class="course-flow-title">YamlDagWorkflowEngine</p>
+                <p class="course-flow-sub">의존성 해석 · 위상 순서 순차 실행 · 루프(eval-opt-loop)</p>
+            </div>
+            <div class="course-flow-arrow" aria-hidden="true">↓</div>
+            <div class="course-flow-step course-flow-runtime">
+                <div class="course-flow-kicker">노드</div>
+                <p class="course-flow-title">WorkflowNode / NodeHandler</p>
+                <p class="course-flow-sub">SubAgentRegistry · LLM 호출 · 병합 등</p>
+            </div>
+            <div class="course-flow-arrow" aria-hidden="true">↓</div>
+            <div class="course-flow-step course-flow-out">
+                <div class="course-flow-kicker">출력</div>
+                <p class="course-flow-title">최종 전략 보고서</p>
+            </div>
+        </div>
+    </div>
+
+    <hr class="course-divider">
+
+    <h3 id="c8-s2">2. 코드 기반 DAG vs YAML 기반 DAG</h3>
+    <p>코드 기반 DAG(Chapter 7)과 YAML(DSL 문서) 기반 DAG(Chapter 8)를 비교하면 다음과 같습니다.</p>
+    <div class="table-responsive">
+        <table class="table table-bordered table-sm">
+            <thead class="thead-light">
+            <tr>
+                <th>구분</th>
+                <th>코드 기반 DAG (Ch7)</th>
+                <th>YAML 기반 DAG / DSL 문서 (Ch8)</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>정의 위치</td>
+                <td>자바 코드 (<code>DagWorkflowEngine</code> 내부 체인)</td>
+                <td>YAML 파일 — 워크플로 DSL 문서 (<code>workflow/*.yml</code>)</td>
+            </tr>
+            <tr>
+                <td>변경 방법</td>
+                <td>코드 수정 + 빌드/배포</td>
+                <td>YAML 수정 + 재로딩(또는 배포)</td>
+            </tr>
+            <tr>
+                <td>유연성</td>
+                <td>코드 레벨 커스터마이징은 자유롭지만 구조 변경이 무겁다</td>
+                <td>워크플로 구조 변경에 유연, 런타임 재구성도 용이</td>
+            </tr>
+            <tr>
+                <td>가시성</td>
+                <td>그래프 구조를 이해하려면 코드를 따라가야 함</td>
+                <td>YAML만 봐도 노드·분기·의존 관계를 한눈에 파악 가능</td>
+            </tr>
+            <tr>
+                <td>검증</td>
+                <td>컴파일 시 타입 검사가 강력</td>
+                <td>스키마/유효성 검증 로직을 별도로 설계해야 함</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <hr class="course-divider">
+
+    <h3 id="c8-s3">3. YAML DSL 구조 (핵심 개념 정리)</h3>
+    <p>
+        YAML은 단순 설정 파일이 아니라 워크플로를 기술하는 <strong>DSL</strong>로 보는 것이 맞습니다.
+    </p>
+    <p><strong>기본 구성 예시</strong></p>
+    <pre style="font-size:0.85rem; background:#f9fafb; color:#111827; padding:0.8rem 1rem; border-radius:10px; overflow:auto;"><code>id: strategic-analysis
+nodes:
+  - id: router
+  - id: simple-query
+    dependsOn: [router]</code></pre>
+
+    <p><strong>핵심 필드 (강의용 축약)</strong></p>
+    <ul>
+        <li><strong>워크플로 메타</strong>
+            <ul>
+                <li><code>id</code> — 워크플로 식별자</li>
+                <li><code>description</code> — 설명 (운영·모니터링용)</li>
+            </ul>
+        </li>
+        <li><strong>노드 정의</strong>
+            <ul>
+                <li><code>id</code> — 노드 이름 (의존성 기준)</li>
+                <li><code>type</code> — 실행 유형 (llm, router, loop 등)</li>
+                <li><code>handler</code> — 실제 실행 로직 (SubAgent 또는 Bean 매핑)</li>
+                <li><code>dependsOn</code> — 선행 노드</li>
+                <li><code>when</code> — 조건 실행</li>
+                <li><code>outputs</code> — 결과를 컨텍스트에 저장</li>
+            </ul>
+        </li>
+        <li><strong>config</strong> (노드별 옵션) — 예: loop 노드
+            <pre style="font-size:0.85rem; background:#f9fafb; color:#111827; padding:0.8rem 1rem; border-radius:10px; overflow:auto; margin:0.5rem 0 0.35rem;"><code>config:
+  maxRounds: 4
+  evaluator: report-evaluator
+  optimizer: report-optimizer
+  approveThreshold: 0.8</code></pre>
+            <ul>
+                <li>반복 횟수 제한</li>
+                <li>평가·개선 에이전트 지정</li>
+                <li>승인 기준 설정</li>
+            </ul>
+        </li>
+    </ul>
+
+    <p><strong>전체 예시 (주석 포함)</strong></p>
+    <p class="small text-muted mb-1">
+        <code>chapter8/dagworkflow/strategic-analysis.yml</code> 및 <code>chapter9/dagworkflow/strategic-analysis.yml</code>과 같은 구조를, 필드 의미를 한눈에 보기 위해 교육용 주석과 함께 옮긴 것입니다.
+    </p>
+    <pre style="font-size:0.8rem; background:#f9fafb; color:#111827; padding:0.8rem 1rem; border-radius:10px; overflow:auto; max-height:32rem;"><code>id: strategic-analysis                 # 워크플로 식별자 (컨트롤러/서비스에서 workflowDefinition=... 으로 사용)
+description: Strategic analysis workflow (YAML-defined DAG)
+
+nodes:
+  # ─────────────────────────────────────────────────────────────
+  # 1) Router 노드
+  #    - 사용자 입력을 SIMPLE / STRATEGIC 으로 분류
+  #    - handler: ch8 WorkflowNode.id() (보통 …-ch8; 노드 내부에서 SubAgent 키는 별도)
+  # ─────────────────────────────────────────────────────────────
+  - id: router                         # YAML 안에서의 노드 식별자 (dependsOn 에서 참조)
+    type: router                       # 노드 유형 (엔진에서는 참고용 메타데이터)
+    handler: routing-ch8               # WorkflowNodeRegistry (= WorkflowNode.id())
+    outputs:
+      routeCategory: route.category    # (예시) 라우팅 결과를 컨텍스트의 route.category 로 매핑한다는 의미적 표현
+
+  # ─────────────────────────────────────────────────────────────
+  # 2) SIMPLE 브랜치 — 단일 응답 노드
+  #    - Router 결과가 SIMPLE 일 때만 실행
+  # ─────────────────────────────────────────────────────────────
+  - id: simple-query
+    type: llm
+    handler: simple-query-ch8          # 노드 내부에서 SubAgent "simple-query" 호출
+    dependsOn: [router]                # router 가 끝난 뒤에만 실행 가능
+    when: route.category == 'SIMPLE'   # ch8 엔진의 shouldRun 이 해석하는 조건식 (간단한 문자열 비교)
+
+  # ─────────────────────────────────────────────────────────────
+  # 3) STRATEGIC 브랜치 — 기술 분석
+  #    - Router 결과가 STRATEGIC 일 때만 실행
+  # ─────────────────────────────────────────────────────────────
+  - id: technical-analysis
+    type: llm
+    handler: technical-analysis-ch8
+    dependsOn: [router]                # router 이후에 실행
+    when: route.category == 'STRATEGIC'
+
+  # ─────────────────────────────────────────────────────────────
+  # 4) STRATEGIC 브랜치 — 시장 분석
+  #    - Router 결과가 STRATEGIC 일 때만 실행
+  #    - technical-analysis 와는 서로 dependsOn 이 없으므로 병렬 실행 가능
+  # ─────────────────────────────────────────────────────────────
+  - id: market-analysis
+    type: llm
+    handler: market-analysis-ch8
+    dependsOn: [router]
+    when: route.category == 'STRATEGIC'
+
+  # ─────────────────────────────────────────────────────────────
+  # 5) 병합 노드 — 기술/시장 분석 결과를 하나의 초안으로 합치기
+  #    - dependsOn 에 technical-analysis, market-analysis 두 개가 있으므로
+  #      두 노드가 모두 끝난 뒤에만 실행됩니다.
+  # ─────────────────────────────────────────────────────────────
+  - id: merge-report
+    type: merge
+    handler: merge-report-ch8
+    dependsOn:
+      - technical-analysis
+      - market-analysis
+
+  # ─────────────────────────────────────────────────────────────
+  # 6) 평가/개선 루프 노드 (개념적 핸들러)
+  #    - 예제에서는 하나의 handler(eval-opt-loop) 로 표현했지만,
+  #      실제 구현에서는 EvaluationNode / OptimizationNode 조합으로 풀어 쓸 수도 있습니다.
+  #    - config 에 루프 설정(최대 회차, evaluator/optimizer 핸들러, 승인 임계값 등)을 둡니다.
+  # ─────────────────────────────────────────────────────────────
+  - id: eval-opt-loop
+    type: loop
+    handler: eval-opt-loop             # 이 id 에 맞는 WorkflowNode 를 만들거나, 향후 엔진에서 특별 처리 가능
+    dependsOn: [merge-report]
+    config:
+      maxRounds: 4                     # 최대 평가/개선 반복 횟수 (엔진에서 참조)
+      evaluator: report-evaluator-ch8
+      optimizer: report-optimizer-ch8
+      approveThreshold: 0.8            # 승인 임계값 (예: EvaluationApprovalDecider 에 넘길 값)
+</code></pre>
+
+    <hr class="course-divider">
+
+    <h3 id="c8-s4">4. YAML 스키마 설계 예시</h3>
+    <p>
+        DSL로 DAG를 정의하려면(표기는 YAML이어도) 최소한 다음 정보를 <strong>스키마·어휘</strong>로 정해 두는 것이 좋습니다.
+    </p>
+    <ul>
+        <li><strong>워크플로 메타데이터</strong>: <code>id</code>, <code>description</code>, 버전 등</li>
+        <li><strong>노드 목록</strong>: <code>id</code>, <code>type</code>, <code>handler</code>, <code>dependsOn</code>, <code>when</code>, <code>config</code> 등</li>
+        <li><strong>전역 설정(설계·확장 시)</strong>: 타임아웃·노드 재시도·동시 실행 상한 등을 스키마에 둘 수 있음 — 본 과정 예제 엔진은 노드 <code>config</code>(예: <code>eval-opt-loop</code>) 중심</li>
+    </ul>
+    <p>
+        Spring 환경에서는 이 스키마를 <code>@ConfigurationProperties</code>로 바인딩하거나,
+        전용 <code>YamlWorkflowDefinitionLoader</code>를 만들어 <code>Map&lt;String, WorkflowDefinition&gt;</code> 형태로 적재해 둘 수 있습니다.
+        이후 <code>YamlDagWorkflowEngine</code>은 <code>workflowId</code>로 정의를 찾아 실행 계획을 구성합니다.
+    </p>
+
+    <p>
+        위 예시 YAML에는 <strong>워크플로 전체에 대한 메타 정보</strong>와 <strong>각 노드에 대한 실행 정의</strong>가 함께 들어 있습니다.
+        각 필드는 다음과 같이 해석할 수 있습니다.
+    </p>
+    <ul>
+        <li><strong>워크플로 메타데이터</strong>
+            <ul>
+                <li><strong>id</strong>: 워크플로의 고유 식별자입니다. 예시의 <code>strategic-analysis</code>처럼,
+                    엔진이 어떤 YAML을 불러와야 하는지 구분하는 “워크플로 이름/키”가 들어갑니다.
+                    일반적으로 <code>strategic-analysis</code>, <code>customer-onboarding-v2</code> 같은
+                    <strong>영문 슬러그</strong>를 사용합니다.</li>
+                <li><strong>description</strong>: 워크플로의 용도와 역할을 사람이 읽을 수 있게 설명하는 필드입니다.
+                    실행 로직에는 직접 쓰이지 않지만, 운영·모니터링 화면에서 설명 텍스트로 활용할 수 있습니다.</li>
+            </ul>
+        </li>
+        <li><strong>노드 정의 (<code>nodes</code> 배열 안)</strong>
+            <ul>
+                <li><strong>id</strong>: 각 노드를 구분하는 고유 이름입니다. 예: <code>router</code>,
+                    <code>simple-query</code>, <code>technical-analysis</code> 등. <code>dependsOn</code>에서
+                    이 <code>id</code>를 참조해 노드 간 의존 관계를 표현합니다.</li>
+                <li><strong>type</strong>: 노드가 어떤 종류의 역할을 하는지 나타내는 <strong>노드 타입</strong>입니다.
+                    예시에서는 <code>router</code>, <code>llm</code>, <code>merge</code>, <code>loop</code> 등이 있으며,
+                    엔진은 이 값을 기준으로 어떤 Node 핸들러(예: LLM 호출, 라우팅, 병합, 루프 제어)를 써야 할지 결정합니다.</li>
+                <li><strong>handler</strong>: 실제로 비즈니스 로직을 수행하는 <strong>핸들러의 이름</strong>입니다.
+                    예를 들어 <code>simple-query</code>, <code>technical-analysis</code>, <code>market-analysis</code>처럼 작성하며,
+                    <code>SubAgentRegistry</code>의 키나 Spring Bean 이름에 매핑됩니다.
+                    즉, 엔진은 <code>handler</code> 값을 통해 “어떤 서브에이전트/노드 클래스”를 실행할지 찾습니다.</li>
+                <li><strong>outputs</strong>: 노드 실행 결과 중에서 <strong>다음 노드들이 참조할 수 있도록 노출할 값의 매핑</strong>입니다.
+                    예시의 <code>routeCategory: route.category</code>는 “라우터 노드의 내부 결과 중
+                    <code>route.category</code>라는 값을, 워크플로 전체 컨텍스트에서는 <code>routeCategory</code>라는 이름으로 쓸 수 있게 한다”는 의미입니다.
+                    이후 노드의 <code>when</code> 조건식에서 <code>route.category</code> 또는 매핑된 키를 사용할 수 있습니다.</li>
+                <li><strong>dependsOn</strong>: 이 노드가 실행되기 전에 <strong>완료되어야 하는 선행 노드 목록</strong>입니다.
+                    예를 들어 <code>dependsOn: [router]</code>라고 적으면, <code>router</code> 노드가 끝난 뒤에만
+                    해당 노드가 실행됩니다. 여러 개를 넣으면 <code>dependsOn: [technical-analysis, market-analysis]</code>와 같이
+                    <strong>모든 선행 노드가 완료된 후</strong>에 실행됩니다.</li>
+                <li><strong>when</strong>: (예시 YAML에는 포함되어 있지만 생략된 부분도 있을 수 있는)
+                    <strong>조건부 실행 표현식</strong>입니다. <code>route.category == 'SIMPLE'</code>처럼 작성해,
+                    워크플로 컨텍스트 값에 따라 노드를 실행할지 말지를 제어합니다.</li>
+            </ul>
+        </li>
+        <li><strong>config 블록 (특정 타입 노드 전용 설정)</strong>
+            <ul>
+                <li><strong>config</strong>: 특정 타입의 노드가 필요로 하는 <strong>추가 설정값들을 담는 하위 객체</strong>입니다.
+                    예시에서는 <code>loop</code> 타입 노드(<code>eval-opt-loop</code>)가 루프 횟수, 평가/최적화 전략 등을 이 블록에서 읽습니다.</li>
+                <li><strong>maxRounds</strong> (<code>config</code> 안): 루프 노드가 <strong>최대 몇 번까지 반복</strong>할 수 있는지 나타내는 정수 값입니다.
+                    예시의 <code>4</code>는 “최대 4라운드(평가·개선 반복 상한)” 정도로 해석할 수 있으며,
+                    엔진은 이 숫자에 도달하면 더 이상 반복하지 않고 종료/최종 결과를 반환합니다.</li>
+                <li><strong>evaluator</strong> (<code>config</code> 안): 현재 보고서(또는 출력물)를 평가하는 <strong>평가 노드/에이전트의 식별자</strong>입니다.
+                    <code>report-evaluator</code>라는 값은 <code>SubAgentRegistry</code>에서 등록된
+                    평가용 서브에이전트, 또는 “평가용 LLM 프롬프트/노드 Bean” 이름에 매핑될 수 있습니다.</li>
+                <li><strong>optimizer</strong> (<code>config</code> 안): 평가 결과를 바탕으로 <strong>출력을 수정/개선하는 노드/에이전트의 식별자</strong>입니다.
+                    <code>report-optimizer</code> 값은 “보고서 개선 프롬프트”나 “수정 로직을 가진 노드 Bean”을 가리키며,
+                    루프가 한 번 돌 때마다 이 옵티마이저가 새로운 버전의 보고서를 생성합니다.</li>
+                <li><strong>approveThreshold</strong> (<code>config</code> 안): 평가 점수가 몇 점 이상이면 <strong>“승인(approve)”로 간주할지</strong>를
+                    결정하는 실수 값입니다. 예시의 <code>0.8</code>은 “평가 점수가 0.8 이상이면 루프를 중단하고 결과를 채택한다”는 의미이며,
+                    <code>evaluator</code>가 반환하는 점수 스케일(0~1, 0~100 등)에 맞추어 설계됩니다.</li>
+            </ul>
+        </li>
+    </ul>
+
+    <hr class="course-divider">
+
+    <h3 id="c8-s5">5. 요청 시점의 워크플로 정의 바인딩</h3>
+    <p>
+        선언적 워크플로에서는 <strong>실행 엔진</strong>(정의 로더, 위상·순서 스케줄, 노드 핸들러 연결)을 <strong>한 벌</strong>로 두고,
+        <strong>들어오는 요청마다</strong> &quot;이번 실행에 적용할 DSL 문서(YAML)를 어떤 <strong>논리 식별자</strong>로 불러올지&quot;만 넘기는 패턴이 자연스럽습니다.
+        식별자는 리소스에 둔 파일·워크플로 <code>id</code> 등과 맞춰 두면, <strong>같은 HTTP 진입점</strong>으로 서로 다른 그래프를 골라 태울 수 있어
+        업무별·테넌트별로 단계 구성이 달라도 엔진 소스에 업무 분기 <code>if</code>를 반복해서 쌓지 않아도 됩니다.
+    </p>
+    <p>
+        본 과정 <strong>실습 화면</strong>(<a th:href="@{/go/ch8/1_strategic_analysis}">Strategic Analysis (YAML)</a>)에서도 이 계약을 그대로 씁니다.
+        질문을 보내기 전에 <strong>적용할 YAML 워크플로</strong>를 드롭다운 등으로 고르면, 선택한 정의의 <strong>논리 식별자</strong>가 <code>workflowDefinition</code> 요청 파라미터로 넘어가고,
+        서버는 <code>chapter8/dagworkflow/{식별자}.yml</code> 같은 경로 규칙에 맞춰 해당 문서만 로드해 실행합니다.
+        API를 직접 호출할 때도 동일한 키로 어떤 정의를 태울지 지정할 수 있어, 화면·클라이언트 모두 &quot;엔진은 고정, 이번만 어떤 YAML인가&quot;만 바꿉니다.
+    </p>
+    <p>
+        <strong>Chapter 9</strong> 실습에서도 <code>workflowDefinition</code>으로 정의를 고르는 방식은 같고, 달라지는 점은 <code>chapter9/dagworkflow/</code> 아래 YAML을 <strong>검증층을 거친 뒤</strong> 캐시한다는 실행 파이프라인뿐입니다.
+    </p>
+    <p><strong>왜 이렇게 나누는가</strong></p>
+    <p>
+        실무에서 자주 바뀌는 것은 <strong>노드 나열, 의존 관계, <code>when</code> 분기</strong>처럼 &quot;<strong>무엇을</strong> 돌릴지&quot;이고,
+        엔진 쪽은 &quot;<strong>어떻게</strong> 문서를 읽고 의존을 지키며 순서를 잡을지&quot;에 가깝습니다.
+        식별자로 정의를 선택하면 수정 범위가 <strong>문서(YAML)와 호출 계약(어떤 키를 넘길지)</strong> 쪽으로 모이고,
+        엔진은 상대적으로 안정적으로 유지할 수 있어 <strong>코드 리뷰·앱 배포 주기</strong>와 <strong>문서 수정·운영 주기</strong>를 나누기 쉽습니다.
+    </p>
+    <p><strong>기대 효과</strong></p>
+    <ul>
+        <li><strong>정의와 실행의 분리</strong>가 서비스 경계(API, 로그)에서도 드러나, &quot;어떤 워크플로 정의를 태웠는지&quot;를 식별자로 <strong>감사·추적</strong>하기 좋습니다.</li>
+        <li>엔진 바이너리는 유지한 채 <strong>정의만 추가·되돌리기</strong>하는 운영 패턴으로 확장하기 쉽습니다.</li>
+        <li><strong>기본 식별자</strong>를 정해 두면 기존 클라이언트는 그대로 두고, 새 흐름만 다른 식별자로 <strong>점진적으로</strong> 열 수 있습니다.</li>
+    </ul>
+
+    <hr class="course-divider">
+
+    <h3 id="c8-s6">6. 언제 YAML DSL이 유리한가</h3>
+    <p>
+        “자바를 잘 모르는 사람도 흐름을 보고 말할 수 있게 하고 싶다”, “배포 없이 흐름만 자주 바꾸고 싶다”처럼 느껴질 때 YAML DSL이 특히 잘 맞습니다.
+    </p>
+    <ul>
+        <li><strong>워크플로를 자주 바꿀 때</strong> — 단계 추가·순서 변경·분기 조건 수정을 <strong>YAML 파일만 고치면</strong> 됩니다. 매번 애플리케이션을 다시 빌드·배포할 부담이 줄어듭니다.</li>
+        <li><strong>기획자·PO(프로덕트 오너)도 구조를 같이 봐야 할 때</strong> — 긴 자바 코드 대신 <strong>노드 목록과 <code>dependsOn</code></strong>이 보이면 “어디서 갈라지는지, 무엇이 끝나야 다음이 도는지”를 대화하기 쉽습니다.</li>
+        <li><strong>하나의 엔진으로 여러 흐름을 돌릴 때</strong> — 전략 분석·간단 Q&amp;A·다른 리포트처럼 <strong>워크플로마다 YAML만 두고</strong> 같은 <code>YamlDagWorkflowEngine</code>으로 실행할 수 있습니다.</li>
+    </ul>
+    <p>
+        한 줄로 말하면, <strong>“흐름 설계는 YAML(DSL), 공통 실행 규칙은 엔진”</strong>으로 나누는 것이고,
+        그래서 <strong>코드는 거의 건드리지 않고 YAML만으로 워크플로를 바꿀 수 있다</strong>는 점이 가장 큰 이점입니다.
+    </p>
+    <p class="small text-muted">
+        반대로, 노드 안의 복잡한 알고리즘이나 새로운 종류의 실행 단계를 <strong>처음부터 자바로 만들어 넣어야 한다</strong>면 그 부분은 여전히 코드 작업이 필요합니다. YAML은 <strong>어떤 순서로 어떤 노드를 돌릴지</strong>를 정하는 쪽에 강합니다.
+    </p>
+
+    <hr class="course-divider">
+
+    <h3 id="c8-s7">7. YAML이 유리한 경우와 실무 적용</h3>
+    <p>
+        &quot;언제 YAML을 쓸지&quot;와 &quot;현장에서는 어떤 형태로 쓰는지&quot;는 같은 축에서 잘 이어집니다.
+        아래는 <strong>선언 표면(YAML)을 두면 이득인 동기</strong>와, 그것이 <strong>구체화되는 운영 패턴</strong>을 한데 묶어 정리한 것입니다.
+        (식별자로 정의를 고르는 흐름은 <a href="#c8-s5">§5</a>와 맞물립니다.)
+    </p>
+    <ul>
+        <li>
+            <strong>비즈니스·기획과 같은 언어로 설계</strong> —
+            PO(프로덕트 오너)·기획과 워크플로를 함께 맞춰야 할 때, 코드보다 읽기 쉬운 YAML이 검토·합의 비용을 줄입니다.
+        </li>
+        <li>
+            <strong>자주 바뀌는 흐름을 배포와 분리</strong> —
+            노드 나열·의존·<code>when</code> 분기가 앱 배포 주기보다 짧은 주기로 바뀌면, 문서만 고치는 편이 안전합니다.
+        </li>
+        <li>
+            <strong>한 엔진으로 여러 파이프라인</strong> —
+            전략 분석·리포트 등 <strong>종류가 다른 파이프라인</strong>을 같은 실행 엔진으로 돌리고, 식별자별 YAML만 추가·교체해 운용합니다.
+        </li>
+        <li>
+            <strong>리포트·분석 파이프라인을 YAML로 나누기</strong> —
+            예: <code>weekly-report.yml</code>, <code>deep-dive.yml</code>처럼 파일만 나누어 두고, 같은 엔진이 정의 ID만 바꿔 실행합니다. 팀별·제품별로 정의를 분리하기 좋습니다.
+        </li>
+        <li>
+            <strong>고객사·상품별 차이를 문서로만 분기</strong> —
+            공통 베이스 정의 위에 테넌트별 <strong>YAML 오버레이</strong>(패치·병합)로 미세 조정하면, 엔진 소스에 업무 분기 <code>if</code>를 반복해서 넣지 않아도 됩니다.
+        </li>
+    </ul>
+
+    <hr class="course-divider">
+
+    <h3 id="c8-s8">8. 핵심 정리</h3>
+    <p>
+        Chapter 8의 핵심은 <strong>“워크플로 정의는 YAML, 실행은 엔진”</strong>이라는 역할 분리입니다.
+        Chapter 4~7에서 구축한 <strong>SubAgentRegistry, Tool, Task, DAG 엔진</strong> 위에
+        <strong>선언적 YAML 레이어</strong>를 얹으면, 복잡한 Agent Workflow를 더 안전하고 유연하게 운용할 수 있습니다.
+    </p>
+    <p class="small text-muted mb-0">
+        <strong>Chapter 9</strong>에서는 <strong>엔진·DSL 어휘는 그대로</strong> 두고, <code>chapter9/dagworkflow/*.yml</code> 로딩 직후 <code>WorkflowDefinitionValidator</code>를 통과한 정의만 캐시해 <strong>스케줄링 전에</strong> 선언 오류를 걸러 내는 <strong>검증층</strong>을 더합니다.
+    </p>
+
+    <hr class="course-divider">
+
+    <div class="course-footer-actions">
+    <p>
+        <a th:href="@{/go/ch8/desc}" class="btn btn-warning font-weight-bold">Chapter8. 상세 가이드 (Screen Description)</a>
+    </p>
+    <p>
+        이전 장: <a th:href="@{/go/ch7}">Chapter 7 — DAG-Orchestrated Multi-Agent</a>
+    </p>
+    <p>
+        다음 장: <a th:href="@{/go/ch9}">Chapter 9 — Validated Agent Workflow DSL</a>
+    </p>
+    </div>
+
+    </div>
+    </div>
+
+</th:block>
+</html>
+

@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<th:block>
+    <script>
+        /**
+         * multi_llm 객체
+         * ------------------------------------------------------------
+         * ✔ 목적:
+         *  - 여러 LLM(OpenAI, Gemini, Llama)을 선택하여 서버에 요청
+         *  - 채팅 UI 형태로 질문/응답을 화면에 동적으로 출력
+         *
+         * ✔ 구조:
+         *  - init()                : 초기 이벤트 바인딩
+         *  - send()                : 서버 요청 처리
+         *  - responseDisplay()     : 응답 화면 렌더링
+         *
+         * ✔ 학습 포인트:
+         *  1) fetch API 사용법
+         *  2) 비동기(async/await) 처리
+         *  3) DOM 동적 생성
+         *  4) Form URL Encoding 방식 이해
+         *  5) Multi-LLM 요청 분기 구조
+         */
+        multi_llm = {
+
+            // 서버 API 엔드포인트
+            url: '/ch1/multi_llm',
+
+            /**
+             * 초기화 함수
+             * --------------------------------------------------
+             * ✔ 페이지 로드시 실행
+             * ✔ 버튼 클릭 이벤트 등록
+             * ✔ 로딩 스피너 초기 상태 숨김 처리
+             */
+            init:function(){
+                // Send 버튼 클릭 시 send() 실행
+                document.querySelector("#send_btn").addEventListener("click", ()=>{
+                    this.send();
+                })
+
+                // 초기에는 로딩 스피너를 숨김
+                document.querySelector("#spinner").style.cssText = "visibility:hidden;";
+            },
+
+            /**
+             * 메시지 전송 함수 (핵심 로직)
+             * --------------------------------------------------
+             * ✔ 사용자 입력 수집
+             * ✔ 질문 화면에 먼저 출력 (UX 향상)
+             * ✔ fetch를 통한 서버 POST 요청
+             * ✔ 응답 수신 후 responseDisplay 호출
+             *
+             * ✔ async/await 사용 이유:
+             *   - 네트워크 통신은 비동기 처리 필요
+             */
+            send:async function(){
+
+                // 로딩 표시
+                document.querySelector('#spinner').style.cssText = "visibility:visible;";
+
+                // 사용자 입력 값 수집
+                let question = document.querySelector('#question').value;
+                let type = document.querySelector('#type').value;
+
+                /**
+                 * 질문 UI를 동적으로 생성
+                 * --------------------------------------------------
+                 * ✔ prepend() 사용 → 최신 메시지를 위에 표시
+                 * ✔ new Date().toLocaleTimeString('ko-kr') → 한국 시간 포맷
+                 */
+                const questionArea = document.createElement("div");
+                questionArea.innerHTML = `
+                <div class="d-flex justify-content-between">
+                    <p class="small mb-1">User</p>
+                    <p class="small mb-1 text-muted">`+new Date().toLocaleTimeString('ko-kr')+`</p>
+                </div>
+                <div class="d-flex flex-row justify-content-start">
+                    <img src="/imgs/user.jpg"
+                         alt="User" style="width: 45px; height: 100%;">
+                    <div>
+                        <p class="small p-2 ms-3 mb-3 rounded-3 bg-body-tertiary bg-warning">`
+                    +type+`:`+question+`</p>
+                    </div>
+                </div>
+            `;
+
+                document.querySelector('#result').prepend(questionArea);
+
+                /**
+                 * fetch API 요청
+                 * --------------------------------------------------
+                 * ✔ method: POST
+                 * ✔ Content-Type:
+                 *     application/x-www-form-urlencoded
+                 *     → key=value&key2=value2 형식
+                 *
+                 * ✔ Accept:
+                 *     text/plain
+                 *     → 서버에게 "순수 텍스트로 응답해달라"고 요청
+                 *
+                 * ✔ URLSearchParams:
+                 *     Form 데이터를 자동 인코딩
+                 */
+                const response = await fetch(this.url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'Accept': 'text/plain'
+                    },
+                    body: new URLSearchParams({
+                        prompt: question,
+                        type:type
+                    })
+                });
+
+                // 서버 응답을 텍스트로 수신
+                const responseText = await response.text();
+
+                // 화면에 응답 출력
+                this.responseDisplay(responseText);
+            },
+
+            /**
+             * 서버 응답 화면 출력 함수
+             * --------------------------------------------------
+             * ✔ 로딩 스피너 제거
+             * ✔ 챗봇 응답을 UI에 추가
+             */
+            responseDisplay:function(result){
+
+                // 로딩 숨김
+                document.querySelector("#spinner").style.cssText = "visibility:hidden;";
+
+                const responseArea = document.createElement("div");
+                responseArea.innerHTML = `
+                <div class="d-flex justify-content-between">
+                    <p class="small mb-1 text-muted">`+new Date().toLocaleTimeString('ko-kr')+`</p>
+                    <p class="small mb-1">Chatbot</p>
+                </div>
+                <div class="d-flex flex-row justify-content-end mb-4 pt-1">
+                    <div class="small p-2 me-3 mb-3 rounded-3 bg-info" style="overflow: auto">
+                        <pre class="text-white" style="font-weight: bold">`
+                    +result+`</pre>
+                    </div>
+                    <img src="/imgs/chatbot.png"
+                         alt="Chat Bot" style="width: 45px; height: 100%;">
+                </div>
+            `;
+
+                document.querySelector('#result').prepend(responseArea);
+            }
+        }
+
+        /**
+         * window.onload
+         * --------------------------------------------------
+         * ✔ DOM 로딩 완료 후 multi_llm.init() 실행
+         * ✔ 이벤트 바인딩은 DOM이 완성된 이후 실행해야 안전
+         */
+        window.onload = function(){
+            multi_llm.init();
+        }
+    </script>
+
+    <div class="col-sm-10">
+        <h2 class="text-center">1. Multi LLM</h2>
+        <div class="container py-5">
+
+            <div class="row d-flex justify-content-center">
+                <div class="col-sm-10">
+                    <button class="btn btn-primary" disabled id="spinner">
+                        <span class="spinner-border spinner-border-sm" ></span>
+                        Loading..
+                    </button>
+                    <div class="row justify-content-center">
+                        <div class="col-sm-5">
+                            <div class="input-group p-1">
+                                <span class="input-group-text">구분</span>
+                                <select id="type" class="form-control">
+                                    <option value="openai" selected>OpenAI</option>
+                                    <option value="gemini">Gemini</option>
+                                    <option value="llama">Llama</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header text-muted d-flex justify-content-start align-items-center p-3">
+                            <div class="input-group mb-0">
+                                <input  id="question" type="text" class="form-control" placeholder="Type message" value="서울의 맛집 알려줘"
+                                        aria-label="Recipient's username" aria-describedby="button-addon2" />
+                                <button type="button" class="btn btn-primary" id="send_btn">Send</button>
+                            </div>
+                        </div>
+                        <div id="result" class="card-body" data-mdb-perfect-scrollbar-init >
+
+
+                        </div> <!-- end result -->
+                    </div> <!-- end card -->
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+</html>

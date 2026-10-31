@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+
+
+<th:block>
+    <script>
+
+        /**
+         * multi_llm_stream 객체
+         * ============================================================
+         * ✔ 목적
+         *   - Multi LLM(OpenAI, Gemini, Llama) 요청을 스트리밍 방식으로 처리
+         *   - 서버에서 전달되는 데이터를 "조각(chunk)" 단위로 실시간 출력
+         *
+         * ✔ 일반 호출과의 차이
+         *   - 기존: response.text() → 응답 완료 후 한 번에 출력
+         *   - 현재: response.body.getReader() → 데이터가 도착하는 즉시 출력
+         *
+         * ✔ 학습 포인트
+         *   1) fetch + Streaming 응답 처리
+         *   2) ReadableStream 사용법
+         *   3) TextDecoder 활용
+         *   4) Reactive UI 구성
+         */
+
+        multi_llm_stream = {
+
+            // 스트리밍 전용 서버 엔드포인트
+            url:'/ch1/multi_llm_stream',
+
+            /**
+             * 초기화 함수
+             * --------------------------------------------------
+             * ✔ 버튼 이벤트 등록
+             * ✔ 초기 스피너 숨김 처리
+             */
+            init:function(){
+                document.querySelector("#send_btn").addEventListener("click", ()=>{
+                    this.send();
+                })
+                document.querySelector("#spinner").style.cssText = "visibility:hidden;";
+            },
+
+            /**
+             * 사용자 질문 HTML 생성
+             * --------------------------------------------------
+             * ✔ 사용자의 입력을 화면에 먼저 표시
+             * ✔ prepend() → 최신 메시지를 상단에 배치
+             */
+            makeQuestionHtml:function(question){
+
+            },
+
+            /**
+             * 응답 HTML 생성
+             * --------------------------------------------------
+             * ✔ 스트리밍 데이터를 출력할 <pre> 영역 생성
+             * ✔ 고유 ID 생성 후 리턴
+             *
+             * ✔ crypto.getRandomValues()
+             *   - 충돌 방지를 위한 랜덤 ID 생성
+             */
+            makeResponseHtml: async function(){
+
+            },
+
+            /**
+             * 메시지 전송 함수
+             * ============================================================
+             * ✔ 사용자 입력 수집
+             * ✔ fetch POST 요청
+             * ✔ 스트리밍 응답 처리 시작
+             */
+            send:async function(){
+
+            },
+
+            /**
+             * 스트리밍 응답 출력 로직 (핵심)
+             * ============================================================
+             * ✔ response.body → ReadableStream
+             * ✔ getReader() → 스트림을 chunk 단위로 읽기
+             * ✔ TextDecoder → 바이너리 → 문자열 변환
+             *
+             * ✔ while(true) 루프:
+             *   - 서버가 데이터를 계속 보내는 동안 반복
+             */
+            responseDisplay:async function(targetId, response) {
+
+            }
+        }
+
+        /**
+         * DOM 로딩 완료 후 초기화 실행
+         */
+        window.onload = function(){
+            multi_llm_stream.init();
+        }
+
+    </script>
+
+
+    <div class="col-sm-10">
+        <h2 class="text-center">2. Multi LLM - Reactive Streams</h2>
+        <div class="container py-5">
+
+            <div class="row d-flex justify-content-center">
+                <div class="col-sm-10">
+                    <button class="btn btn-primary" disabled id="spinner">
+                        <span class="spinner-border spinner-border-sm" ></span>
+                        Loading..
+                    </button>
+                    <div class="row justify-content-center">
+                        <div class="col-sm-5">
+                            <div class="input-group p-1">
+                                <span class="input-group-text">구분</span>
+                                <select id="type" class="form-control">
+                                    <option value="openai" selected>OpenAI</option>
+                                    <option value="gemini">Gemini</option>
+                                    <option value="llama">Llama</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header text-muted d-flex justify-content-start align-items-center p-3">
+                            <div class="input-group mb-0">
+                                <input  id="question" type="text" class="form-control" placeholder="Type message" value="서울의 맛집 알려줘"
+                                        aria-label="Recipient's username" aria-describedby="button-addon2" />
+                                <button type="button" class="btn btn-primary" id="send_btn">Send</button>
+                            </div>
+                        </div>
+                        <div id="result" class="card-body" data-mdb-perfect-scrollbar-init >
+
+
+                        </div> <!-- end result -->
+                    </div> <!-- end card -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+</th:block>
+
+</html>

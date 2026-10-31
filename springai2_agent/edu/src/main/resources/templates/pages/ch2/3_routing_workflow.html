@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+
+
+<th:block>
+    <script>
+        /*
+         * ==========================================================
+         *  Routing Workflow 예제
+         * ----------------------------------------------------------
+         *  - 사용자의 질문을 서버로 전송
+         *  - 서버는 질문 유형에 따라 적절한 LLM 또는 로직으로 라우팅
+         *  - NDJSON 기반 스트리밍 응답을 받아 화면에 실시간 출력
+         * ==========================================================
+         */
+
+        routing_workflow = {
+
+            // 서버 엔드포인트 (Spring Boot Controller와 연결)
+            // 질문을 전달하면 서버 내부에서 "Routing 로직"이 실행됨
+            url:'/ch2/routing-workflow',
+
+            /*
+             * 초기화 함수
+             * - Send 버튼 클릭 이벤트 등록
+             * - 로딩 스피너 기본 숨김 처리
+             */
+            init:function(){
+                document.querySelector("#send_btn").addEventListener("click", ()=>{
+                    this.send();  // 버튼 클릭 시 send() 실행
+                })
+                document.querySelector("#spinner").style.cssText = "visibility:hidden;";
+            },
+
+            /*
+             * 사용자가 입력한 질문을 화면에 출력하는 함수
+             * - 채팅 UI에서 사용자 메시지 영역 생성
+             * - prepend()를 사용하여 최신 메시지가 위에 오도록 구성
+             */
+            makeQuestionHtml:function(question){
+
+            },
+
+            /*
+             * 챗봇 응답 영역을 생성하는 함수
+             * - 고유 ID를 생성하여 각 응답을 구분
+             * - 이후 Streaming 데이터가 이 영역에 append 됨
+             */
+            makeResponseHtml: async function(){
+
+            },
+
+            /*
+             * 실제 서버와 통신하는 핵심 함수
+             * 1. 스피너 표시
+             * 2. 질문 화면 출력
+             * 3. fetch로 서버 호출
+             * 4. Streaming 응답 처리
+             */
+            send:async function(){
+
+            },
+
+            /*
+             * Streaming 응답 처리 함수
+             * - ReadableStream을 사용하여 데이터를 chunk 단위로 읽음
+             * - LLM이 생성하는 텍스트를 실시간으로 화면에 출력
+             */
+            responseDisplay:async function(targetId, response) {
+
+            }
+        }
+
+        // 페이지 로드 완료 시 초기화 실행
+        window.onload = function(){
+            routing_workflow.init();
+        }
+    </script>
+
+
+    <div class="col-sm-10">
+        <h2 class="text-center">3. Routing Workflow</h2>
+        <div class="container py-2">
+            <div class="alert alert-light border small shadow-sm mb-3" role="note">
+                <p class="mb-2 font-weight-bold">라우팅(SIMPLE / COMPLEX / SEARCH) 검증용 예시 문장</p>
+                <ul class="mb-0 pl-3">
+                    <li class="mb-2">
+                        <span class="badge badge-success mr-1">SIMPLE</span>
+                        <strong>단순 대화</strong> —
+                        <code class="small text-dark" style="color: #212529 !important;">안녕? 오늘 기분이 어때? 간단하게 인사해줘.</code>
+                    </li>
+                    <li class="mb-2">
+                        <span class="badge badge-primary mr-1">COMPLEX</span>
+                        <strong>복잡한 설계·아키텍처</strong> —
+                        <code class="small text-dark" style="color: #212529 !important;">Spring Boot에서 Redis Pub/Sub을 이용한 비동기 알림 시스템을 구축하는 복잡한 아키텍처를 설계해줘.</code>
+                    </li>
+                    <li class="mb-0">
+                        <span class="badge badge-info mr-1">SEARCH</span>
+                        <strong>최신 트렌드·뉴스</strong> —
+                        <code class="small text-dark" style="color: #212529 !important;">현재 구글 검색 트렌드에서 가장 핫한 AI 관련 뉴스가 뭐야?</code>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="container py-5">
+
+            <div class="row d-flex justify-content-center">
+                <div class="col-sm-10">
+                    <button class="btn btn-primary" disabled id="spinner">
+                        <span class="spinner-border spinner-border-sm" ></span>
+                        Loading..
+                    </button>
+                    <div class="card">
+                        <div class="card-header text-muted d-flex justify-content-start align-items-center p-3">
+                            <div class="input-group mb-0">
+                                <input  id="question" type="text" class="form-control" placeholder="Type message" value="안녕? 오늘 기분이 어때? 간단하게 인사해줘."
+                                        aria-label="Recipient's username" aria-describedby="button-addon2" />
+                                <button type="button" class="btn btn-primary" id="send_btn">Send</button>
+                            </div>
+                        </div>
+                        <div id="result" class="card-body" data-mdb-perfect-scrollbar-init >
+
+
+                        </div> <!-- end result -->
+                    </div> <!-- end card -->
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+</html>

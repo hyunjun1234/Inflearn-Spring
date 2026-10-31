@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+
+
+<th:block>
+    <script>
+        /*
+         * ==========================================================
+         * 📌 Parallelization Workflow 객체
+         * ==========================================================
+         * ✔ 하나의 사용자 요청을 서버에서 여러 작업으로 병렬 처리
+         * ✔ 프론트엔드는 단일 API 호출
+         * ✔ 서버 내부에서는:
+         *      - 여러 AI 모델 동시 호출
+         *      - 기능별 작업 분리 (요약, 분석, 추천 등)
+         *      - 결과 병합 후 반환
+         * ✔ 응답은 스트리밍 방식으로 실시간 출력
+         */
+
+        parallelization_workflow = {
+
+            // 병렬 처리 서버 API 경로
+            url:'/ch2/parallel-workflow',
+
+            /*
+             * ----------------------------------------------------------
+             * 🔹 init()
+             * ----------------------------------------------------------
+             * - 페이지 로딩 시 최초 실행
+             * - 버튼 이벤트 연결
+             * - 스피너 초기 상태 숨김 처리
+             */
+            init:function(){
+
+                // Send 버튼 클릭 → send() 실행
+                // 화살표 함수 사용 이유:
+                // this가 parallelization_workflow 객체를 유지하도록 하기 위함
+                document.querySelector("#send_btn").addEventListener("click", ()=>{
+                    this.send();
+                })
+
+                // 로딩 스피너 숨김
+                document.querySelector("#spinner").style.cssText = "visibility:hidden;";
+            },
+
+            /*
+             * ----------------------------------------------------------
+             * 🔹 makeQuestionHtml()
+             * ----------------------------------------------------------
+             * - 사용자의 질문을 채팅 화면에 출력
+             * - UX 향상을 위해 서버 응답 전 먼저 화면에 표시
+             */
+            makeQuestionHtml:function(question){
+
+            },
+
+            /*
+             * ----------------------------------------------------------
+             * 🔹 makeResponseHtml()
+             * ----------------------------------------------------------
+             * - 챗봇 응답을 출력할 영역 생성
+             * - 스트리밍 데이터를 출력할 고유 ID 생성
+             */
+            makeResponseHtml: async function(){
+
+            },
+
+            /*
+             * ----------------------------------------------------------
+             * 🔹 send()
+             * ----------------------------------------------------------
+             * 전체 처리 흐름:
+             *   1️⃣ 스피너 표시 (로딩 시작)
+             *   2️⃣ 사용자 질문 화면 출력
+             *   3️⃣ 서버로 POST 요청 전송
+             *   4️⃣ 응답 출력 영역 생성
+             *   5️⃣ 스트리밍 응답 처리
+             */
+            send:async function(){
+
+            },
+
+            /*
+             * ----------------------------------------------------------
+             * 🔹 responseDisplay()
+             * ----------------------------------------------------------
+             * - 서버가 데이터를 한 번에 보내지 않고
+             *   chunk(조각) 단위로 전송
+             * - 실시간 AI 응답 UX 구현 핵심 로직
+             */
+            responseDisplay:async function(targetId, response) {
+
+            }
+        }
+
+        /*
+         * 페이지 로딩 완료 시 초기화 실행
+         */
+        window.onload = function(){
+            parallelization_workflow.init();
+        }
+    </script>
+
+
+    <div class="col-sm-10">
+        <h2 class="text-center">2. Parallelization Workflow</h2>
+        <div class="container py-2">
+            <div class="alert alert-light border small shadow-sm mb-3" role="note">
+                <p class="mb-2 font-weight-bold">기본 입력 예시 (입력창 기본값과 동일 · 기술·시장·글로벌 병렬 분석)</p>
+                <ul class="mb-0 pl-3">
+                    <li class="mb-0">
+                        <span class="badge badge-secondary mr-1">예시</span>
+                        <strong>지역 화폐·탄소 보상 시스템</strong> —
+                        <code class="small text-dark" style="color: #212529 !important;">개인이 텀블러 사용이나 대중교통 이용 등 탄소 절감 활동을 인증하면, 이를 블록체인 기반 토큰으로 보상해주고 지역 상점에서 결제할 수 있게 하는 지역 화폐 시스템</code>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="container py-5">
+
+            <div class="row d-flex justify-content-center">
+                <div class="col-sm-10">
+                    <button class="btn btn-primary" disabled id="spinner">
+                        <span class="spinner-border spinner-border-sm" ></span>
+                        Loading..
+                    </button>
+                    <div class="card">
+                        <div class="card-header text-muted d-flex justify-content-start align-items-center p-3">
+                            <div class="input-group mb-0">
+                                <input  id="question" type="text" class="form-control" placeholder="Type message" value="개인이 텀블러 사용이나 대중교통 이용 등 탄소 절감 활동을 인증하면, 이를 블록체인 기반 토큰으로 보상해주고 지역 상점에서 결제할 수 있게 하는 지역 화폐 시스템"
+                                        aria-label="Recipient's username" aria-describedby="button-addon2" />
+                                <button type="button" class="btn btn-primary" id="send_btn">Send</button>
+                            </div>
+                        </div>
+                        <div id="result" class="card-body" data-mdb-perfect-scrollbar-init >
+
+
+                        </div> <!-- end result -->
+                    </div> <!-- end card -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</th:block>
+
+</html>

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+
+
+<th:block>
+    <script>
+
+        /**
+         * chat_workflow 객체
+         * ============================================================
+         * ✔ 목적
+         *   - Chain Workflow 기반 LLM 처리 결과를
+         *     스트리밍(NDJSON) 방식으로 화면에 출력
+         *
+         * ✔ Chain Workflow란?
+         *   하나의 요청을 여러 단계로 나누어 순차적으로 처리하는 구조
+         *
+         *   예시:
+         *   1️⃣ Idea Analysis
+         *   2️⃣ Market Research
+         *   3️⃣ Business Strategy
+         *   4️⃣ Final Report Generation
+         *
+         * ✔ 강의 핵심 포인트
+         *   - NDJSON 스트리밍 처리
+         *   - 단계별 LLM 오케스트레이션
+         *   - UX 관점에서 실시간 결과 표시
+         */
+
+        chat_workflow = {
+
+            // Chain Workflow 서버 엔드포인트
+            url:'/ch2/chain-workflow',
+
+            /**
+             * 초기화
+             * --------------------------------------------------
+             * ✔ 버튼 이벤트 등록
+             * ✔ 스피너 초기 숨김
+             */
+            init:function(){
+                document.querySelector("#send_btn").addEventListener("click", ()=>{
+                    this.send();
+                })
+                document.querySelector("#spinner").style.cssText = "visibility:hidden;";
+            },
+
+            /**
+             * 사용자 질문 화면 출력
+             * --------------------------------------------------
+             * ✔ 질문을 먼저 UI에 표시 (UX 향상)
+             */
+            makeQuestionHtml:function(question){
+
+            },
+
+            /**
+             * 응답 출력 영역 생성
+             * --------------------------------------------------
+             * ✔ 스트리밍 데이터를 누적 출력할 영역 생성
+             * ✔ 고유 ID 반환
+             */
+            makeResponseHtml: async function(){
+
+            },
+
+            /**
+             * 서버 요청
+             * ============================================================
+             * ✔ Chain Workflow 실행 요청
+             * ✔ NDJSON 스트리밍 응답 수신
+             *
+             * 💡 Accept: application/x-ndjson
+             *   - Newline Delimited JSON
+             *   - 한 줄에 하나의 JSON 객체
+             *   - 단계별 결과를 순차적으로 전달할 때 매우 유용
+             */
+            send:async function(){
+
+            },
+
+            /**
+             * 스트리밍 응답 처리 (핵심)
+             * ============================================================
+             * ✔ response.body → ReadableStream
+             * ✔ chunk 단위 수신
+             * ✔ NDJSON 기반 단계별 출력
+             *
+             * 💡 서버에서 예시로 이런 데이터가 올 수 있음:
+             *
+             * {"stage":"analysis","content":"아이디어 분석 중..."}
+             * {"stage":"market","content":"시장 조사 결과..."}
+             * {"stage":"strategy","content":"비즈니스 전략..."}
+             */
+            responseDisplay:async function(targetId, response) {
+
+            }
+        }
+
+        /**
+         * DOM 로딩 완료 후 초기화
+         */
+        window.onload = function(){
+            chat_workflow.init();
+        }
+
+    </script>
+
+
+    <div class="col-sm-10">
+        <h2 class="text-center">1. Chain Workflow</h2>
+        <div class="container py-2">
+            <div class="alert alert-light border small shadow-sm mb-3" role="note">
+                <p class="mb-2 font-weight-bold">입력 예시 (화면 기본값과 같은 문장을 붙여 넣어 볼 수 있습니다)</p>
+                <ul class="mb-0 pl-3">
+                    <li class="mb-2">
+                        <span class="badge badge-secondary mr-1">예시 1</span>
+                        <strong>힐링 여행 아이디어</strong> —
+                        <code class="small text-dark" style="color: #212529 !important;">2월 말, 혼자 떠나는 제주도 2박 3일 힐링 여행. 조용한 카페와 책방 위주로 가고 싶어</code>
+                    </li>
+                    <li class="mb-2">
+                        <span class="badge badge-secondary mr-1">예시 2</span>
+                        <strong>기술 리포트 주제</strong> —
+                        <code class="small text-dark" style="color: #212529 !important;">양자 컴퓨터의 원리인 중첩과 얽힘이 현대 암호화 기술에 미치는 영향에 대한 기술 리포트</code>
+                    </li>
+                    <li class="mb-0">
+                        <span class="badge badge-secondary mr-1">예시 3 · 기본값</span>
+                        <strong>스타트업 아이디어</strong> —
+                        <code class="small text-dark" style="color: #212529 !important;">버려지는 커피 찌꺼기를 활용해 3D 프린터용 친환경 필라멘트를 만드는 스타트업 아이디어</code>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="container py-5">
+
+            <div class="row d-flex justify-content-center">
+                <div class="col-sm-10">
+                    <button class="btn btn-primary" disabled id="spinner">
+                        <span class="spinner-border spinner-border-sm" ></span>
+                        Loading..
+                    </button>
+                    <div class="card">
+                        <div class="card-header text-muted d-flex justify-content-start align-items-center p-3">
+                            <div class="input-group mb-0">
+                                <input  id="question" type="text" class="form-control" placeholder="Type message" value="버려지는 커피 찌꺼기를 활용해 3D 프린터용 친환경 필라멘트를 만드는 스타트업 아이디어"
+                                        aria-label="Recipient's username" aria-describedby="button-addon2" />
+                                <button type="button" class="btn btn-primary" id="send_btn">Send</button>
+                            </div>
+                        </div>
+                        <div id="result" class="card-body" data-mdb-perfect-scrollbar-init >
+
+
+                        </div> <!-- end result -->
+                    </div> <!-- end card -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</th:block>
+
+</html>
